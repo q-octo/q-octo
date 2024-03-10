@@ -13,10 +13,10 @@
   @endverbatim
   ****************************(C)SWJTU_ROBOTCON****************************
   **/
-#include "main.h"
-#include "can.h"
+#include "CANSAME5x.h"
 #include "cybergear.h"
 #include <string.h>
+
 
 CAN_RxHeaderTypeDef rxMsg;    // RX structure
 CAN_TxHeaderTypeDef txMsg;    // TX configuration structure
@@ -25,9 +25,30 @@ uint32_t Motor_Can_ID;        // Motor ID for received data
 uint8_t byte[4];              // Temporary data for conversion
 uint32_t send_mail_box = {0}; // NONE
 
-#define can_txd() HAL_CAN_AddTxMessage(&hcan, &txMsg, tx_data, &send_mail_box) // CAN send macro
+CANSAME5x CAN;
+
+// #define can_txd() HAL_CAN_AddTxMessage(&hcan, &txMsg, tx_data, &send_mail_box) // CAN send macro
+
 
 MI_Motor mi_motor[2]; // Predefine 2 Xiaomi motors
+
+static void init_can() {
+  // start the CAN bus at 250 kbps
+  if (!CAN.begin(250000)) {
+    // TODO This may require Arduino.h
+    Serial.println("Starting CAN failed!");
+    while (1) delay(10);
+  }
+}
+
+static void sendCANPacket(long id, const u_int8_t data) {
+  // Remote transmission request
+  bool rtr = false; 
+  CAN.beginExtendedPacket(id, len, rtr);
+
+  CAN.write(&data, sizeof(data));
+  CAN.endPacket(); 
+}
 
 /**
  * @brief          Convert float to 4-byte array
@@ -91,7 +112,7 @@ static int float_to_uint(float x, float x_min, float x_max, int bits)
 static void Set_Motor_Parameter(MI_Motor *Motor, uint16_t Index, float Value, char Value_type)
 {
   uint8_t tx_data[8];
-  txMsg.ExtId = Communication_Type_SetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  uint32_t tx_msg_id = Communication_Type_SetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
   tx_data[0] = Index;
   tx_data[1] = Index >> 8;
   tx_data[2] = 0x00;
@@ -111,7 +132,7 @@ static void Set_Motor_Parameter(MI_Motor *Motor, uint16_t Index, float Value, ch
     tx_data[6] = 0x00;
     tx_data[7] = 0x00;
   }
-  can_txd();
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -148,8 +169,8 @@ static void Motor_Data_Handler(MI_Motor *Motor, uint8_t DataFrame[8], uint32_t I
 void check_cybergear(uint8_t ID)
 {
   uint8_t tx_data[8] = {0};
-  txMsg.ExtId = Communication_Type_GetID << 24 | Master_CAN_ID << 8 | ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_GetID << 24 | Master_CAN_ID << 8 | ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -160,8 +181,8 @@ void check_cybergear(uint8_t ID)
 void start_cybergear(MI_Motor *Motor)
 {
   uint8_t tx_data[8] = {0};
-  txMsg.ExtId = Communication_Type_MotorEnable << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_MotorEnable << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -174,8 +195,8 @@ void stop_cybergear(MI_Motor *Motor, uint8_t clear_error)
 {
   uint8_t tx_data[8] = {0};
   tx_data[0] = clear_error; // Set clear error bit
-  txMsg.ExtId = Communication_Type_MotorStop << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_MotorStop << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -209,8 +230,8 @@ void set_zeropos_cybergear(MI_Motor *Motor)
 {
   uint8_t tx_data[8] = {0};
   tx_data[0] = 1;
-  txMsg.ExtId = Communication_Type_SetPosZero << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_SetPosZero << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -222,9 +243,9 @@ void set_zeropos_cybergear(MI_Motor *Motor)
 void set_CANID_cybergear(MI_Motor *Motor, uint8_t CAN_ID)
 {
   uint8_t tx_data[8] = {0};
-  txMsg.ExtId = Communication_Type_CanID << 24 | CAN_ID << 16 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  uint32_t tx_msg_id = Communication_Type_CanID << 24 | CAN_ID << 16 | Master_CAN_ID << 8 | Motor->CAN_ID;
   Motor->CAN_ID = CAN_ID; // Load the new ID into the motor structure
-  can_txd();
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /**
@@ -238,7 +259,7 @@ void set_CANID_cybergear(MI_Motor *Motor, uint8_t CAN_ID)
 void init_cybergear(MI_Motor *Motor, uint8_t Can_Id, uint8_t mode)
 {
   txMsg.StdId = 0;          // Configure CAN send: clear standard frame
-  txMsg.ExtId = 0;          // Configure CAN send: clear extended frame
+  uint32_t tx_msg_id = 0;          // Configure CAN send: clear extended frame
   txMsg.IDE = CAN_ID_EXT;   // Configure CAN send: extended frame
   txMsg.RTR = CAN_RTR_DATA; // Configure CAN send: data frame
   txMsg.DLC = 0x08;         // Configure CAN send: data length
@@ -271,8 +292,8 @@ void motor_controlmode(MI_Motor *Motor, float torque, float MechPosition, float 
   tx_data[6] = float_to_uint(kd, KD_MIN, KD_MAX, 16) >> 8;
   tx_data[7] = float_to_uint(kd, KD_MIN, KD_MAX, 16);
 
-  txMsg.ExtId = Communication_Type_MotionControl << 24 | float_to_uint(torque, T_MIN, T_MAX, 16) << 8 | Motor->CAN_ID; // Load extended frame data
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_MotionControl << 24 | float_to_uint(torque, T_MIN, T_MAX, 16) << 8 | Motor->CAN_ID; // Load extended frame data
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 void motor_position_control(MI_Motor *Motor, float desiredPosition)
@@ -285,8 +306,8 @@ void motor_position_control(MI_Motor *Motor, float desiredPosition)
   // tx_data[6] = float_to_uint(desiredPosition, -3.14f, 3.14f, 32) >> 8;
   // tx_data[7] = float_to_uint(desiredPosition, -3.14f, 3.14f, 32);
   memcpy(&tx_data[4], &desiredPosition, 4);
-  txMsg.ExtId = Communication_Type_SetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_SetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 extern void motor_get_angle(MI_Motor *Motor)
@@ -294,8 +315,8 @@ extern void motor_get_angle(MI_Motor *Motor)
   uint8_t tx_data[8];
   tx_data[0] = 0x15;
   tx_data[1] = 0x30;
-  txMsg.ExtId = Communication_Type_GetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
-  can_txd();
+  uint32_t tx_msg_id = Communication_Type_GetSingleParameter << 24 | Master_CAN_ID << 8 | Motor->CAN_ID;
+  sendCANPacket(tx_msg_id, tx_data);
 }
 
 /***************************** Callback function responsible for receiving returned information Can be moved elsewhere *****************************/

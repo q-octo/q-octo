@@ -13,8 +13,7 @@
   @endverbatim
   ****************************(C)SWJTU_ROBOTCON****************************
   **/
-#include "main.h"
-#include "can.h"
+
 // Control parameters (do not change unless you have to)
 #define P_MIN (-12.5f)
 #define P_MAX 12.5f
