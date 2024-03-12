@@ -108,6 +108,7 @@ typedef struct
 } MI_Motor;
 extern MI_Motor mi_motor[2]; // Define two motors here
 
+extern void init_can();
 extern void check_cybergear(uint8_t ID);
 extern void start_cybergear(MI_Motor *Motor);
 extern void stop_cybergear(MI_Motor *Motor, uint8_t clear_error);

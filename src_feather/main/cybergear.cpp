@@ -32,7 +32,7 @@ CANSAME5x CAN;
 
 MI_Motor mi_motor[2]; // Predefine 2 Xiaomi motors
 
-static void init_can() {
+void init_can() {
   // start the CAN bus at 250 kbps
   if (!CAN.begin(250000)) {
     // TODO This may require Arduino.h
@@ -45,7 +45,6 @@ static void sendCANPacket(long id, const u_int8_t data) {
   // Remote transmission request
   bool rtr = false; 
   CAN.beginExtendedPacket(id, len, rtr);
-
   CAN.write(&data, sizeof(data));
   CAN.endPacket(); 
 }
