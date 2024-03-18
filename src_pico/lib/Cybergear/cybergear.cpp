@@ -13,40 +13,18 @@
   @endverbatim
   ****************************(C)SWJTU_ROBOTCON****************************
   **/
-#include "CANSAME5x.h"
-#include "cybergear.h"
+// #include "CANSAME5x.h"
+#include <can.h>
+#include <cybergear.h>
 #include <string.h>
 
-
-CAN_RxHeaderTypeDef rxMsg;    // RX structure
-CAN_TxHeaderTypeDef txMsg;    // TX configuration structure
-uint8_t rx_data[8];           // RX data
-uint32_t Motor_Can_ID;        // Motor ID for received data
-uint8_t byte[4];              // Temporary data for conversion
-uint32_t send_mail_box = {0}; // NONE
-
-CANSAME5x CAN;
-
-// #define can_txd() HAL_CAN_AddTxMessage(&hcan, &txMsg, tx_data, &send_mail_box) // CAN send macro
-
+uint8_t temp_byte[4]; // Temporary data for conversion
 
 MI_Motor mi_motor[2]; // Predefine 2 Xiaomi motors
 
-void init_can() {
-  // start the CAN bus at 250 kbps
-  if (!CAN.begin(250000)) {
-    // TODO This may require Arduino.h
-    Serial.println("Starting CAN failed!");
-    while (1) delay(10);
-  }
-}
-
-static void sendCANPacket(long id, const u_int8_t data) {
-  // Remote transmission request
-  bool rtr = false; 
-  CAN.beginExtendedPacket(id, len, rtr);
-  CAN.write(&data, sizeof(data));
-  CAN.endPacket(); 
+static void sendCANPacket(uint32_t id, uint8_t *data)
+{
+  CanCommunication::sendCANPacket(id, data);
 }
 
 /**
@@ -59,11 +37,11 @@ static uint8_t *Float_to_Byte(float f)
 {
   unsigned long longdata = 0;
   longdata = *(unsigned long *)&f;
-  byte[0] = (longdata & 0xFF000000) >> 24;
-  byte[1] = (longdata & 0x00FF0000) >> 16;
-  byte[2] = (longdata & 0x0000FF00) >> 8;
-  byte[3] = (longdata & 0x000000FF);
-  return byte;
+  temp_byte[0] = (longdata & 0xFF000000) >> 24;
+  temp_byte[1] = (longdata & 0x00FF0000) >> 16;
+  temp_byte[2] = (longdata & 0x0000FF00) >> 8;
+  temp_byte[3] = (longdata & 0x000000FF);
+  return temp_byte;
 }
 
 /**
@@ -119,10 +97,10 @@ static void Set_Motor_Parameter(MI_Motor *Motor, uint16_t Index, float Value, ch
   if (Value_type == 'f')
   {
     Float_to_Byte(Value);
-    tx_data[4] = byte[3];
-    tx_data[5] = byte[2];
-    tx_data[6] = byte[1];
-    tx_data[7] = byte[0];
+    tx_data[4] = temp_byte[3];
+    tx_data[5] = temp_byte[2];
+    tx_data[6] = temp_byte[1];
+    tx_data[7] = temp_byte[0];
   }
   else if (Value_type == 's')
   {
@@ -257,12 +235,13 @@ void set_CANID_cybergear(MI_Motor *Motor, uint8_t CAN_ID)
  */
 void init_cybergear(MI_Motor *Motor, uint8_t Can_Id, uint8_t mode)
 {
+  /*
   txMsg.StdId = 0;          // Configure CAN send: clear standard frame
-  uint32_t tx_msg_id = 0;          // Configure CAN send: clear extended frame
+  uint32_t tx_msg_id = 0;   // Configure CAN send: clear extended frame
   txMsg.IDE = CAN_ID_EXT;   // Configure CAN send: extended frame
   txMsg.RTR = CAN_RTR_DATA; // Configure CAN send: data frame
   txMsg.DLC = 0x08;         // Configure CAN send: data length
-
+  */
   Motor->CAN_ID = Can_Id;          // Set ID
   set_mode_cybergear(Motor, mode); // Set motor mode
   start_cybergear(Motor);          // Enable motor
@@ -324,33 +303,33 @@ extern void motor_get_angle(MI_Motor *Motor)
  * @param[in]      hcan: CAN handle pointer
  * @retval         none
  */
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+void cybergear_receive_can_message(int packetSize, long packetId, uint8_t *packetData)
 {
-  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);                // Toggle LED to indicate activity
-  HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxMsg, rx_data); // Receive data
-  Motor_Can_ID = Get_Motor_ID(rxMsg.ExtId);                  // First, get the returned motor ID information
-  switch (Motor_Can_ID)                                      // Extract corresponding motor information to its structure
+  // HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);                // Toggle LED to indicate activity
+  // HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxMsg, rx_data); // Receive data
+  uint32_t motor_id = Get_Motor_ID(packetId); // First, get the returned motor ID information
+  switch (motor_id)                  // Extract corresponding motor information to its structure
   {
   case 0X01: // Motor 0
-    if (rxMsg.ExtId >> 24 != 0)
+    if (packetId >> 24 != 0)
     { // Check if it is broadcast mode
-      Motor_Data_Handler(&mi_motor[0], rx_data, rxMsg.ExtId);
+      Motor_Data_Handler(&mi_motor[0], packetData, packetId);
       mi_motor[0].Angle = mi_motor[0].Angle - MOTOR0_ANGLE_OFFSET;
     }
     else
     {
-      mi_motor[0].MCU_ID = rx_data[0];
+      mi_motor[0].MCU_ID = packetData[0];
     }
     break;
   case 0X02: // Motor 1
-    if (rxMsg.ExtId >> 24 != 0)
+    if (packetId >> 24 != 0)
     { // Check if it is broadcast mode
-      Motor_Data_Handler(&mi_motor[1], rx_data, rxMsg.ExtId);
+      Motor_Data_Handler(&mi_motor[1], packetData, packetId);
       mi_motor[1].Angle = mi_motor[1].Angle - MOTOR1_ANGLE_OFFSET;
     }
     else
     {
-      mi_motor[1].MCU_ID = rx_data[1];
+      mi_motor[1].MCU_ID = packetData[1];
     }
     break;
   default:

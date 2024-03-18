@@ -108,7 +108,6 @@ typedef struct
 } MI_Motor;
 extern MI_Motor mi_motor[2]; // Define two motors here
 
-extern void init_can();
 extern void check_cybergear(uint8_t ID);
 extern void start_cybergear(MI_Motor *Motor);
 extern void stop_cybergear(MI_Motor *Motor, uint8_t clear_error);
@@ -120,3 +119,4 @@ extern void init_cybergear(MI_Motor *Motor, uint8_t Can_Id, uint8_t mode);
 extern void motor_controlmode(MI_Motor *Motor, float torque, float MechPosition, float speed, float kp, float kd);
 extern void motor_position_control(MI_Motor *Motor, float desiredPosition);
 extern void motor_get_angle(MI_Motor *Motor);
+extern void cybergear_receive_can_message(int packetSize, long packetId, uint8_t *packetData);

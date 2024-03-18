@@ -1,0 +1,3 @@
+## Notes to self
+
+How to compile...
