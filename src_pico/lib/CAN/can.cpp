@@ -9,7 +9,18 @@
 #define CAN_BAUDRATE (250000)
 Adafruit_MCP2515 mcp(CS_PIN);
 
-void (*onExtendedPacketReceived)(int, long, uint8_t *);
+void (*onExtendedPacketReceived)(int, uint32_t, uint8_t *);
+
+
+void check() {
+    Serial.println("Checking");
+    if (mcp.parsePacket()) {
+        Serial.println("Received packet!!");
+    } else {
+        Serial.println("No packet received");
+    }
+
+}
 
 void onReceive(int packetSize)
 {
@@ -56,27 +67,64 @@ void onReceive(int packetSize)
     Serial.println();
 }
 
-void CanCommunication::init(void (*callback)(int, long, uint8_t *)) // packetLength, packetId, packetData
+void CanCommunication::init(void (*callback)(int, uint32_t, uint8_t *)) // packetLength, packetId, packetData
 {
     if (!mcp.begin(CAN_BAUDRATE))
     {
         Serial.println("Starting CAN (MCP2515) failed!");
-        while (1)
-            delay(10);
+        // Loop forever
+        while (1) delay(10);
     }
+    Serial.println("MCP2515 Initialized Successfully!");
 
     mcp.onReceive(INT_PIN, onReceive);
 
+
+    // ACK our own transmitted packets
+    // TODO we shouldn't do this but the motor isn't ACKing our packets
+    // if (mcp.loopback() == 0) {
+    //     Serial.println("MCP2515 Loopback mode failed");
+    // } else {
+    //     Serial.println("MCP2515 Loopback mode set");
+    // }
+
     onExtendedPacketReceived = callback;
+    Serial.println("CAN init complete");
 }
 
-void CanCommunication::sendCANPacket(long id, uint8_t *data)
+void CanCommunication::sendCANPacket(uint32_t id, uint8_t *data)
 {
+    if (mcp.parsePacket()) {
+        Serial.println("Tried to send packet but a receive packet was pending");
+        return;
+    }
+    Serial.print("Sending packet with id 0x");
+    Serial.println(id, HEX);
     // Remote transmission request (false for data frame, true for remote frame)
     bool rtr = false;
     // Data Length Code (how many bytes are being transmitted)
     int dlc = 8;
-    mcp.beginExtendedPacket(id, dlc, rtr);
-    mcp.write(data, sizeof(data));
-    mcp.endPacket();
+    int beginPacketResult = mcp.beginExtendedPacket(id, dlc, rtr);
+    if (beginPacketResult == 0)
+    {
+        Serial.println("Failed to begin packet");
+        return;
+    }
+    Serial.println("Packet begun");
+    mcp.write(data, dlc);
+    // for (int i = 0; i < dlc; i++)
+    // {
+    //     mcp.write(data[i]);
+    //     Serial.print("write ");
+    //     Serial.println(data[i]);
+    // }
+    
+    int endPacketResult = mcp.endPacket();
+    if (endPacketResult == 0)
+    {
+        Serial.println("Failed to end packet");
+        return;
+    }
+    Serial.println("Packet sent");
+
 }

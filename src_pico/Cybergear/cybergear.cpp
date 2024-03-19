@@ -333,6 +333,7 @@ void cybergear_receive_can_message(int packetSize, long packetId, uint8_t *packe
     }
     break;
   default:
+    Serial.println("Unknown motor ID");
     break;
   }
 }
