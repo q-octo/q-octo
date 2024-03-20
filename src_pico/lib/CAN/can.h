@@ -10,6 +10,4 @@ public:
     static void sendCANPacket(uint32_t id, uint8_t *data);
 };
 
-
-extern void check();
 #endif // CAN_H
