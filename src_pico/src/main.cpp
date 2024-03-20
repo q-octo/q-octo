@@ -9,7 +9,7 @@
 
 unsigned long previousMillis = 0; // will store last time a message was send
 
-uint8_t CYBERGEAR_CAN_ID = 0x7E;
+uint8_t CYBERGEAR_CAN_ID = 0x7F;
 uint8_t MASTER_CAN_ID = 0x00;
 XiaomiCyberGearDriver cybergear = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID, MASTER_CAN_ID);
 
@@ -52,52 +52,26 @@ void setup()
   Serial.println("Hello, we're live!");
 
   CanCommunication::init(onReceiveExtendedCANPacket);
+  // delay(500);
   Serial.println("CAN init complete, setting up motor...");
-  setupViaLibrary();
-  Serial.println("Motor setup complete!");
-
-
-  // for (size_t i = 0; i < 128; i++)
-  // {
-
-  //     init_cybergear(&mi_motor[0], i, Position_mode);
-  //     check_cybergear(i);
-  //     delay(10);
-  // }
+  cybergear.init_motor(MODE_CURRENT);
+  // delay(500);
+  cybergear.request_status();
+  Serial.println("Requested status");
 }
 
 void loop()
 { 
-  // delay(1000);
-  Serial.println("Looping...");
-
-  static float pos = 0.0;
-  static float inc_val = 1;
-  pos += inc_val;
-  if (pos > 10.0)
-    inc_val = -1;
-  if (pos < -10.0)
-    inc_val = 1;
-  cybergear.set_position_ref(pos);
-
+  delay(1000);
   XiaomiCyberGearStatus cybergear_status = cybergear.get_status();
   char buffer[100]; // Adjust the size as necessary
   sprintf(buffer, "POS:%f V:%f T:%f temp:%d\n", cybergear_status.position, cybergear_status.speed, cybergear_status.torque, cybergear_status.temperature);
   Serial.print(buffer);
 
-  // Serial.printf("POS:%f V:%f T:%f temp:%d\n", cybergear_status.position, cybergear_status.speed, cybergear_status.torque, cybergear_status.temperature);
-
-  // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
+    // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= TRANSMIT_RATE_MS)
-  {
+  if (currentMillis - previousMillis >= TRANSMIT_RATE_MS) {
     previousMillis = currentMillis;
     cybergear.request_status();
   }
-
-  // // Wait 3 seconds
-  // delay(3000);
-  // motor_position_control(&mi_motor[0], 6);
-  // delay(3000);
-  // motor_position_control(&mi_motor[0], 0.0);
 }

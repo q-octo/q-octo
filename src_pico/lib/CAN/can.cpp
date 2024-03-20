@@ -77,7 +77,7 @@ void CanCommunication::init(void (*callback)(int, uint32_t, uint8_t *)) // packe
     }
     Serial.println("MCP2515 Initialized Successfully!");
 
-    mcp.onReceive(INT_PIN, onReceive);
+    // mcp.onReceive(INT_PIN, onReceive);
 
 
     // ACK our own transmitted packets
