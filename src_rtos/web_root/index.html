@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<body>
+    <script src="htmx.min.js"></script>
+
+    <style>
+        .floating {  
+            animation-name: floating;
+            animation-duration: 3s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            margin-left: 30px;
+            margin-top: 5px;
+        }
+        
+        @keyframes floating {
+            0% { transform: translate(0,  0px); }
+            50%  { transform: translate(0, 15px); }
+            100%   { transform: translate(0, -0px); }    
+        }
+    </style>
+
+<center>
+        <h1 class="floating" style="color:blue">How many times has this LED blinked?</h1>
+    
+        <!-- Spacer -->
+        <br>
+
+        <div style="font-size: 42px;" hx-get="/api/blink" hx-trigger="every 1s">Loading...</div>
+    </center>
+</body>
