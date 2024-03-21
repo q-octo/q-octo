@@ -1,5 +1,4 @@
 #include "xiaomi_cybergear_driver.h"
-// #include "HardwareSerial.h"
 #include "can.h"
 
 /* PUBLIC */
@@ -125,27 +124,6 @@ float XiaomiCyberGearDriver::_uint_to_float(uint16_t x, float x_min, float x_max
 void XiaomiCyberGearDriver::_send_can_package(uint8_t can_id, uint8_t cmd_id, uint16_t option, uint8_t len, uint8_t* data){
     uint32_t id = cmd_id << 24 | option << 8 | can_id;
     CanCommunication::sendCANPacket(id, data);
-    // 
-
-    /*
-    twai_message_t message;
-    message.extd = id;
-    message.identifier = id;
-    message.data_length_code = len;
-    for (int i = 0; i < len; i++) {
-        message.data[i] = data[i];
-    }
-    */
-
-
-    /*
-    // Queue message for transmission
-    if (twai_transmit(&message, pdMS_TO_TICKS(1000)) == ESP_OK) {
-        // if (_use_serial_debug) Serial.println("Message queued for transmission\n");
-    } else {
-        if (_use_serial_debug) Serial.println("Failed to queue message for transmission\n");
-    }
-    */
 }
 
 
