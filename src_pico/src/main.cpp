@@ -1,5 +1,4 @@
 #include <Arduino.h>
-// #include "cybergear.h"
 #include "can.h"
 #include "xiaomi_cybergear_driver.h"
 
@@ -7,15 +6,64 @@
 #define TRANSMIT_RATE_MS 1000
 #define POLLING_RATE_MS 1000
 
+#define MOTOR_SPEED_LIMIT 10.0f
+#define MOTOR_CURRENT_LIMIT 5.0f
+
 unsigned long previousMillis = 0; // will store last time a message was send
 
-uint8_t CYBERGEAR_CAN_ID_L = 0x7E;
-uint8_t CYBERGEAR_CAN_ID_R = 0x7F;
-uint8_t MASTER_CAN_ID = 0x00;
+const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
+const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
+const uint8_t MASTER_CAN_ID = 0x00;
 XiaomiCyberGearDriver cybergearL = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
 XiaomiCyberGearDriver cybergearR = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
 
-static void onReceiveExtendedCANPacket(int packetSize, uint32_t packetId, uint8_t *packetData)
+void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData, bool extended);
+void initMotors();
+void debugAlternateMotorSpeed();
+void debugPrintMotorStatus();
+
+void setup()
+{
+  // Start serial communication
+  Serial.begin(115200);
+  while (!Serial)
+    delay(10);
+  Serial.println("Hello, we're live!");
+
+  CanCommunication::init(onReceiveCanPacket);
+  Serial.println("CAN init complete, setting up motor...");
+  initMotors();
+}
+
+void loop()
+{
+  CanCommunication::checkForPacket();
+  debugPrintMotorStatus();
+  debugAlternateMotorSpeed();
+
+  // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= TRANSMIT_RATE_MS)
+  {
+    previousMillis = currentMillis;
+    cybergearL.request_status();
+    cybergearR.request_status();
+  }
+}
+
+void initMotors()
+{
+  cybergearL.init_motor(MODE_SPEED);
+  cybergearL.set_limit_speed(MOTOR_SPEED_LIMIT);
+  cybergearL.set_limit_current(MOTOR_CURRENT_LIMIT);
+  cybergearL.enable_motor();
+  cybergearR.init_motor(MODE_SPEED);
+  cybergearR.set_limit_speed(MOTOR_SPEED_LIMIT);
+  cybergearR.set_limit_current(MOTOR_CURRENT_LIMIT);
+  cybergearR.enable_motor();
+}
+
+void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData)
 {
   Serial.print("main.cpp: Received packet with id 0x");
   Serial.print(packetId, HEX);
@@ -24,83 +72,35 @@ static void onReceiveExtendedCANPacket(int packetSize, uint32_t packetId, uint8_
   {
     cybergearL.process_message(packetData);
   }
-
-  // cybergear_receive_can_message(packetSize, packetId, packetData);
-  // process_message(packetData);
+  else if (((packetId & 0xFF00) >> 8) == CYBERGEAR_CAN_ID_R)
+  {
+    cybergearR.process_message(packetData);
+  }
+  else
+  {
+    Serial.println("main.cpp: Received packet from unknown device");
+  }
 }
 
-
-
-/*
-static void setupViaLibrary()
+void debugAlternateMotorSpeed()
 {
-  cybergearL.init_motor(MODE_POSITION);
-  Serial.println("init_motor");
-  cybergear.set_limit_speed(10.0f); // set the maximum speed of the motor
-  Serial.println("set_limit_speed");
-  cybergear.set_limit_current(5.0); // current limit allows faster operation 
-  Serial.println("set_limit_current");
-  cybergear.enable_motor();        // turn on the motor 
-  Serial.println("enable_motor");
-
-  cybergear.set_position_ref(0.0); // set initial rotor position
-  Serial.println("set_position_ref");
-  cybergear.stop_motor();          // stop the motor
-  Serial.println("stop_motor");
-}
-*/
-
-void setup()
-{
-  Serial.begin(115200);
-  while (!Serial)
-    delay(10);
-  Serial.println("Hello, we're live!");
-
-  CanCommunication::init(onReceiveExtendedCANPacket);
-  // delay(500);
-  Serial.println("CAN init complete, setting up motor...");
-  cybergearL.init_motor(MODE_SPEED);
-  cybergearL.set_limit_speed(10.0f);    /* set the maximum speed of the motor */
-  cybergearL.set_limit_current(5.0);    /* current limit allows faster operation */
-  cybergearL.enable_motor();            /* turn on the motor */
-  // cybergear.set_position_ref(0.0);     /* set initial rotor position */
-  cybergearR.init_motor(MODE_SPEED);
-  cybergearR.set_limit_speed(10.0f);    /* set the maximum speed of the motor */
-  cybergearR.set_limit_current(5.0);    /* current limit allows faster operation */
-  cybergearR.enable_motor();            /* turn on the motor */
-
-  
-
-  // delay(500);
-  // cybergear.request_status();
-  // Serial.println("Requested status");
-}
-
-void loop()
-{ 
-  delay(1000);
-  XiaomiCyberGearStatus cybergear_status = cybergearL.get_status();
-  char buffer[100]; // Adjust the size as necessary
-  sprintf(buffer, "POS:%f V:%f T:%f temp:%d\n", cybergear_status.position, cybergear_status.speed, cybergear_status.torque, cybergear_status.temperature);
-  Serial.print(buffer);
-
   cybergearR.set_speed_ref(0);
   cybergearL.set_speed_ref(2);
   delay(1000);
   cybergearL.set_speed_ref(0);
   cybergearR.set_speed_ref(2);
+  delay(1000);
+}
 
-    // cybergear.set_speed_ref(12);
-
-  // cybergear.set_position_ref(1);
-  // delay(1000);
-  // cybergear.set_position_ref(-1);
-
-    // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
-  // unsigned long currentMillis = millis();
-  // if (currentMillis - previousMillis >= TRANSMIT_RATE_MS) {
-  //   previousMillis = currentMillis;
-  //   cybergearL.request_status();
-  // }
+void debugPrintMotorStatus()
+{
+  XiaomiCyberGearStatus statusL = cybergearL.get_status();
+  XiaomiCyberGearStatus statusR = cybergearR.get_status();
+  // Adjust the size as necessary
+  char bufferL[100];
+  char bufferR[100];
+  sprintf(bufferL, "L: POS:%f V:%f T:%f temp:%d\n", statusL.position, statusL.speed, statusL.torque, statusL.temperature);
+  sprintf(bufferR, "R: POS:%f V:%f T:%f temp:%d\n", statusR.position, statusR.speed, statusR.torque, statusR.temperature);
+  Serial.print(bufferL);
+  Serial.print(bufferR);
 }

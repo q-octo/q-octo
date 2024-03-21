@@ -3,10 +3,13 @@
 
 #include <Adafruit_MCP2515.h>
 
+typedef void (*PacketCallback)(int packetLength, uint32_t packetId, uint8_t *packetData, bool extended);
+
 class CanCommunication
 {
 public:
-    static void init(void (*callback)(int, uint32_t, uint8_t*)); // packetSize, packetId, packetData
+    static void init(PacketCallback callback);
+    static void checkForPacket();
     static void sendCANPacket(uint32_t id, uint8_t *data);
 };
 

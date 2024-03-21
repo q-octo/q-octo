@@ -9,70 +9,78 @@
 #define CAN_BAUDRATE (1000000) // 1Mbit/s (determined by the motor)
 Adafruit_MCP2515 mcp(CS_PIN);
 
-void (*onExtendedPacketReceived)(int, uint32_t, uint8_t *);
+PacketCallback _onPacketReceived;
 
-
-static void onReceive(int packetSize)
-{
-    // received a packet
-    Serial.print("Received ");
-
-    if (mcp.packetExtended())
-    {
-        Serial.print("extended ");
-    }
-
-    if (mcp.packetRtr())
-    {
-        // Remote transmission request, packet contains no data
-        Serial.print("RTR ");
-    }
-
-    Serial.print("packet with id 0x");
-    Serial.print(mcp.packetId(), HEX);
-
-    if (mcp.packetRtr())
-    {
-        Serial.print(" and requested length ");
-        Serial.println(mcp.packetDlc());
-    }
-    else
-    {
-        Serial.print(" and length ");
-        Serial.println(packetSize);
-
-        uint8_t packetData[8] = {0};
-        int i = 0;
-        // only print packet data for non-RTR packets
-        while (mcp.available())
-        {
-            packetData[i] = mcp.read();
-            i++;
-            Serial.print((char)mcp.read());
-        }
-        onExtendedPacketReceived(packetSize, mcp.packetId(), packetData);
-        Serial.println();
-    }
-
-    Serial.println();
-}
-
-void CanCommunication::init(void (*callback)(int, uint32_t, uint8_t *)) // packetLength, packetId, packetData
+void CanCommunication::init(PacketCallback onPacketReceived)
 {
     if (!mcp.begin(CAN_BAUDRATE))
     {
-        Serial.println("Starting CAN (MCP2515) failed!");
+        Serial.println("Starting CAN (MCP2515) failed");
         // Loop forever
-        while (1) delay(10);
+        while (1)
+            delay(10);
     }
-    Serial.println("MCP2515 Initialized Successfully!");
-
-    mcp.onReceive(INT_PIN, onReceive);
-
-    onExtendedPacketReceived = callback;
+    _onPacketReceived = onPacketReceived;
     Serial.println("CAN init complete");
 }
 
+void CanCommunication::checkForPacket()
+{
+    int packetSize = mcp.parsePacket();
+
+    if (packetSize)
+    {
+        // received a packet
+        Serial.print("Received ");
+
+        bool extended = mcp.packetExtended();
+        if (extended)
+        {
+            Serial.print("extended ");
+        }
+
+        if (mcp.packetRtr())
+        {
+            // Remote transmission request, packet contains no data
+            Serial.print("RTR ");
+        }
+
+        Serial.print("packet with id 0x");
+        Serial.print(mcp.packetId(), HEX);
+
+        if (mcp.packetRtr())
+        {
+            Serial.print(" and requested length ");
+            Serial.println(mcp.packetDlc());
+        }
+        else
+        {
+            Serial.print(" and length ");
+            Serial.println(packetSize);
+            uint8_t packetData[8] = {0};
+            int i = 0;
+            // only print packet data for non-RTR packets
+            while (mcp.available())
+            {
+                packetData[i] = mcp.read();
+                i++;
+            }
+            _onPacketReceived(packetSize, mcp.packetId(), packetData, extended);
+            
+            Serial.println();
+        }
+
+        Serial.println();
+    }
+}
+
+/**
+ * Sends a CAN packet with the specified ID and data.
+ * Assumes that the data length is 8 bytes.
+ *
+ * @param id The ID of the CAN packet.
+ * @param data Pointer to the data to be sent.
+ */
 void CanCommunication::sendCANPacket(uint32_t id, uint8_t *data)
 {
     Serial.print("Sending packet with id 0x");
@@ -81,20 +89,15 @@ void CanCommunication::sendCANPacket(uint32_t id, uint8_t *data)
     bool rtr = false;
     // Data Length Code (how many bytes are being transmitted)
     int dlc = 8;
-    int beginPacketResult = mcp.beginExtendedPacket(id, dlc, rtr);
-    if (beginPacketResult == 0)
+    if (!mcp.endPacket())
     {
         Serial.println("Failed to begin packet");
         return;
     }
-    Serial.println("Packet begun");
-    mcp.write(data, dlc); 
-    int endPacketResult = mcp.endPacket();
-    if (endPacketResult == 0)
+    mcp.write(data, dlc);
+    if (!mcp.endPacket())
     {
         Serial.println("Failed to end packet");
         return;
     }
-    Serial.println("Packet sent");
-
 }
