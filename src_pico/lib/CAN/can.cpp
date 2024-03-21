@@ -89,7 +89,7 @@ void CanCommunication::sendCANPacket(uint32_t id, uint8_t *data)
     bool rtr = false;
     // Data Length Code (how many bytes are being transmitted)
     int dlc = 8;
-    if (!mcp.endPacket())
+    if (!mcp.beginExtendedPacket(id, dlc, rtr))
     {
         Serial.println("Failed to begin packet");
         return;
