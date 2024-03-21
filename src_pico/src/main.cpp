@@ -67,18 +67,18 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData)
 {
   Serial.print("main.cpp: Received packet with id 0x");
   Serial.print(packetId, HEX);
-
-  if (((packetId & 0xFF00) >> 8) == CYBERGEAR_CAN_ID_L)
+  
+  switch ((packetId & 0xFF00) >> 8)
   {
-    cybergearL.process_message(packetData);
-  }
-  else if (((packetId & 0xFF00) >> 8) == CYBERGEAR_CAN_ID_R)
-  {
-    cybergearR.process_message(packetData);
-  }
-  else
-  {
-    Serial.println("main.cpp: Received packet from unknown device");
+    case CYBERGEAR_CAN_ID_L:
+      cybergearL.process_message(packetData);
+      break;
+    case CYBERGEAR_CAN_ID_R:
+      cybergearR.process_message(packetData);
+      break;
+    default:
+      Serial.println("main.cpp: Received packet from unknown device");
+      break;
   }
 }
 
