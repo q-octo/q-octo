@@ -2,7 +2,9 @@
 #include "can.h"
 #include "xiaomi_cybergear_driver.h"
 #include "pico/stdlib.h"
-#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
+#include <FreeRTOS.h> // Enables FreeRTOS and multicore support]
+#include <task.h>     // Enables FreeRTOS tasks
+#include "task_crsf.h"
 
 // Interval:
 #define TRANSMIT_RATE_MS 1000
@@ -24,48 +26,46 @@ void initMotors();
 void debugAlternateMotorSpeed();
 void debugPrintMotorStatus();
 
+void taskDebug(void *pvParameters);
 void setup()
 {
-  // Start serial communication
-  Serial.begin(0); // baud rate is ignored for USB serial
+  Serial.begin(115200); // initialize serial communication
   while (!Serial)
-    delay(10);
+    ;          // Wait for serial connection to be established
+  delay(1000); // Wait for a second
   Serial.println("Live on core 0");
-  
-
   CanCommunication::init(onReceiveCanPacket);
   Serial.println("CAN init complete, setting up motor...");
   initMotors();
+
+  xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(taskDebug, "taskDebug", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 }
 
 void loop()
 {
-  CanCommunication::checkForPacket();
-  debugPrintMotorStatus();
-  debugAlternateMotorSpeed();
+  // Handled by FreeRTOS
+}
 
-  // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= TRANSMIT_RATE_MS)
+void taskDebug(void *pvParameters)
+{
+  for (;;)
   {
-    previousMillis = currentMillis;
-    cybergearL.request_status();
-    cybergearR.request_status();
+     Serial.println("taskDebug: Hello from taskDebug");
+    CanCommunication::checkForPacket();
+    debugPrintMotorStatus();
+    debugAlternateMotorSpeed();
+
+    // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= TRANSMIT_RATE_MS)
+    {
+      previousMillis = currentMillis;
+      cybergearL.request_status();
+      cybergearR.request_status();
+    }
+    vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for a second
   }
-}
-
-// Setup code on Core 1
-void setup1()
-{
-    Serial.begin(0); // baud rate is ignored for USB serial
-  while (!Serial)
-    delay(10);
-  Serial.println("Live on core 1");
-}
-
-// Loop code on Core 1
-void loop1()
-{
 }
 
 void initMotors()
