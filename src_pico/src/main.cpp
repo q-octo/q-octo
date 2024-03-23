@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "can.h"
 #include "xiaomi_cybergear_driver.h"
+#include "pico/stdlib.h"
+#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
 
 // Interval:
 #define TRANSMIT_RATE_MS 1000
@@ -25,10 +27,11 @@ void debugPrintMotorStatus();
 void setup()
 {
   // Start serial communication
-  Serial.begin(115200);
+  Serial.begin(0); // baud rate is ignored for USB serial
   while (!Serial)
     delay(10);
-  Serial.println("Hello, we're live!");
+  Serial.println("Live on core 0");
+  
 
   CanCommunication::init(onReceiveCanPacket);
   Serial.println("CAN init complete, setting up motor...");
@@ -51,6 +54,20 @@ void loop()
   }
 }
 
+// Setup code on Core 1
+void setup1()
+{
+    Serial.begin(0); // baud rate is ignored for USB serial
+  while (!Serial)
+    delay(10);
+  Serial.println("Live on core 1");
+}
+
+// Loop code on Core 1
+void loop1()
+{
+}
+
 void initMotors()
 {
   cybergearL.init_motor(MODE_SPEED);
@@ -63,22 +80,22 @@ void initMotors()
   cybergearR.enable_motor();
 }
 
-void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData)
+void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData, bool extendedb)
 {
   Serial.print("main.cpp: Received packet with id 0x");
   Serial.print(packetId, HEX);
-  
+
   switch ((packetId & 0xFF00) >> 8)
   {
-    case CYBERGEAR_CAN_ID_L:
-      cybergearL.process_message(packetData);
-      break;
-    case CYBERGEAR_CAN_ID_R:
-      cybergearR.process_message(packetData);
-      break;
-    default:
-      Serial.println("main.cpp: Received packet from unknown device");
-      break;
+  case CYBERGEAR_CAN_ID_L:
+    cybergearL.process_message(packetData);
+    break;
+  case CYBERGEAR_CAN_ID_R:
+    cybergearR.process_message(packetData);
+    break;
+  default:
+    Serial.println("main.cpp: Received packet from unknown device");
+    break;
   }
 }
 
@@ -96,11 +113,6 @@ void debugPrintMotorStatus()
 {
   XiaomiCyberGearStatus statusL = cybergearL.get_status();
   XiaomiCyberGearStatus statusR = cybergearR.get_status();
-  // Adjust the size as necessary
-  char bufferL[100];
-  char bufferR[100];
-  sprintf(bufferL, "L: POS:%f V:%f T:%f temp:%d\n", statusL.position, statusL.speed, statusL.torque, statusL.temperature);
-  sprintf(bufferR, "R: POS:%f V:%f T:%f temp:%d\n", statusR.position, statusR.speed, statusR.torque, statusR.temperature);
-  Serial.print(bufferL);
-  Serial.print(bufferR);
+  Serial.printf("L: POS:%f V:%f T:%f temp:%d\n", statusL.position, statusL.speed, statusL.torque, statusL.temperature);
+  Serial.printf("R: POS:%f V:%f T:%f temp:%d\n", statusR.position, statusR.speed, statusR.torque, statusR.temperature);
 }

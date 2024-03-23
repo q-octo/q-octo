@@ -36,7 +36,8 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData);
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t);
 
 
-void setup()
+// Ignore for now
+void setupCrsf()
 {
     Serial.begin(115200);
     while (!Serial) delay(10);
@@ -64,7 +65,8 @@ void setup()
     }
 }
 
-void loop()
+// Ignore for now
+void loopCrsf()
 {
     if (crsf != nullptr)
     {
