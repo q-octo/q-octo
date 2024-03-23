@@ -2,9 +2,10 @@
 #include "can.h"
 #include "xiaomi_cybergear_driver.h"
 #include "pico/stdlib.h"
-#include <FreeRTOS.h> // Enables FreeRTOS and multicore support]
+#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
 #include <task.h>     // Enables FreeRTOS tasks
 #include "task_crsf.h"
+#include "task_display.h"
 
 // Interval:
 #define TRANSMIT_RATE_MS 1000
@@ -30,16 +31,16 @@ void taskDebug(void *pvParameters);
 void setup()
 {
   Serial.begin(115200); // initialize serial communication
-  while (!Serial)
-    ;          // Wait for serial connection to be established
+  while (!Serial);     // Wait for serial connection to be established
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
-  CanCommunication::init(onReceiveCanPacket);
-  Serial.println("CAN init complete, setting up motor...");
-  initMotors();
+  // CanCommunication::init(onReceiveCanPacket);
+  // Serial.println("CAN init complete, setting up motor...");
+  // initMotors();
 
   xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-  xTaskCreate(taskDebug, "taskDebug", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+  // xTaskCreate(taskDebug, "taskDebug", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 }
 
 void loop()
@@ -49,9 +50,10 @@ void loop()
 
 void taskDebug(void *pvParameters)
 {
+  (void)pvParameters; //  To avoid warnings
   for (;;)
   {
-     Serial.println("taskDebug: Hello from taskDebug");
+    Serial.println("taskDebug: Hello from taskDebug");
     CanCommunication::checkForPacket();
     debugPrintMotorStatus();
     debugAlternateMotorSpeed();
@@ -64,7 +66,7 @@ void taskDebug(void *pvParameters)
       cybergearL.request_status();
       cybergearR.request_status();
     }
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for a second
+    // vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for a second
   }
 }
 

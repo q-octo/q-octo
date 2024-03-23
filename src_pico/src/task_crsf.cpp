@@ -1,9 +1,10 @@
+#include <Arduino.h> // Always include this first
 #include "FreeRTOS.h"
 #include "task.h"
-#include <Arduino.h>
 
 void taskCRSF(void *pvParameters)
 {
+    (void) pvParameters; //  To avoid warnings
     for (;;)
     {
         Serial.println("taskCRSF: Hello from taskCRSF");
