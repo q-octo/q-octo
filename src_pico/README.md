@@ -4,6 +4,8 @@ How to compile...
 
 Speed is in RPM
 
+https://www.instructables.com/Using-RP2040-PIO-in-Arduino-IDE-on-Windows/
+
 
 ## Windows Footguns
 
