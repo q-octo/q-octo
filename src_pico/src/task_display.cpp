@@ -11,107 +11,167 @@
 
 using namespace pimoroni;
 
+// Display driver
 ST7789 st7789(PicoDisplay::WIDTH, PicoDisplay::HEIGHT, ROTATE_0, false, get_spi_pins(BG_SPI_FRONT));
+
+// Graphics library - in RGB332 mode you get 256 colours and optional dithering for ~32K RAM.
 PicoGraphics_PenRGB332 graphics(st7789.width, st7789.height, nullptr);
 
+// RGB LED
 RGBLED led(PicoDisplay::LED_R, PicoDisplay::LED_G, PicoDisplay::LED_B);
+
+// And each button
+Button button_a(PicoDisplay::A);
+Button button_b(PicoDisplay::B);
+Button button_x(PicoDisplay::X);
+Button button_y(PicoDisplay::Y);
+
+#define SET_PEN_RED() graphics.set_pen(244, 67, 54);
+#define SET_PEN_GREEN() graphics.set_pen(76, 176, 80);
+#define SET_PEN_ORANGE() graphics.set_pen(255, 152, 0);
+#define SET_PEN_BLACK() graphics.set_pen(0, 0, 0);
+#define SET_PEN_WHITE() graphics.set_pen(255, 255, 255);
 
 void taskDisplay(void *pvParameters)
 {
+    (void)pvParameters; // To avoid warnings
+
     st7789.set_backlight(100);
+    led.set_brightness(0); // Turn LED off.
 
-    struct pt
-    {
-        float x;
-        float y;
-        uint8_t r;
-        float dx;
-        float dy;
-        uint16_t pen;
-    };
-
-    std::vector<pt> shapes;
-    for (int i = 0; i < 100; i++)
-    {
-        pt shape;
-        shape.x = rand() % 240;
-        shape.y = rand() % 135;
-        shape.r = (rand() % 10) + 3;
-        shape.dx = float(rand() % 255) / 128.0f;
-        shape.dy = float(rand() % 255) / 128.0f;
-        shape.pen = graphics.create_pen(rand() % 255, rand() % 255, rand() % 255);
-        shapes.push_back(shape);
-    }
-
-    uint32_t i = 0;
-    Pen BG = graphics.create_pen(120, 40, 60);
-    Pen YELLOW = graphics.create_pen(255, 255, 0);
-    Pen TEAL = graphics.create_pen(0, 255, 255);
-    Pen WHITE = graphics.create_pen(255, 255, 255);
-
-    (void)pvParameters; //  To avoid warnings
+    // Display is 240x135 pixels
     for (;;)
     {
-        Serial.println("taskDisplay: Hello from taskDisplay");
-        graphics.set_pen(BG);
+        // bitmap6, bitmap8, bitmap14_outline
+        graphics.set_font("bitmap8");
+
+        // set the colour of the pen
+        // parameters are red, green, blue all between 0 and 255
+        SET_PEN_WHITE()
+        // fill the screen with the current pen colour
         graphics.clear();
 
-        for (auto &shape : shapes)
-        {
-            shape.x += shape.dx;
-            shape.y += shape.dy;
-            if (shape.x < 0)
-                shape.dx *= -1;
-            if (shape.x >= graphics.bounds.w)
-                shape.dx *= -1;
-            if (shape.y < 0)
-                shape.dy *= -1;
-            if (shape.y >= graphics.bounds.h)
-                shape.dy *= -1;
+        int32_t motorBoxWidth = 160;
 
-            graphics.set_pen(shape.pen);
-            graphics.circle(Point(shape.x, shape.y), shape.r);
+        // Left Motor
+        SET_PEN_GREEN()
+        Rect leftMotorRect(0, 0, motorBoxWidth, 18);
+        // graphics.rectangle(leftMotorRect);
+        leftMotorRect.deflate(2);
+        SET_PEN_BLACK()
+        graphics.text("22°C 30RPM 180°", Point(leftMotorRect.x, leftMotorRect.y), leftMotorRect.w);
+
+        // Right Motor
+        SET_PEN_RED()
+        Rect rightMotorRect(0, 18, motorBoxWidth, 18);
+        // graphics.rectangle(rightMotorRect);
+        rightMotorRect.deflate(2);
+        SET_PEN_BLACK()
+        graphics.text("22°C 30RPM 180°", Point(rightMotorRect.x, rightMotorRect.y), rightMotorRect.w);
+
+        // Vertical separator
+        SET_PEN_BLACK()
+        graphics.rectangle(Rect(motorBoxWidth, 0, 2, 36));
+
+        // WiFi Status
+        SET_PEN_ORANGE()
+        Rect wifiRect(motorBoxWidth + 2, 0, 240 - motorBoxWidth, 36);
+        // graphics.rectangle(wifiRect);
+        wifiRect.deflate(2);
+        if (button_x.raw())
+        {
+            SET_PEN_RED()
+            graphics.text("WiFi ONOFF", Point(wifiRect.x, wifiRect.y), wifiRect.w);
+        }
+        else
+        {
+            SET_PEN_BLACK()
+            graphics.text("WiFi OFF", Point(wifiRect.x, wifiRect.y), wifiRect.w);
         }
 
-        float led_step = fmod(i / 20.0f, M_PI * 2.0f);
-        int r = (sin(led_step) * 32.0f) + 32.0f;
-        led.set_rgb(r, r / 1.2f, r);
+        // Horizontal separator
+        SET_PEN_BLACK()
+        graphics.rectangle(Rect(0, 36, 240, 1));
 
-        std::vector<Point> poly;
-        poly.push_back(Point(30, 30));
-        poly.push_back(Point(50, 35));
-        poly.push_back(Point(70, 25));
-        poly.push_back(Point(80, 65));
-        poly.push_back(Point(50, 85));
-        poly.push_back(Point(30, 45));
+        // Batteries, SRC, Status
+        SET_PEN_GREEN();
+        Rect brsPlaceholder(0, 37, 240, 20);
+        // graphics.rectangle(brsPlaceholder);
 
-        graphics.set_pen(YELLOW);
-        // pico_display.pixel(Point(0, 0));
-        graphics.polygon(poly);
+        // Horizontal separator
+        SET_PEN_BLACK()
+        graphics.rectangle(Rect(0, 57, 240, 1));
 
-        graphics.set_pen(TEAL);
-        graphics.triangle(Point(50, 50), Point(130, 80), Point(80, 110));
+        // Battery section
 
-        graphics.set_pen(WHITE);
-        graphics.line(Point(50, 50), Point(120, 80));
-        graphics.line(Point(20, 20), Point(120, 20));
-        graphics.line(Point(20, 20), Point(20, 120));
+        // Progress bar background
+        SET_PEN_BLACK()
+        // graphics.rec tangle(Rect(100, 58, 240 - 100, 135 - 58));
 
-        for (int r = 0; r < 30; r++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                float rads = ((M_PI * 2) / 30.0f) * float(r);
-                rads += (float(i) / 100.0f);
-                rads += (float(j) / 100.0f);
-                float cx = sin(rads) * 300.0f;
-                float cy = cos(rads) * 300.0f;
-                graphics.line(Point(120, 67), Point(cx + 120, cy + 67));
-            }
-        }
+        // Fuel
+        SET_PEN_RED()
+        Rect batteryRect1(0, 58, 100, 18);
+        // graphics.rectangle(batteryRect1);
+        batteryRect1.deflate(2);
+        SET_PEN_BLACK()
+        graphics.text("FUEL   84%", Point(batteryRect1.x, batteryRect1.y), batteryRect1.w);
 
-        // update screen
+        // BATT
+        SET_PEN_GREEN()
+        Rect batteryRect2(0, 76, 100, 18);
+        // graphics.rectangle(batteryRect2);
+        batteryRect2.deflate(2);
+        SET_PEN_BLACK()
+        graphics.text("BATT 22.1V", Point(batteryRect2.x, batteryRect2.y), batteryRect2.w);
+
+        // CURR
+        SET_PEN_ORANGE()
+        Rect batteryRect3(0, 94, 100, 18);
+        // graphics.rectangle(batteryRect3);
+        batteryRect3.deflate(2);
+        SET_PEN_BLACK()
+        graphics.text("CURR 14.5A", Point(batteryRect3.x, batteryRect3.y), batteryRect3.w);
+
+        // Progres bars
+        float fuel = 0.84;
+        float batt = 0.67;
+        float curr = 0.72;
+        SET_PEN_GREEN()
+        uint32_t maxWidth = 139; // 240 - 100 - 1(padding);
+        Rect fuelBar(101, 58, maxWidth * fuel, 18);
+        fuelBar.deflate(2);
+        graphics.rectangle(fuelBar);
+        Rect battBar(101, 76, maxWidth * batt, 18);
+        battBar.deflate(2);
+        graphics.rectangle(battBar);
+        Rect currBar(101, 94, maxWidth * curr, 18);
+        currBar.deflate(2);
+        graphics.rectangle(currBar);
+
+        // Make the text smaller
+        graphics.set_font("bitmap6");
+
+        // CRSF Status
+        SET_PEN_RED()
+        Rect rcRectL(1, 112, 100, 135 - 112);
+        // graphics.rectangle(rcRectL);
+        SET_PEN_BLACK()
+        graphics.text("RSSI 77dB", Point(rcRectL.x, rcRectL.y), rcRectL.w);
+        graphics.text("LINK  64%", Point(rcRectL.x, rcRectL.y + 11), rcRectL.w);
+
+        // CRSF Progress Bars
+        SET_PEN_ORANGE()
+        Rect rssiBar(101, 112 + 1, maxWidth * 0.77, 11);
+        rssiBar.deflate(1);
+        graphics.rectangle(rssiBar);
+        Rect linkBar(101, 112 + 11 + 1, maxWidth * 0.64, 11);
+        linkBar.deflate(1);
+        graphics.rectangle(linkBar);
+
+        // now we've done our drawing let's update the screen
         st7789.update(&graphics);
-        vTaskDelay(pdMS_TO_TICKS(1000 / 60)); 
+        vTaskDelay(pdMS_TO_TICKS(1000 / 120));
     }
 }
+
+void displayMotorStatus() {}
