@@ -16,9 +16,6 @@ void CanCommunication::init(PacketCallback onPacketReceived)
     if (!mcp.begin(CAN_BAUDRATE))
     {
         Serial.println("Starting CAN (MCP2515) failed");
-        // Loop forever
-        // while (1)
-            // delay(10);
         return;
     }
     _onPacketReceived = onPacketReceived;
@@ -67,7 +64,7 @@ void CanCommunication::checkForPacket()
                 i++;
             }
             _onPacketReceived(packetSize, mcp.packetId(), packetData, extended);
-            
+
             Serial.println();
         }
 
