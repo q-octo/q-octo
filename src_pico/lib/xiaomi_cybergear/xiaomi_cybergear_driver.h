@@ -1,4 +1,6 @@
 // #include "driver/twai.h"
+#ifndef XIAOMI_CYBERGEAR_DRIVER_H
+#define XIAOMI_CYBERGEAR_DRIVER_H
 #include "xiaomi_cybergear_defs.h"
 #include <cstdint>
 
@@ -60,3 +62,4 @@ class XiaomiCyberGearDriver {
         bool _use_serial_debug;
         XiaomiCyberGearStatus _status;
 };
+#endif // XIAOMI_CYBERGEAR_DRIVER_H
