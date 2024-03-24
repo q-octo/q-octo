@@ -1,67 +1,59 @@
 #include "task_motors.h"
-
+#include "Arduino.h"
 #include "FreeRTOS.h"
-#include "task.h"
+#include "queue.h"
+#include "task_control_motors.h"
 
-#define MOTOR_SPEED_LIMIT 10.0f
-#define MOTOR_CURRENT_LIMIT 5.0f
+#define STATUS_REQUEST_FREQUENCY 500   // ms
+#define STATUS_BROADCAST_FREQUENCY 500 // ms
+#define TASK_FREQUENCY 500             // ms
 
-unsigned long previousMillis = 0; // will store last time a message was send
+unsigned long lastStatusRequestMs = 0;
+unsigned long lastStatusBroadcastMs = 0;
 
-void initMotors();
-void debugAlternateMotorSpeed();
-void debugPrintMotorStatus();
+void taskMotors(void *pvParameters) {
+  (void)pvParameters; //  To avoid warnings
+  Serial.println("taskMotors started");
 
-XiaomiCyberGearDriver cybergearL = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
-XiaomiCyberGearDriver cybergearR = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
-
-void taskMotors(void *pvParameters)
-{
-    (void)pvParameters; //  To avoid warnings
-
-    for (;;)
-    {
-        debugPrintMotorStatus();
-        debugAlternateMotorSpeed();
-
-        // send a request to the cybergear to receive motor status (position, speed, torque, temperature)
-        unsigned long currentMillis = millis();
-        if (currentMillis - previousMillis >= 1000)
-        {
-            previousMillis = currentMillis;
-            cybergearL.request_status();
-            cybergearR.request_status();
-        }
-        vTaskDelay(pdMS_TO_TICKS(1));
+  for (;;) {
+    // send a request to the cybergear to receive motor status (position, speed,
+    // torque, temperature)
+    const unsigned long currentMillis = millis();
+    if (currentMillis - lastStatusRequestMs >= STATUS_REQUEST_FREQUENCY) {
+      lastStatusRequestMs = currentMillis;
+      cybergearL.request_status();
+      cybergearR.request_status();
     }
-}
 
-void initMotors()
-{
-    cybergearL.init_motor(MODE_SPEED);
-    cybergearL.set_limit_speed(MOTOR_SPEED_LIMIT);
-    cybergearL.set_limit_current(MOTOR_CURRENT_LIMIT);
-    cybergearL.enable_motor();
-    cybergearR.init_motor(MODE_SPEED);
-    cybergearR.set_limit_speed(MOTOR_SPEED_LIMIT);
-    cybergearR.set_limit_current(MOTOR_CURRENT_LIMIT);
-    cybergearR.enable_motor();
-}
+    if (currentMillis - lastStatusBroadcastMs >= STATUS_BROADCAST_FREQUENCY) {
+      lastStatusBroadcastMs = currentMillis;
+      auto statusL = cybergearL.get_status();
+      auto statusR = cybergearR.get_status();
+      TaskMessageMotors motors = {
+          .left =
+              {
+                  .temperature = statusL.temperature,
+                  .RPM = statusL.speed,
+                  .torque = statusL.torque,
+                  .position = statusL.position,
+              },
+          .right =
+              {
+                  .temperature = statusR.temperature,
+                  .RPM = statusR.speed,
+                  .torque = statusR.torque,
+                  .position = statusR.position,
+              },
+      };
+      TaskMessage message = {.type = TaskMessageType::STATE_MOTORS,
+                             .motors = motors};
+      xQueueSend(dataManagerQueue, &message, 0);
+    }
 
-void debugAlternateMotorSpeed()
-{
-    cybergearR.set_speed_ref(0);
-    cybergearL.set_speed_ref(2);
-    delay(1000);
-    cybergearL.set_speed_ref(0);
-    cybergearR.set_speed_ref(2);
-    delay(1000);
-}
+    // When the motor CAN data was monitored via a saleae logic analyzer, it was
+    // sending a constant stream of messages. Do we receive these messages, are
+    // they status updates? If so, we could avoid this polling approach
 
-void debugPrintMotorStatus()
-{
-    XiaomiCyberGearStatus statusL = cybergearL.get_status();
-    XiaomiCyberGearStatus statusR = cybergearR.get_status();
-    Serial.printf("L: POS:%f V:%f T:%f temp:%d\n", statusL.position, statusL.speed, statusL.torque, statusL.temperature);
-    Serial.printf("R: POS:%f V:%f T:%f temp:%d\n", statusR.position, statusR.speed, statusR.torque, statusR.temperature);
+    vTaskDelay(pdMS_TO_TICKS(TASK_FREQUENCY));
+  }
 }

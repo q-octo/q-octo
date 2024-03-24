@@ -44,11 +44,11 @@ void taskCRSF(void *pvParameters)
 
     /* Initialise CRSF for Arduino, and clean up
     any allocated resources if initialisation fails. */
-    if (crsf->begin() == true)
+    if (crsf->begin())
     {
         crsf->setLinkStatisticsCallback(onLinkStatisticsUpdate);
         crsf->setRcChannelsCallback(onReceiveRcChannels);
-        /* Constrain the RC Channels Count to the maximum number
+        /* Constrain the STATE_RC Channels Count to the maximum number
           of channels that are specified by The Crossfire Protocol.*/
         rcChannelCount = rcChannelCount > crsfProtocol::RC_CHANNEL_COUNT ? crsfProtocol::RC_CHANNEL_COUNT : rcChannelCount;
         // crsf->telemetryWriteBattery(0, 0, 0, 71);
@@ -79,6 +79,9 @@ void terminateCrsf()
 
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistics)
 {
+    // WARNING: Treat as an ISR callback!
+
+
     /* This is your Link Statistics Event Callback.
     By using the linkStatistics parameter that's passed in,
     you have access to the following:
@@ -108,7 +111,9 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
 
 void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
 {
-    /* This is your RC Channels Event Callback.
+    // WARNING: Treat as an ISR callback!
+
+    /* This is your STATE_RC Channels Event Callback.
     Here, you have access to all 16 11-bit channels,
     plus an additional "failsafe" flag that tells you whether-or-not
     your receiver is connected to your controller's transmitter module.
@@ -117,13 +122,13 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
     you have access to the following:
 
     - failsafe - A boolean flag indicating the "Fail-safe" status.
-    - value[16] - An array consisting of all 16 received RC channels.
-      NB: RC Channels are RAW values and are NOT in "microseconds" units.
+    - value[16] - An array consisting of all 16 received STATE_RC channels.
+      NB: STATE_RC Channels are RAW values and are NOT in "microseconds" units.
 
     For the purposes of this example, the fail-safe flag is used to centre
     all channels except for Channel 5 (AKA Aux1). Aux1 is set to the
     "Disarmed" position.
-    The RC Channels themselves are all converted to "microseconds" for
+    The STATE_RC Channels themselves are all converted to "microseconds" for
     visualisation purposes, and printed to the Serial Monitor at a rate
     of 100 Hz. */
 
@@ -133,7 +138,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         {
             isFailsafeActive = true;
 
-            /* Centre all RC Channels, except for Channel 5 (Aux1). */
+            /* Centre all STATE_RC Channels, except for Channel 5 (Aux1). */
             for (int i = 0; i < rcChannelCount; i++)
             {
                 if (i != 4)
@@ -158,15 +163,15 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         }
     }
 
-    /* Here is where you may write your RC channels implementation.
-    For this example, RC Channels are simply sent to the Serial Monitor. */
+    /* Here is where you may write your STATE_RC channels implementation.
+    For this example, STATE_RC Channels are simply sent to the Serial Monitor. */
     static uint32_t lastPrint = millis();
 
     if (millis() - lastPrint >= 200)
     {
         lastPrint = millis();
 
-        Serial.print("[Sketch | INFO]: RC Channels: <");
+        Serial.print("[Sketch | INFO]: STATE_RC Channels: <");
         for (int i = 0; i < rcChannelCount; i++)
         {
             Serial.print(rcChannelNames[i]);
