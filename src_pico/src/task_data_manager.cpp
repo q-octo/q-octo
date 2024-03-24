@@ -24,12 +24,11 @@ void taskDataManager(void *pvParameters) {
 
   TaskMessage message;
   for (;;) {
-    Serial.println("taskDataManager tick");
     if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY)) {
-      Serial.println("Message received");
       TaskDisplayMessage displayMessage;
       switch (message.type) {
       case TaskMessageType::STATE_MOTORS:
+        Serial.println("taskDataManager: STATE_MOTORS received");
         displayMessage = {
             .type = TaskDisplay::MessageType::MOTORS,
             .motors = message.motors,

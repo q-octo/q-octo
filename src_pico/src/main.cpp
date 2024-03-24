@@ -10,7 +10,7 @@
 #include "task_motors.h"
 
 #define ENABLE_CAN 0
-#define ENABLE_MOTORS 0
+#define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
 // TODO fix bug that requires this to be enabled
 #define DEBUG_LIST_TASKS 1
@@ -61,7 +61,7 @@ void setup() {
 
 #if ENABLE_DISPLAY
   // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE, nullptr, 3, &displayHandle);
+  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE * (2^1), nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_0);
 #endif
 

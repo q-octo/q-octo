@@ -39,7 +39,8 @@ void taskMotors(void *pvParameters) {
               },
           .right =
               {
-                  .temperature = statusR.temperature,
+//                  .temperature = statusR.temperature,
+                  .temperature = static_cast<uint16_t>((currentMillis % 24)),
                   .RPM = statusR.speed,
                   .torque = statusR.torque,
                   .position = statusR.position,

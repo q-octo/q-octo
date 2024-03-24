@@ -12,6 +12,8 @@
 
 #include "task_display.h"
 
+#include <sstream>
+
 // Explicitly include necessary classes from the pimoroni namespace
 using pimoroni::BG_SPI_FRONT;
 using pimoroni::Button;
@@ -63,6 +65,14 @@ bool ledState = false;
 float batteryFuel = 0.0; // 0.0 to 1.0
 float batteryVoltage = 0.0;
 float batteryCurrent = 0.0;
+uint16_t motorLtemperature = 0;
+float motorLRPM = 0.0;
+float motorLtorque = 0.0;
+float motorLposition = 0.0;
+uint16_t motorRtemperature = 0;
+float motorRRPM = 0.0;
+float motorRtorque = 0.0;
+float motorRposition = 0.0;
 
 void taskDisplay(void *pvParameters) {
   (void)pvParameters; // To avoid warnings
@@ -86,6 +96,14 @@ void taskDisplay(void *pvParameters) {
       Serial.println("Message received");
       switch (message.type) {
       case TaskDisplay::MessageType::MOTORS:
+        motorLtemperature = message.motors.left.temperature;
+        motorLRPM = message.motors.left.RPM;
+        motorLtorque = message.motors.left.torque;
+        motorLposition = message.motors.left.position;
+        motorRtemperature = message.motors.right.temperature;
+        motorRRPM = message.motors.right.RPM;
+        motorRtorque = message.motors.right.torque;
+        motorRposition = message.motors.right.position;
         break;
       case TaskDisplay::MessageType::DIAGNOSTICS:
         break;
@@ -138,7 +156,13 @@ void repaintDisplay() {
   // graphics.rectangle(leftMotorRect);
   leftMotorRect.deflate(2);
   SET_PEN_BLACK()
-  graphics.text("22°C 30RPM 180°", Point(leftMotorRect.x, leftMotorRect.y),
+  // Format string based on motorLtemperature, motorLRPM, motorLposition
+  
+
+
+  std::ostringstream oss;
+  oss << "L " << motorLtemperature << "°C " << motorLRPM << "RPM " << motorLposition << "°";
+  graphics.text( oss.str(), Point(leftMotorRect.x, leftMotorRect.y),
                 leftMotorRect.w);
 
   // Right Motor
@@ -147,7 +171,10 @@ void repaintDisplay() {
   // graphics.rectangle(rightMotorRect);
   rightMotorRect.deflate(2);
   SET_PEN_BLACK()
-  graphics.text("22°C 30RPM 180°", Point(rightMotorRect.x, rightMotorRect.y),
+
+  oss.str("");
+        oss << "R " << motorRtemperature << "°C " << motorRRPM << "RPM " << motorRposition << "°";
+  graphics.text(oss.str(), Point(rightMotorRect.x, rightMotorRect.y),
                 rightMotorRect.w);
 
   // Vertical separator
