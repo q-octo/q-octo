@@ -42,11 +42,11 @@ void setup()
 
   // Setup FreeRTOS tasks
   xTaskCreate(taskWatchdog, "taskWatchdog", configMINIMAL_STACK_SIZE, NULL, 1, &watchdogHandle);
-  vTaskCoreAffinitySet(watchdogHandle, CORE_1);
+  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
   xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, NULL, 1, &crsfHandle);
   vTaskCoreAffinitySet(crsfHandle, CORE_0);
   xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE, NULL, 2, &displayHandle);
-  vTaskCoreAffinitySet(displayHandle, CORE_0);
+  vTaskCoreAffinitySet(displayHandle, CORE_1);
 #if ENABLE_CAN
   xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_0);
