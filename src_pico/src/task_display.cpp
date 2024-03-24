@@ -9,7 +9,18 @@
 #include "rgbled.hpp"
 #include "button.hpp"
 
-using namespace pimoroni;
+
+// Explicitly include necessary classes from the pimoroni namespace
+using pimoroni::ST7789;
+using pimoroni::PicoDisplay;
+using pimoroni::PicoGraphics_PenRGB332;
+using pimoroni::ROTATE_0;
+using pimoroni::RGBLED;
+using pimoroni::Button;
+using pimoroni::Rect;
+using pimoroni::Point;
+using pimoroni::get_spi_pins;
+using pimoroni::BG_SPI_FRONT;
 
 // Display driver
 ST7789 st7789(PicoDisplay::WIDTH, PicoDisplay::HEIGHT, ROTATE_0, false, get_spi_pins(BG_SPI_FRONT));
@@ -32,6 +43,9 @@ Button button_y(PicoDisplay::Y);
 #define SET_PEN_BLACK() graphics.set_pen(0, 0, 0);
 #define SET_PEN_WHITE() graphics.set_pen(255, 255, 255);
 
+unsigned long lastBlinkMillis = 0;
+bool ledState = false;
+
 void taskDisplay(void *pvParameters)
 {
     (void)pvParameters; // To avoid warnings
@@ -50,6 +64,16 @@ void taskDisplay(void *pvParameters)
         SET_PEN_WHITE()
         // fill the screen with the current pen colour
         graphics.clear();
+
+        // Blink the LED every second to show that the data is live
+        unsigned long currentMillis = millis();
+        if (currentMillis - lastBlinkMillis >= 1000)
+        {
+            lastBlinkMillis = currentMillis;
+            led.set_rgb(76, 176, 80);
+            led.set_brightness(ledState ? 0 : 100);
+            ledState = !ledState;
+        }
 
         int32_t motorBoxWidth = 160;
 
@@ -81,7 +105,7 @@ void taskDisplay(void *pvParameters)
         if (button_x.raw())
         {
             SET_PEN_RED()
-            graphics.text("WiFi ONOFF", Point(wifiRect.x, wifiRect.y), wifiRect.w);
+            graphics.text("WiFi  ON", Point(wifiRect.x, wifiRect.y), wifiRect.w);
         }
         else
         {
@@ -170,8 +194,7 @@ void taskDisplay(void *pvParameters)
 
         // now we've done our drawing let's update the screen
         st7789.update(&graphics);
-        vTaskDelay(pdMS_TO_TICKS(1000 / 120));
+        vTaskDelay(pdMS_TO_TICKS(32));
     }
 }
 
-void displayMotorStatus() {}

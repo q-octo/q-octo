@@ -12,6 +12,9 @@ void initMotors();
 void debugAlternateMotorSpeed();
 void debugPrintMotorStatus();
 
+XiaomiCyberGearDriver cybergearL = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
+XiaomiCyberGearDriver cybergearR = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
+
 void taskMotors(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings

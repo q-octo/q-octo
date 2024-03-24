@@ -17,8 +17,9 @@ void CanCommunication::init(PacketCallback onPacketReceived)
     {
         Serial.println("Starting CAN (MCP2515) failed");
         // Loop forever
-        while (1)
-            delay(10);
+        // while (1)
+            // delay(10);
+        return;
     }
     _onPacketReceived = onPacketReceived;
     Serial.println("CAN init complete");

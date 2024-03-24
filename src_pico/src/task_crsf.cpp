@@ -65,7 +65,6 @@ void taskCRSF(void *pvParameters)
 
     for (;;)
     {
-        Serial.println("taskCRSF: Hello from taskCRSF");
         crsf->update();
         vTaskDelay(pdMS_TO_TICKS(1));
     }

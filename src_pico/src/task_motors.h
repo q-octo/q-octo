@@ -8,8 +8,8 @@
 const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
 const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
 const uint8_t MASTER_CAN_ID = 0x00;
-XiaomiCyberGearDriver cybergearL = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
-XiaomiCyberGearDriver cybergearR = XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
+extern XiaomiCyberGearDriver cybergearL;
+extern XiaomiCyberGearDriver cybergearR;
 
 void taskMotors(void *pvParameters);
 
