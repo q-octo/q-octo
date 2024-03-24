@@ -50,7 +50,7 @@ void taskDisplay(void *pvParameters)
 {
     (void)pvParameters; // To avoid warnings
 
-    st7789.set_backlight(100);
+    st7789.set_backlight(255);
     led.set_brightness(0); // Turn LED off.
 
     // Display is 240x135 pixels
