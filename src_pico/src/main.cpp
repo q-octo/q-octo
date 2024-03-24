@@ -84,11 +84,6 @@ void taskWatchdog(void *pvParameters)
   (void)pvParameters; //  To avoid warnings
   for (;;)
   {
-    // Get the current core
-    int currentCore = get_core_num();
-    Serial.print("Current core: ");
-    Serial.println(currentCore);
-    Serial.println("main.cpp: Watchdog task on core 1");
     vTaskDelay(pdMS_TO_TICKS(2000));
   }
 }
