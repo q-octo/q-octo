@@ -24,6 +24,7 @@ void taskDataManager(void *pvParameters) {
 
   TaskMessage message;
   for (;;) {
+    Serial.println("taskDataManager tick");
     if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY)) {
       Serial.println("Message received");
       TaskDisplayMessage displayMessage;

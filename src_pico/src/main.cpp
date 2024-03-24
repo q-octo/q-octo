@@ -10,7 +10,10 @@
 #include "task_motors.h"
 
 #define ENABLE_CAN 0
-#define DEBUG_LIST_TASKS 0
+#define ENABLE_MOTORS 0
+#define ENABLE_DISPLAY 1
+// TODO fix bug that requires this to be enabled
+#define DEBUG_LIST_TASKS 1
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
 
@@ -53,37 +56,36 @@ void setup() {
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
 
-  xTaskCreate(taskWatchdog, "taskWatchdog", configMINIMAL_STACK_SIZE, nullptr,
-              7, &watchdogHandle);
+  xTaskCreate(taskWatchdog, "taskWatchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_0);
 
+#if ENABLE_DISPLAY
   // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE, nullptr, 3,
-              &displayHandle);
+  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE, nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_0);
+#endif
 
-  xTaskCreate(taskControlMotors, "taskControlMotors", configMINIMAL_STACK_SIZE,
-              nullptr, 1, &controlMotorsHandle);
+#if ENABLE_MOTORS
+  xTaskCreate(taskControlMotors, "taskControlMotors", configMINIMAL_STACK_SIZE, nullptr, 1, &controlMotorsHandle);
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
+#endif
 
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
-  xTaskCreate(taskDataManager, "taskDisplay", configMINIMAL_STACK_SIZE, nullptr,
-              2, &dataManagerHandle);
+  xTaskCreate(taskDataManager, "taskDataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
 
   // Producer
-  xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, nullptr, 1,
-              &crsfHandle);
+  xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, nullptr, 1, &crsfHandle);
   vTaskCoreAffinitySet(crsfHandle, CORE_0);
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1,
-              &canHandle);
+  xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_0);
 #endif
-  xTaskCreate(taskMotors, "taskMotors", configMINIMAL_STACK_SIZE, nullptr, 1,
-              &motorsHandle);
+#if ENABLE_MOTORS
+  xTaskCreate(taskMotors, "taskMotors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_0);
+#endif
 }
 
 // Handled by FreeRTOS
@@ -115,7 +117,8 @@ void taskWatchdog(void *pvParameters) {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskWatchdog started");
   for (;;) {
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    Serial.println("taskWatchdog tick");
+    delay(pdMS_TO_TICKS(2000));
   }
 }
 
@@ -124,7 +127,7 @@ void taskCAN(void *pvParameters) {
   Serial.println("taskCAN started");
   for (;;) {
     CanCommunication::checkForPacket();
-    vTaskDelay(pdMS_TO_TICKS(1));
+    delay(pdMS_TO_TICKS(1));
   }
 }
 

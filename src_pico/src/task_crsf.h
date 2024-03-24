@@ -3,5 +3,6 @@
 
 
 void taskCRSF(void *pvParameters);
+void taskRCSender(void *pvParameters);
 
 #endif // TASK_CRSF_H
