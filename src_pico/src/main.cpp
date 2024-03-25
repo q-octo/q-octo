@@ -12,8 +12,7 @@
 #define ENABLE_CAN 0
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
-// TODO fix bug that requires this to be enabled
-#define DEBUG_LIST_TASKS 1
+#define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
 
