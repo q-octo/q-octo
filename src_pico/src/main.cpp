@@ -5,7 +5,7 @@
 
 #include "can.h"
 #include "task_control_motors.h"
-#include "task_crsf.h"
+#include "task_rc.h"
 #include "task_display.h"
 #include "task_motors.h"
 
@@ -28,7 +28,8 @@ void taskDebug(void *pvParameters);
 void taskCAN(void *pvParameters);
 
 TaskHandle_t watchdogHandle = nullptr;
-TaskHandle_t crsfHandle = nullptr;
+TaskHandle_t receiveFromRCHandle = nullptr;
+TaskHandle_t sendToRCHandle = nullptr;
 TaskHandle_t displayHandle = nullptr;
 TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
@@ -69,14 +70,17 @@ void setup() {
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
 #endif
 
+  xTaskCreate(taskSendToRC, "taskSendToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
+  vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
+
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "taskDataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
 
   // Producer
-  xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, nullptr, 1, &crsfHandle);
-  vTaskCoreAffinitySet(crsfHandle, CORE_1);
+  xTaskCreate(taskReceiveFromRC, "taskReceiveFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
+  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
 #if ENABLE_CAN
   xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_1);

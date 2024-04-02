@@ -1,7 +1,11 @@
 #include "task_data_manager.h"
 #include "task_display.h"
+#include "task_rc.h"
 
 QueueHandle_t dataManagerQueue;
+
+TaskDisplayMessage displayMessage;
+TaskRCMessage rcMessage;
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -13,20 +17,24 @@ Likewise, tasks that we forward messages to should have a higher priority than
 this task so that their queue does not overflow.
 */
 
-void taskDataManager(void *pvParameters) {
+void taskDataManager(void *pvParameters)
+{
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskDataManager started");
   dataManagerQueue = xQueueCreate(10, sizeof(TaskMessage));
-  if (dataManagerQueue == nullptr) {
+  if (dataManagerQueue == nullptr)
+  {
     Serial.println("Failed to create dataManagerQueue");
     vTaskDelete(nullptr);
   }
 
   TaskMessage message;
-  for (;;) {
-    if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY)) {
-      TaskDisplayMessage displayMessage;
-      switch (message.type) {
+  for (;;)
+  {
+    if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY))
+    {
+      switch (message.type)
+      {
       case TaskMessageType::STATE_MOTORS:
         Serial.println("taskDataManager: STATE_MOTORS received");
         displayMessage = {
@@ -43,6 +51,13 @@ void taskDataManager(void *pvParameters) {
             .battery = message.battery,
         };
         xQueueSend(displayQueue, &displayMessage, 0);
+        rcMessage = {
+            .type = TaskRC::MessageType::BATTERY,
+            .get = {
+                .battery = message.battery,
+            },
+        };
+        xQueueSend(rcSendQueue, &rcMessage, 0);
         break;
       case TaskMessageType::STATE_RC:
         displayMessage = {

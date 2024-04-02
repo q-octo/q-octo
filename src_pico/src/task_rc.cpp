@@ -2,8 +2,11 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 #include "CRSFforArduino.hpp"
+
+#include "task_rc.h"
 
 CRSFforArduino *crsf = nullptr;
 
@@ -32,12 +35,14 @@ const char *rcChannelNames[] = {
     "Aux11",
     "Aux12"};
 
+QueueHandle_t rcSendQueue;
+
 void terminateCrsf();
 /* RC Channels Event Callback. */
 void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData);
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t);
 
-void taskCRSF(void *pvParameters)
+void taskReceiveFromRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
     Serial.println("taskCRSF started");
@@ -61,7 +66,6 @@ void taskCRSF(void *pvParameters)
         terminateCrsf();
         return;
     }
-    
 
     for (;;)
     {
@@ -70,16 +74,36 @@ void taskCRSF(void *pvParameters)
     }
 }
 
-void taskRcSender(void *pvParameters)
+void taskSendToRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
+    Serial.println("taskSendToRC started");
+    rcSendQueue = xQueueCreate(10, sizeof(TaskRCMessage));
+    if (rcSendQueue == nullptr)
+    {
+        Serial.println("Failed to create rcSendQueue");
+        vTaskDelete(nullptr);
+    }
+
+    TaskRCMessage message;
     for (;;)
     {
-       // TODO setup queue to subscribe
-        crsf->telemetryWriteBattery(0, 0, 0, 0);
-
-        // TODO remove this
-        delay(pdMS_TO_TICKS(1000));
+        if (xQueueReceive(rcSendQueue, &message, portMAX_DELAY))
+        {
+            switch (message.type)
+            {
+            case TaskRC::BATTERY:
+                crsf->telemetryWriteBattery(
+                    message.get.battery.voltage,
+                    message.get.battery.current,
+                    message.get.battery.fuel,
+                    100);
+                break;
+            default:
+                Serial.println("[ERROR] unknown message type");
+                break;
+            }
+        }
     }
 }
 
@@ -93,7 +117,6 @@ void terminateCrsf()
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistics)
 {
     // WARNING: Treat as an ISR callback!
-
 
     /* This is your Link Statistics Event Callback.
     By using the linkStatistics parameter that's passed in,
