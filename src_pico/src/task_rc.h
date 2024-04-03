@@ -16,7 +16,7 @@ typedef struct
     union
     {
         TaskMessageBattery battery;
-    } get;
+    } as;
 
 } TaskRCMessage;
 

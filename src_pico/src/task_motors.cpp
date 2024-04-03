@@ -8,8 +8,8 @@
 #define STATUS_BROADCAST_FREQUENCY 500 // ms
 #define TASK_FREQUENCY 500             // ms
 
-unsigned long lastStatusRequestMs = 0;
-unsigned long lastStatusBroadcastMs = 0;
+uint32_t lastStatusRequestMs = 0;
+uint32_t lastStatusBroadcastMs = 0;
 
 void taskMotors(void *pvParameters) {
   (void)pvParameters; //  To avoid warnings
@@ -18,7 +18,7 @@ void taskMotors(void *pvParameters) {
   for (;;) {
     // send a request to the cybergear to receive motor status (position, speed,
     // torque, temperature)
-    const unsigned long currentMillis = millis();
+    static const uint32_t currentMillis = millis();
     if (currentMillis - lastStatusRequestMs >= STATUS_REQUEST_FREQUENCY) {
       lastStatusRequestMs = currentMillis;
       cybergearL.request_status();

@@ -1,11 +1,13 @@
 #include "task_data_manager.h"
 #include "task_display.h"
 #include "task_rc.h"
+#include "task_control_motors.h"
 
 QueueHandle_t dataManagerQueue;
 
 TaskDisplayMessage displayMessage;
 TaskRCMessage rcMessage;
+TaskControlMotors::Message controlMotorsMessage;
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -53,9 +55,7 @@ void taskDataManager(void *pvParameters)
         xQueueSend(displayQueue, &displayMessage, 0);
         rcMessage = {
             .type = TaskRC::MessageType::BATTERY,
-            .get = {
-                .battery = message.battery,
-            },
+            .as = {.battery = message.battery},
         };
         xQueueSend(rcSendQueue, &rcMessage, 0);
         break;
@@ -96,7 +96,34 @@ void taskDataManager(void *pvParameters)
                 },
         };
         xQueueSend(displayQueue, &displayMessage, 0);
-
+      case TaskMessageType::ENABLE_MOTORS:
+        break;
+      case TaskMessageType::DISABLE_MOTORS:
+        break;
+      case TaskMessageType::SET_MOTOR_SPEED_COMBINED:
+        controlMotorsMessage = {
+            .type = TaskControlMotors::MessageType::SET_SPEED_COMBINED,
+            .as = {.speedCombined = message.motorSpeedCombined},
+        };
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        break;
+      case TaskMessageType::SET_MOTOR_SPEED_INDIVIDUAL:
+        controlMotorsMessage = {
+            .type = TaskControlMotors::MessageType::SET_SPEED_INDIVIDUAL,
+            .as = {.speedIndividual = message.motorSpeedIndividual},
+        };
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        break;
+      case TaskMessageType::TX_LOST:
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        // TODO update display status to NO_TX
+        break;
+      case TaskMessageType::TX_RESTORED:
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::ENABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        // Update display status
+        break;
       default:
         Serial.println("[ERROR] Unknown message type");
       }

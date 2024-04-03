@@ -16,6 +16,10 @@ typedef enum {
   DISABLE_MOTORS,
   SET_MOTOR_SPEED_COMBINED,
   SET_MOTOR_SPEED_INDIVIDUAL,
+  // The RC signal was lost
+  TX_LOST,
+  // The RC signal was restored
+  TX_RESTORED,
 } TaskMessageType;
 
 typedef struct {
@@ -41,8 +45,10 @@ typedef struct {
 } TaskMessageBattery;
 
 typedef struct {
-  float rssi;
-  float linkQuality;
+  int16_t rssi;
+  int16_t linkQuality;
+  int16_t signalNoiseRatio;
+  int16_t tx_power;
 } TaskMessageRC;
 
 typedef struct {
@@ -50,9 +56,14 @@ typedef struct {
 } TaskMessageDiagnostics;
 
 typedef struct {
-  int8_t rpmL;
-  int8_t rpmR;
+  float rpmL;
+  float rpmR;
 } TaskMessageSetMotorSpeedIndividual;
+
+typedef struct {
+  float rpm;
+  float direction;
+} TaskMessageSetMotorSpeedCombined;
 
 typedef struct {
   TaskMessageType type;
@@ -62,6 +73,7 @@ typedef struct {
     TaskMessageRC rc;
     TaskMessageDiagnostics diagnostics;
     TaskMessageSetMotorSpeedIndividual motorSpeedIndividual;
+    TaskMessageSetMotorSpeedCombined motorSpeedCombined;
   };
 } TaskMessage;
 

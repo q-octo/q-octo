@@ -1,12 +1,15 @@
 #include <Arduino.h> // Always include this first
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 
 #include "CRSFforArduino.hpp"
-
 #include "task_rc.h"
+
+#define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
+#define DEBUG_LOG_RC_CHANNELS 1
+#define DEBUG_LOG_RC_LINK_STATS 1
+#define BROADCAST_FREQUENCY 500 // ms
 
 CRSFforArduino *crsf = nullptr;
 
@@ -36,6 +39,13 @@ const char *rcChannelNames[] = {
     "Aux12"};
 
 QueueHandle_t rcSendQueue;
+TaskMessage taskMessage;
+
+#define RC_CHANNELS_LOG_FREQUENCY 500   // ms
+#define RC_LINK_STATS_LOG_FREQUENCY 500 // ms
+uint32_t lastRcChannelsLogMs = 0;
+uint32_t lastRcLinkStatsLogMs = 0;
+uint32_t lastBroadcastMs = 0;
 
 void terminateCrsf();
 /* RC Channels Event Callback. */
@@ -70,7 +80,8 @@ void taskReceiveFromRC(void *pvParameters)
     for (;;)
     {
         crsf->update();
-        delay(pdMS_TO_TICKS(100));
+        // TODO consider a 1ms delay?
+        delay(pdMS_TO_TICKS(10));
     }
 }
 
@@ -94,9 +105,9 @@ void taskSendToRC(void *pvParameters)
             {
             case TaskRC::BATTERY:
                 crsf->telemetryWriteBattery(
-                    message.get.battery.voltage,
-                    message.get.battery.current,
-                    message.get.battery.fuel,
+                    message.as.battery.voltage,
+                    message.as.battery.current,
+                    message.as.battery.fuel,
                     100);
                 break;
             default:
@@ -118,21 +129,14 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
 {
     // WARNING: Treat as an ISR callback!
 
-    /* This is your Link Statistics Event Callback.
-    By using the linkStatistics parameter that's passed in,
-    you have access to the following:
-    - linkStatistics.rssi
-    - linkStatistics.lqi
-    - linkStatistics.snr
-    - linkStatistics.tx_power
-
-    For the purposes of this example, these values are simply
-    printed to the Serial Monitor at a rate of 5 Hz. */
-
-    static unsigned long lastPrint = 0;
-    if (millis() - lastPrint >= 500)
+    // portYIELD_FROM_ISR requests a context switch to the highest priority task
+    // that is ready to run.
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    static const uint32_t currentMillis = millis();
+#if DEBUG_LOG_RC_LINK_STATS
+    if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY)
     {
-        lastPrint = millis();
+        lastRcLinkStatsLogMs = currentMillis;
         Serial.print("Link Statistics: ");
         Serial.print("RSSI: ");
         Serial.print(linkStatistics.rssi);
@@ -142,6 +146,22 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
         Serial.print(linkStatistics.snr);
         Serial.print(", Transmitter Power: ");
         Serial.println(linkStatistics.tx_power);
+    }
+#endif
+
+    if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY)
+    {
+        lastBroadcastMs = currentMillis;
+        taskMessage = {
+            .type = TaskMessageType::STATE_RC,
+            .rc = {
+                .rssi = linkStatistics.rssi,
+                .linkQuality = linkStatistics.lqi,
+                .signalNoiseRatio = linkStatistics.snr,
+                .tx_power = linkStatistics.tx_power,
+            }};
+        xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 }
 
@@ -160,33 +180,21 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
     - failsafe - A boolean flag indicating the "Fail-safe" status.
     - value[16] - An array consisting of all 16 received RC channels.
       NB: RC Channels are RAW values and are NOT in "microseconds" units.
+    */
 
-    For the purposes of this example, the fail-safe flag is used to centre
-    all channels except for Channel 5 (AKA Aux1). Aux1 is set to the
-    "Disarmed" position.
-    The RC Channels themselves are all converted to "microseconds" for
-    visualisation purposes, and printed to the Serial Monitor at a rate
-    of 100 Hz. */
+    // portYIELD_FROM_ISR requests a context switch to the highest priority task
+    // that is ready to run.
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
     if (rcData->failsafe)
     {
         if (!isFailsafeActive)
         {
             isFailsafeActive = true;
-
-            /* Centre all RC Channels, except for Channel 5 (Aux1). */
-            for (int i = 0; i < rcChannelCount; i++)
-            {
-                if (i != 4)
-                {
-                    rcData->value[i] = 992;
-                }
-            }
-
-            /* Set Channel 5 (Aux1) to its minimum value. */
-            rcData->value[4] = 191;
-
-            Serial.println("[Sketch | WARN]: Failsafe detected.");
+            Serial.println("[WARN]: Failsafe detected.");
+            taskMessage = {.type = TaskMessageType::TX_LOST};
+            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
     }
     else
@@ -196,18 +204,33 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         {
             isFailsafeActive = false;
             Serial.println("[Sketch | INFO]: Failsafe cleared.");
+            taskMessage = {.type = TaskMessageType::TX_RESTORED};
+            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
+        else
+        {
+            float motorRPM = mapRange(992, 2008, -30, 30, crsf->rcToUs(rcData->value[0]));
+            float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
+            taskMessage = {
+                .type = TaskMessageType::SET_MOTOR_SPEED_INDIVIDUAL,
+                .motorSpeedCombined = {
+                    .rpm = motorRPM,
+                    .direction = direction,
+                },
+            };
+            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
     }
 
-    /* Here is where you may write your RC channels implementation.
-    For this example, RC Channels are simply sent to the Serial Monitor. */
-    static uint32_t lastPrint = millis();
-
-    if (millis() - lastPrint >= 200)
+#if DEBUG_LOG_RC_CHANNELS
+    static const uint32_t currentMillis = millis();
+    if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY)
     {
-        lastPrint = millis();
+        lastRcChannelsLogMs = currentMillis;
 
-        Serial.print("[Sketch | INFO]: RC Channels: <");
+        Serial.print("[INFO]: RC Channels: <");
         for (int i = 0; i < rcChannelCount; i++)
         {
             Serial.print(rcChannelNames[i]);
@@ -221,4 +244,5 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         }
         Serial.println(">");
     }
+#endif
 }
