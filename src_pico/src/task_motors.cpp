@@ -18,7 +18,7 @@ void taskMotors(void *pvParameters) {
   for (;;) {
     // send a request to the cybergear to receive motor status (position, speed,
     // torque, temperature)
-    static const uint32_t currentMillis = millis();
+    const uint32_t currentMillis = millis();
     if (currentMillis - lastStatusRequestMs >= STATUS_REQUEST_FREQUENCY) {
       lastStatusRequestMs = currentMillis;
       cybergearL.request_status();

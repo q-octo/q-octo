@@ -121,7 +121,7 @@ void taskDisplay(void *pvParameters) {
     }
 
     // Blink the LED every second to show that the data is live
-    const unsigned long currentMillis = millis();
+    const uint32_t currentMillis = millis();
     if (currentMillis - lastBlinkMillis >= 1000) {
       lastBlinkMillis = currentMillis;
       blinkLED();

@@ -132,7 +132,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
     // portYIELD_FROM_ISR requests a context switch to the highest priority task
     // that is ready to run.
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    static const uint32_t currentMillis = millis();
+    const uint32_t currentMillis = millis();
 #if DEBUG_LOG_RC_LINK_STATS
     if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY)
     {

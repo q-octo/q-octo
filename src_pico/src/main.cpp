@@ -56,38 +56,38 @@ void setup() {
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
 
-  xTaskCreate(taskWatchdog, "taskWatchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
+  xTaskCreate(taskWatchdog, "watchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_1);
 
 #if ENABLE_DISPLAY
   // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE * (2^1), nullptr, 3, &displayHandle);
+  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (2^1), nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_1);
 #endif
 
 #if ENABLE_MOTORS
-  xTaskCreate(taskControlMotors, "taskControlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
+  xTaskCreate(taskControlMotors, "ctrlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
 #endif
 
-  xTaskCreate(taskSendToRC, "taskSendToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
+  xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
 
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
-  xTaskCreate(taskDataManager, "taskDataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
+  xTaskCreate(taskDataManager, "dataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
 
   // Producer
-  xTaskCreate(taskReceiveFromRC, "taskReceiveFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
+  xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
   vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
+  xTaskCreate(taskCAN, "CAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_1);
 #endif
 #if ENABLE_MOTORS
   // Producer
-  xTaskCreate(taskMotors, "taskMotors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
+  xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_1);
 #endif  
 }
