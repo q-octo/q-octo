@@ -39,7 +39,7 @@ const char *rcChannelNames[] = {
     "Aux12"};
 
 QueueHandle_t rcSendQueue;
-TaskMessage taskMessage;
+TaskMessage::Message taskMessage;
 
 #define RC_CHANNELS_LOG_FREQUENCY 500   // ms
 #define RC_LINK_STATS_LOG_FREQUENCY 500 // ms
@@ -89,14 +89,14 @@ void taskSendToRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
     Serial.println("taskSendToRC started");
-    rcSendQueue = xQueueCreate(10, sizeof(TaskRCMessage));
+    rcSendQueue = xQueueCreate(10, sizeof(TaskRC::Message));
     if (rcSendQueue == nullptr)
     {
         Serial.println("Failed to create rcSendQueue");
         vTaskDelete(nullptr);
     }
 
-    TaskRCMessage message;
+    TaskRC::Message message;
     for (;;)
     {
         if (xQueueReceive(rcSendQueue, &message, portMAX_DELAY))
@@ -153,7 +153,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
     {
         lastBroadcastMs = currentMillis;
         taskMessage = {
-            .type = TaskMessageType::STATE_RC,
+            .type = TaskMessage::Type::STATE_RC,
             .rc = {
                 .rssi = linkStatistics.rssi,
                 .linkQuality = linkStatistics.lqi,
@@ -192,7 +192,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         {
             isFailsafeActive = true;
             Serial.println("[WARN]: Failsafe detected.");
-            taskMessage = {.type = TaskMessageType::TX_LOST};
+            taskMessage = {.type = TaskMessage::Type::TX_LOST};
             xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
@@ -204,7 +204,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         {
             isFailsafeActive = false;
             Serial.println("[Sketch | INFO]: Failsafe cleared.");
-            taskMessage = {.type = TaskMessageType::TX_RESTORED};
+            taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
             xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         }
@@ -213,7 +213,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
             float motorRPM = mapRange(992, 2008, -30, 30, crsf->rcToUs(rcData->value[0]));
             float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
             taskMessage = {
-                .type = TaskMessageType::SET_MOTOR_SPEED_INDIVIDUAL,
+                .type = TaskMessage::Type::SET_MOTOR_SPEED_INDIVIDUAL,
                 .motorSpeedCombined = {
                     .rpm = motorRPM,
                     .direction = direction,

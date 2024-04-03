@@ -25,8 +25,8 @@ namespace TaskControlMotors
     MessageType type;
     union
     {
-      TaskMessageSetMotorSpeedIndividual speedIndividual;
-      TaskMessageSetMotorSpeedCombined speedCombined;
+      TaskMessage::SetMotorSpeedIndividual speedIndividual;
+      TaskMessage::SetMotorSpeedCombined speedCombined;
     } as;
   } Message;
 }

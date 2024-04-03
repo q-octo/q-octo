@@ -29,7 +29,7 @@ void taskMotors(void *pvParameters) {
       lastStatusBroadcastMs = currentMillis;
       auto statusL = cybergearL.get_status();
       auto statusR = cybergearR.get_status();
-      TaskMessageMotors motors = {
+      TaskMessage::Motors motors = {
           .left =
               {
                   .temperature = statusL.temperature,
@@ -46,7 +46,7 @@ void taskMotors(void *pvParameters) {
                   .position = statusR.position,
               },
       };
-      TaskMessage message = {.type = TaskMessageType::STATE_MOTORS,
+      TaskMessage::Message message = {.type = TaskMessage::Type::STATE_MOTORS,
                              .motors = motors};
       xQueueSend(dataManagerQueue, &message, 0);
     }

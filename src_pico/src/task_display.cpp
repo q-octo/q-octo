@@ -77,7 +77,7 @@ float motorRposition = 0.0;
 void taskDisplay(void *pvParameters) {
   (void)pvParameters; // To avoid warnings
   Serial.println("taskDisplay started");
-  displayQueue = xQueueCreate(10, sizeof(TaskDisplayMessage));
+  displayQueue = xQueueCreate(10, sizeof(TaskDisplay::Message));
   if (displayQueue == nullptr) {
     Serial.println("Failed to create displayQueue");
     vTaskDelete(nullptr);
@@ -88,7 +88,7 @@ void taskDisplay(void *pvParameters) {
 
   // Display is 240x135 pixels
   for (;;) {
-    TaskDisplayMessage message;
+    TaskDisplay::Message message;
     BaseType_t xStatus = xQueueReceive(displayQueue, &message, xTicksToWait);
     const bool messageReceived = xStatus == pdPASS;
 
@@ -96,23 +96,23 @@ void taskDisplay(void *pvParameters) {
       Serial.println("Message received");
       switch (message.type) {
       case TaskDisplay::MessageType::MOTORS:
-        motorLtemperature = message.motors.left.temperature;
-        motorLRPM = message.motors.left.RPM;
-        motorLtorque = message.motors.left.torque;
-        motorLposition = message.motors.left.position;
-        motorRtemperature = message.motors.right.temperature;
-        motorRRPM = message.motors.right.RPM;
-        motorRtorque = message.motors.right.torque;
-        motorRposition = message.motors.right.position;
+        motorLtemperature = message.as.motors.left.temperature;
+        motorLRPM = message.as.motors.left.RPM;
+        motorLtorque = message.as.motors.left.torque;
+        motorLposition = message.as.motors.left.position;
+        motorRtemperature = message.as.motors.right.temperature;
+        motorRRPM = message.as.motors.right.RPM;
+        motorRtorque = message.as.motors.right.torque;
+        motorRposition = message.as.motors.right.position;
         break;
       case TaskDisplay::MessageType::DIAGNOSTICS:
         break;
       case TaskDisplay::MessageType::RC:
         break;
       case TaskDisplay::MessageType::BATTERY:
-        batteryFuel = message.battery.fuel;
-        batteryVoltage = message.battery.voltage;
-        batteryCurrent = message.battery.current;
+        batteryFuel = message.as.battery.fuel;
+        batteryVoltage = message.as.battery.voltage;
+        batteryCurrent = message.as.battery.current;
         break;
       default:
         Serial.println("[ERROR] Unknown message type");

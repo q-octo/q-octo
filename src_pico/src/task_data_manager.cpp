@@ -5,8 +5,8 @@
 
 QueueHandle_t dataManagerQueue;
 
-TaskDisplayMessage displayMessage;
-TaskRCMessage rcMessage;
+TaskDisplay::Message displayMessage;
+TaskRC::Message rcMessage;
 TaskControlMotors::Message controlMotorsMessage;
 
 /*
@@ -23,34 +23,34 @@ void taskDataManager(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskDataManager started");
-  dataManagerQueue = xQueueCreate(10, sizeof(TaskMessage));
+  dataManagerQueue = xQueueCreate(10, sizeof(TaskMessage::Message));
   if (dataManagerQueue == nullptr)
   {
     Serial.println("Failed to create dataManagerQueue");
     vTaskDelete(nullptr);
   }
 
-  TaskMessage message;
+  TaskMessage::Message message;
   for (;;)
   {
     if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY))
     {
       switch (message.type)
       {
-      case TaskMessageType::STATE_MOTORS:
+      case TaskMessage::Type::STATE_MOTORS:
         Serial.println("taskDataManager: STATE_MOTORS received");
         displayMessage = {
             .type = TaskDisplay::MessageType::MOTORS,
-            .motors = message.motors,
+            .as = {.motors = message.motors},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         // Can send the message to other tasks such as the web server
         // task in the future
         break;
-      case TaskMessageType::STATE_BATTERY:
+      case TaskMessage::Type::STATE_BATTERY:
         displayMessage = {
             .type = TaskDisplay::MessageType::BATTERY,
-            .battery = message.battery,
+            .as = {.battery = message.battery},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         rcMessage = {
@@ -59,67 +59,61 @@ void taskDataManager(void *pvParameters)
         };
         xQueueSend(rcSendQueue, &rcMessage, 0);
         break;
-      case TaskMessageType::STATE_RC:
+      case TaskMessage::Type::STATE_RC:
         displayMessage = {
             .type = TaskDisplay::MessageType::RC,
-            .rc = message.rc,
+            .as = {.rc = message.rc},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
-      case TaskMessageType::STATE_DIAGNOSTICS:
+      case TaskMessage::Type::STATE_DIAGNOSTICS:
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .diagnostics = message.diagnostics,
+            .as = {.diagnostics = message.diagnostics},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
-      case TaskMessageType::ENABLE_DIAGNOSTICS:
+      case TaskMessage::Type::ENABLE_DIAGNOSTICS:
         // TODO(niall) enable web server
         // For now, just reply immediately
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .diagnostics =
-                {
-                    .diagnosticsMode = true,
-                },
+            .as = {.diagnostics = {.diagnosticsMode = true}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
-      case TaskMessageType::DISABLE_DIAGNOSTICS:
+      case TaskMessage::Type::DISABLE_DIAGNOSTICS:
         // TODO(niall) disable web server
         // For now, just reply immediately
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .diagnostics =
-                {
-                    .diagnosticsMode = false,
-                },
+            .as = {.diagnostics = {.diagnosticsMode = false}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
-      case TaskMessageType::ENABLE_MOTORS:
+      case TaskMessage::Type::ENABLE_MOTORS:
         break;
-      case TaskMessageType::DISABLE_MOTORS:
+      case TaskMessage::Type::DISABLE_MOTORS:
         break;
-      case TaskMessageType::SET_MOTOR_SPEED_COMBINED:
+      case TaskMessage::Type::SET_MOTOR_SPEED_COMBINED:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::SET_SPEED_COMBINED,
             .as = {.speedCombined = message.motorSpeedCombined},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;
-      case TaskMessageType::SET_MOTOR_SPEED_INDIVIDUAL:
+      case TaskMessage::Type::SET_MOTOR_SPEED_INDIVIDUAL:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::SET_SPEED_INDIVIDUAL,
             .as = {.speedIndividual = message.motorSpeedIndividual},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;
-      case TaskMessageType::TX_LOST:
+      case TaskMessage::Type::TX_LOST:
         controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         // TODO update display status to NO_TX
         break;
-      case TaskMessageType::TX_RESTORED:
+      case TaskMessage::Type::TX_RESTORED:
         controlMotorsMessage = {.type = TaskControlMotors::MessageType::ENABLE};
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         // Update display status

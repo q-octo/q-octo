@@ -8,17 +8,19 @@ namespace TaskRC
     {
         BATTERY,
     } MessageType;
-}
+
 
 typedef struct
 {
-    TaskRC::MessageType type;
+    MessageType type;
     union
     {
-        TaskMessageBattery battery;
+        TaskMessage::Battery battery;
     } as;
 
-} TaskRCMessage;
+} Message;
+
+}
 
 extern QueueHandle_t rcSendQueue;
 
