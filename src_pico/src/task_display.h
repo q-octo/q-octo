@@ -1,11 +1,9 @@
-#ifndef TASK_DISPLAY_H
-#define TASK_DISPLAY_H
+#pragma once
 
 #include "task_data_manager.h"
 
 namespace TaskDisplay
 {
-
     typedef enum
     {
         MOTORS,
@@ -14,21 +12,19 @@ namespace TaskDisplay
         DIAGNOSTICS,
     } MessageType;
 
-}
-typedef struct
-{
-    TaskDisplay::MessageType type;
-    union
+    typedef struct
     {
-        TaskMessageBattery battery;
-        TaskMessageDiagnostics diagnostics;
-        TaskMessageRC rc;
-        TaskMessageMotors motors;
-    };
-} TaskDisplayMessage;
+        MessageType type;
+        union
+        {
+            TaskMessage::Battery battery;
+            TaskMessage::Diagnostics diagnostics;
+            TaskMessage::RC rc;
+            TaskMessage::Motors motors;
+        } as;
+    } Message;
+}
 
 extern QueueHandle_t displayQueue;
 
 void taskDisplay(void *pvParameters);
-
-#endif // TASK_DISPLAY_H

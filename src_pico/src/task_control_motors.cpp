@@ -26,14 +26,14 @@ void taskControlMotors(void *pvParameters) {
   (void)pvParameters; //  To avoid warnings
 
   Serial.println("taskControlMotors started");
-  controlMotorsQueue = xQueueCreate(10, sizeof(TaskControlMotorsMessage));
+  controlMotorsQueue = xQueueCreate(10, sizeof(TaskControlMotors::Message));
   if (controlMotorsQueue == nullptr) {
     Serial.println("Failed to create dataManagerQueue");
     vTaskDelete(nullptr);
   }
   initMotors();
 
-  TaskControlMotorsMessage message;
+  TaskControlMotors::Message message;
   for (;;) {
     if (xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY)) {
       switch (message.type) {
@@ -48,13 +48,15 @@ void taskControlMotors(void *pvParameters) {
         cybergearR.stop_motor();
         break;
       case TaskControlMotors::SET_SPEED_COMBINED:
+        // TODO implement mixing
+        setSpeedIndividual(message.as.speedCombined.rpm,
+                           message.as.speedCombined.rpm);
         break;
       case TaskControlMotors::SET_SPEED_INDIVIDUAL:
-        setSpeedIndividual(message.speedIndividual.rpmL,
-                           message.speedIndividual.rpmR);
+        setSpeedIndividual(message.as.speedIndividual.rpmL,
+                           message.as.speedIndividual.rpmR);
         break;
       }
-
 
     }
   }

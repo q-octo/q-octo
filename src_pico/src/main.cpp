@@ -6,7 +6,7 @@
 #include <WiFi.h>
 #include "can.h"
 #include "task_control_motors.h"
-#include "task_crsf.h"
+#include "task_rc.h"
 #include "task_display.h"
 #include "task_motors.h"
 #include "web_server.h"
@@ -31,7 +31,8 @@ void taskDebug(void *pvParameters);
 void taskCAN(void *pvParameters);
 
 TaskHandle_t watchdogHandle = nullptr;
-TaskHandle_t crsfHandle = nullptr;
+TaskHandle_t receiveFromRCHandle = nullptr;
+TaskHandle_t sendToRCHandle = nullptr;
 TaskHandle_t displayHandle = nullptr;
 TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
@@ -59,35 +60,38 @@ void setup()
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
 
-  xTaskCreate(taskWatchdog, "taskWatchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
+  xTaskCreate(taskWatchdog, "watchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_1);
 
 #if ENABLE_DISPLAY
   // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "taskDisplay", configMINIMAL_STACK_SIZE * (2 ^ 1), nullptr, 3, &displayHandle);
+  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (2^1), nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_1);
 #endif
 
 #if ENABLE_MOTORS
-  xTaskCreate(taskControlMotors, "taskControlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
+  xTaskCreate(taskControlMotors, "ctrlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
 #endif
 
+  xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
+  vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
+
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
-  xTaskCreate(taskDataManager, "taskDataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
+  xTaskCreate(taskDataManager, "dataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
 
   // Producer
-  xTaskCreate(taskCRSF, "taskCRSF", configMINIMAL_STACK_SIZE, nullptr, 1, &crsfHandle);
-  vTaskCoreAffinitySet(crsfHandle, CORE_1);
+  xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
+  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "taskCAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
+  xTaskCreate(taskCAN, "CAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_1);
 #endif
 #if ENABLE_MOTORS
   // Producer
-  xTaskCreate(taskMotors, "taskMotors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
+  xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_1);
 #endif
 }
@@ -97,12 +101,14 @@ void loop()
 {
 #if DEBUG_LIST_TASKS
   printTaskStatus();
-  delay(5000);
 #endif
 #if ENABLE_WEB_SERVER
   WSWebServer::start();
   WSWebServer::loop();
 #endif
+  // It appears that a task labelled CORE0 runs this loop in a task
+  // So if this loop never blocks, no other task on core 0 will run!
+  delay(5000);
 }
 
 void printTaskStatus()
