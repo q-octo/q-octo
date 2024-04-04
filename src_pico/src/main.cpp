@@ -130,14 +130,24 @@ void printTaskStatus()
   delete[] pxTaskStatusArray;
 }
 
+uint32_t getTotalHeap(void) {
+    extern char __StackLimit, __bss_end__;
+    return &__StackLimit - &__bss_end__;
+}
+
+uint32_t getFreeHeap(void) {
+    struct mallinfo m = mallinfo();
+    return getTotalHeap() - m.uordblks;
+}
+
 void taskWatchdog(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskWatchdog started");
   for (;;)
   {
-    Serial.println("taskWatchdog tick");
-    delay(pdMS_TO_TICKS(2000));
+    Serial.printf("taskWatchdog tick, free heap: %lu\n", getFreeHeap());
+    delay(5000);
   }
 }
 
@@ -148,7 +158,7 @@ void taskCAN(void *pvParameters)
   for (;;)
   {
     CanCommunication::checkForPacket();
-    delay(pdMS_TO_TICKS(1));
+    delay(1);
   }
 }
 

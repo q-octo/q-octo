@@ -55,6 +55,6 @@ void taskMotors(void *pvParameters) {
     // sending a constant stream of messages. Do we receive these messages, are
     // they status updates? If so, we could avoid this polling approach
 
-    delay(pdMS_TO_TICKS(TASK_FREQUENCY));
+    delay(TASK_FREQUENCY);
   }
 }

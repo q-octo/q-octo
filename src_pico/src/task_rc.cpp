@@ -80,8 +80,7 @@ void taskReceiveFromRC(void *pvParameters)
     for (;;)
     {
         crsf->update();
-        // TODO consider a 1ms delay?
-        delay(pdMS_TO_TICKS(10));
+        delay(1);
     }
 }
 
