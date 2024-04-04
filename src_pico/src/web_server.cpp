@@ -8,44 +8,28 @@
 #include <LEAmDNS.h>
 
 /*
-The web server is off by default.
-When instructed, it will be started.
-It can be stopped.
-Anyway, it will establish a web socket connection and from there we can send
-commands back and fourth as we wish.
-Think back to the distributed systems & networks coursework, it's like this.
-Create a list of instructions and the shape of their associated payload.
+
+We need to establish a format for sending messages across the web socket
+connection.
 
 First action will likely be the server sending all current configuration info.
 I imagine that a key-value system will work for all the properties to be
 managed, this way we can add new configurations with minimal changes everywhere.
-
-
 */
 
-int status = WL_IDLE_STATUS; // the WiFi server status
-const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 WebServer webServer(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
 bool webServerIsRunning = false;
-bool webServerInitialised = false;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
-
-void initWebServer()
-{
-    if (webServerInitialised)
-    {
-        return;
-    }
-    webServerInitialised = true;
-}
 
 void handleRoot()
 {
     digitalWrite(LED_BUILTIN, 1);
+    // TODO(niall) serve the dashboard html.
+    // Web socket URL is ws://rover.local:81/
     webServer.send(200, "text/html", "<html><head><script>var connection = new WebSocket('ws://rover.local:81/', ['arduino']);connection.onopen = function () {  connection.send('Connect ' + new Date()); }; connection.onerror = function (error) {    console.log('WebSocket Error ', error);};connection.onmessage = function (e) {  console.log('Server: ', e.data);};function sendRGB() {  var r = parseInt(document.getElementById('r').value).toString(16);  var g = parseInt(document.getElementById('g').value).toString(16);  var b = parseInt(document.getElementById('b').value).toString(16);  if(r.length < 2) { r = '0' + r; }   if(g.length < 2) { g = '0' + g; }   if(b.length < 2) { b = '0' + b; }   var rgb = '#'+r+g+b;    console.log('RGB: ' + rgb); connection.send(rgb); }</script></head><body>LED Control:<br/><br/>R: <input id=\"r\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>G: <input id=\"g\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>B: <input id=\"b\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/></body></html>");
     digitalWrite(LED_BUILTIN, 0);
 }
@@ -62,7 +46,7 @@ void WSWebServer::start()
     WiFi.softAP("Q-Octo (rover.local)");
     delayMicroseconds(500 * 1000); // Without delay the IP might be blank (according to an example)
     Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP());
+    Serial.println(WiFi.softAPIP() + " (rover.local)");
 
     webServer.on("/", handleRoot);
     // webServer.onNotFound(handleRoot);
