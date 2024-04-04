@@ -11,11 +11,11 @@
 #include "task_motors.h"
 #include "web_server.h"
 
-#define ENABLE_CAN 0
-#define ENABLE_MOTORS 0
-#define ENABLE_DISPLAY 0
+#define ENABLE_CAN 1
+#define ENABLE_MOTORS 1
+#define ENABLE_DISPLAY 1
 #define ENABLE_WEB_SERVER 1
-#define DEBUG_LIST_TASKS 0
+#define DEBUG_LIST_TASKS 1
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
 
@@ -39,17 +39,20 @@ TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
 
+
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
                                                   {eBlocked, "Blocked"},
                                                   {eSuspended, "Suspended"},
                                                   {eDeleted, "Deleted"}};
+uint32_t lastDebugListTasksMs = 0;
+
 
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial)
-    ;          // Wait for serial connection to be established
+  // Wait for serial connection to be established
+  while (!Serial);
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
 #if ENABLE_CAN
@@ -86,7 +89,7 @@ void setup()
   xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
   vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "CAN", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
+  xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_1);
 #endif
 #if ENABLE_MOTORS
@@ -100,7 +103,12 @@ void setup()
 void loop()
 {
 #if DEBUG_LIST_TASKS
-  printTaskStatus();
+  const uint32_t currentMillis = millis();
+  if (currentMillis - lastDebugListTasksMs >= 5000)
+  {
+    lastDebugListTasksMs = currentMillis;
+    printTaskStatus();
+  }
 #endif
 #if ENABLE_WEB_SERVER
   WSWebServer::start();

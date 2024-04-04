@@ -6,6 +6,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <LEAmDNS.h>
+#include "packed_fs.h"
 
 /*
 
@@ -24,15 +25,7 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 bool webServerIsRunning = false;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
-
-void handleRoot()
-{
-    digitalWrite(LED_BUILTIN, 1);
-    // TODO(niall) serve the dashboard html.
-    // Web socket URL is ws://rover.local:81/
-    webServer.send(200, "text/html", "<html><head><script>var connection = new WebSocket('ws://rover.local:81/', ['arduino']);connection.onopen = function () {  connection.send('Connect ' + new Date()); }; connection.onerror = function (error) {    console.log('WebSocket Error ', error);};connection.onmessage = function (e) {  console.log('Server: ', e.data);};function sendRGB() {  var r = parseInt(document.getElementById('r').value).toString(16);  var g = parseInt(document.getElementById('g').value).toString(16);  var b = parseInt(document.getElementById('b').value).toString(16);  if(r.length < 2) { r = '0' + r; }   if(g.length < 2) { g = '0' + g; }   if(b.length < 2) { b = '0' + b; }   var rgb = '#'+r+g+b;    console.log('RGB: ' + rgb); connection.send(rgb); }</script></head><body>LED Control:<br/><br/>R: <input id=\"r\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>G: <input id=\"g\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>B: <input id=\"b\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/></body></html>");
-    digitalWrite(LED_BUILTIN, 0);
-}
+void handleRoot();
 
 void WSWebServer::start()
 {
@@ -90,9 +83,17 @@ void WSWebServer::loop()
     MDNS.update();
 }
 
+void handleRoot()
+{
+    digitalWrite(LED_BUILTIN, 1);
+    size_t htmlSize;
+    const char* html = mg_unpack("/index.html", &htmlSize, nullptr);
+    webServer.send(200, "text/html", html, htmlSize);
+    digitalWrite(LED_BUILTIN, 0);
+}
+
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 {
-
     switch (type)
     {
     case WStype_DISCONNECTED:
