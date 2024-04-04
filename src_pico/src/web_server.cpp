@@ -3,6 +3,8 @@
 #include "web_server.h"
 #include <WebSocketsServer.h>
 #include <ESP8266WiFi.h>
+#include <WebServer.h>
+#include <DNSServer.h>
 
 /*
 The web server is off by default.
@@ -24,10 +26,13 @@ managed, this way we can add new configurations with minimal changes everywhere.
 #define USE_SERIAL Serial
 
 int status = WL_IDLE_STATUS; // the WiFi server status
-// WiFiServer wifiServer(80);
+WiFiClass wifi;
+const byte DNS_PORT = 53;
+// IPAddress apIP(172, 217, 28, 1);
+IPAddress apIP(192, 168, 0, 1);
+DNSServer dnsServer;
+WebServer webServer(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
-WiFiMulti wifi;
-WiFiClass w;
 
 bool webServerIsRunning = false;
 bool webServerInitialised = false;
@@ -40,10 +45,17 @@ void initWebServer()
     {
         return;
     }
-    
+
     // wifi.addAP("paganello", "20242024");
     webServerInitialised = true;
     // USE_SERIAL.println("Web server initialised");
+}
+
+void handleRoot()
+{
+    digitalWrite(LED_BUILTIN, 1);
+    webServer.send(200, "text/html", "<html><head><script>var connection = new WebSocket('ws://192.168.0.1:81/', ['arduino']);connection.onopen = function () {  connection.send('Connect ' + new Date()); }; connection.onerror = function (error) {    console.log('WebSocket Error ', error);};connection.onmessage = function (e) {  console.log('Server: ', e.data);};function sendRGB() {  var r = parseInt(document.getElementById('r').value).toString(16);  var g = parseInt(document.getElementById('g').value).toString(16);  var b = parseInt(document.getElementById('b').value).toString(16);  if(r.length < 2) { r = '0' + r; }   if(g.length < 2) { g = '0' + g; }   if(b.length < 2) { b = '0' + b; }   var rgb = '#'+r+g+b;    console.log('RGB: ' + rgb); connection.send(rgb); }</script></head><body>LED Control:<br/><br/>R: <input id=\"r\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>G: <input id=\"g\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>B: <input id=\"b\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/></body></html>");
+    digitalWrite(LED_BUILTIN, 0);
 }
 
 void WSWebServer::start()
@@ -53,19 +65,35 @@ void WSWebServer::start()
         return;
     }
     USE_SERIAL.println("Starting web server");
-    if (!webServerInitialised)
-    {
-        initWebServer();
-    }
-    while (w.beginAP("paganello", "20242024") != WL_CONNECTED)
-    {
-        delayMicroseconds(100000);
-    }
+    // if (!webServerInitialised)
+    // {
+    //     initWebServer();
+    // }
+    wifi.mode(WIFI_AP);
+    wifi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WiFi.softAP("Q-Octo Diagnostics");
+
+    // if DNSServer is started with "*" for domain name, it will reply with
+    // provided IP to all DNS request
+    dnsServer.start(DNS_PORT, "rover.local", apIP);  
+    
+
+    // replay to all requests with same HTML
+    webServer.onNotFound(handleRoot);
+    webServer.begin();
+
+    // while (wifi.beginAP("paganello", "20242024") != WL_CONNECTED)
+    // {
+    //     delayMicroseconds(100000); // 100ms
+    // }
     USE_SERIAL.println("setup AP");
     webSocket.begin();
     USE_SERIAL.println("Web socket started");
     webSocket.onEvent(webSocketEvent);
     USE_SERIAL.println("Web socket event set");
+
+    webServer.on("/", handleRoot);
+    webServer.begin();
 
     // handle index
     // wifiServer.on("/", []()
@@ -90,6 +118,8 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
+    dnsServer.processNextRequest();
+    webServer.handleClient();
     webSocket.loop();
 }
 
@@ -128,7 +158,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         break;
     }
 }
-
 
 /*
 WiFiClient client = wifiServer.accept();

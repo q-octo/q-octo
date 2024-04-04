@@ -108,7 +108,7 @@ void loop()
 #endif
   // It appears that a task labelled CORE0 runs this loop in a task
   // So if this loop never blocks, no other task on core 0 will run!
-  delay(5000);
+  delay(1);
 }
 
 void printTaskStatus()
