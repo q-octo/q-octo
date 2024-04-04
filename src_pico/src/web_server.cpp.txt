@@ -2,7 +2,6 @@
 #include <Arduino.h>
 #include "web_server.h"
 #include <WebSocketsServer.h>
-#include <ESP8266WiFi.h>
 
 /*
 The web server is off by default.
@@ -24,10 +23,9 @@ managed, this way we can add new configurations with minimal changes everywhere.
 #define USE_SERIAL Serial
 
 int status = WL_IDLE_STATUS; // the WiFi server status
-// WiFiServer wifiServer(80);
+WiFiServer wifiServer(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
-WiFiMulti wifi;
-WiFiClass w;
+WiFiMulti wifi = WiFiMulti();
 
 bool webServerIsRunning = false;
 bool webServerInitialised = false;
@@ -40,10 +38,9 @@ void initWebServer()
     {
         return;
     }
-    
-    // wifi.addAP("paganello", "20242024");
+    WiFi.mode(WIFI_AP); 
+    wifi.addAP("paganello", "20242024");
     webServerInitialised = true;
-    // USE_SERIAL.println("Web server initialised");
 }
 
 void WSWebServer::start()
@@ -57,15 +54,12 @@ void WSWebServer::start()
     {
         initWebServer();
     }
-    while (w.beginAP("paganello", "20242024") != WL_CONNECTED)
+    while (wifi.run() != WL_CONNECTED)
     {
-        delayMicroseconds(100000);
+        delay(100);
     }
-    USE_SERIAL.println("setup AP");
     webSocket.begin();
-    USE_SERIAL.println("Web socket started");
     webSocket.onEvent(webSocketEvent);
-    USE_SERIAL.println("Web socket event set");
 
     // handle index
     // wifiServer.on("/", []()
@@ -73,7 +67,7 @@ void WSWebServer::start()
     //     // send index.html
     //     wifiServer.send(200, "text/html", "<html><head><script>var connection = new WebSocket('ws://'+location.hostname+':81/', ['arduino']);connection.onopen = function () {  connection.send('Connect ' + new Date()); }; connection.onerror = function (error) {    console.log('WebSocket Error ', error);};connection.onmessage = function (e) {  console.log('Server: ', e.data);};function sendRGB() {  var r = parseInt(document.getElementById('r').value).toString(16);  var g = parseInt(document.getElementById('g').value).toString(16);  var b = parseInt(document.getElementById('b').value).toString(16);  if(r.length < 2) { r = '0' + r; }   if(g.length < 2) { g = '0' + g; }   if(b.length < 2) { b = '0' + b; }   var rgb = '#'+r+g+b;    console.log('RGB: ' + rgb); connection.send(rgb); }</script></head><body>LED Control:<br/><br/>R: <input id=\"r\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>G: <input id=\"g\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/>B: <input id=\"b\" type=\"range\" min=\"0\" max=\"255\" step=\"1\" oninput=\"sendRGB();\" /><br/></body></html>"); });
 
-    // wifiServer.begin();
+    wifiServer.begin();
 
     webServerIsRunning = true;
 }
@@ -91,6 +85,32 @@ void WSWebServer::stop()
 void WSWebServer::loop()
 {
     webSocket.loop();
+    WiFiClient client = wifiServer.accept();
+    if (client)
+    {
+        while (client.connected())
+        {
+            if (client.available())
+            {
+                USE_SERIAL.println("Connected to /");
+                char c = client.read();
+                // Process the request and send a response
+                client.println("HTTP/1.1 200 OK");
+                client.println("Content-Type: text/html");
+                client.println("Connection: close");
+                client.println();
+                client.println("<!DOCTYPE HTML>");
+                client.println("<html>");
+                // Add your HTML content here
+                client.println("Something works :)");
+                client.println("</html>");
+                break;
+            }
+        }
+        // Can probably remove the delay
+        delay(1);
+        client.stop();
+    }
 }
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
@@ -128,33 +148,3 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         break;
     }
 }
-
-
-/*
-WiFiClient client = wifiServer.accept();
-    if (client)
-    {
-        while (client.connected())
-        {
-            if (client.available())
-            {
-                USE_SERIAL.println("Connected to /");
-                char c = client.read();
-                // Process the request and send a response
-                client.println("HTTP/1.1 200 OK");
-                client.println("Content-Type: text/html");
-                client.println("Connection: close");
-                client.println();
-                client.println("<!DOCTYPE HTML>");
-                client.println("<html>");
-                // Add your HTML content here
-                client.println("Something works :)");
-                client.println("</html>");
-                break;
-            }
-        }
-        // Can probably remove the delay
-        delay(1);
-        client.stop();
-    }
-*/
