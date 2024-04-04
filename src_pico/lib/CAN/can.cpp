@@ -81,8 +81,8 @@ void CanCommunication::checkForPacket()
  */
 void CanCommunication::sendCANPacket(uint32_t id, uint8_t *data)
 {
-    Serial.print("Sending packet with id 0x");
-    Serial.println(id, HEX);
+    // Serial.print("Sending packet with id 0x");
+    // Serial.println(id, HEX);
     // Remote transmission request (false for data frame, true for remote frame)
     bool rtr = false;
     // Data Length Code (how many bytes are being transmitted)

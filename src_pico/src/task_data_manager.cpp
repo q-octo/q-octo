@@ -38,7 +38,7 @@ void taskDataManager(void *pvParameters)
       switch (message.type)
       {
       case TaskMessage::Type::STATE_MOTORS:
-        Serial.println("taskDataManager: STATE_MOTORS received");
+        // Serial.println("taskDataManager: STATE_MOTORS received");
         displayMessage = {
             .type = TaskDisplay::MessageType::MOTORS,
             .as = {.motors = message.motors},

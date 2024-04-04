@@ -32,6 +32,9 @@ void taskControlMotors(void *pvParameters) {
     vTaskDelete(nullptr);
   }
   initMotors();
+  // for (;;) {
+  //   debugAlternateMotorSpeed();
+  // }
 
   TaskControlMotors::Message message;
   for (;;) {

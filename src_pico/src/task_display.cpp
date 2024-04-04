@@ -93,7 +93,7 @@ void taskDisplay(void *pvParameters) {
     const bool messageReceived = xStatus == pdPASS;
 
     if (messageReceived) {
-      Serial.println("Message received");
+      // Serial.println("Message received");
       switch (message.type) {
       case TaskDisplay::MessageType::MOTORS:
         motorLtemperature = message.as.motors.left.temperature;
