@@ -3,3 +3,5 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+# Pack binary (https://github.com/cesanta/mongoose/blob/9276f764e094daa915a1989144f40413c1144f76/test/pack.c)
+packed_fs/pack

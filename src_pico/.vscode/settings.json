@@ -18,6 +18,7 @@
         "sstream": "cpp",
         "map": "cpp",
         "cmath": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "cstdlib": "cpp"
     }
 }

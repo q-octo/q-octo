@@ -23,4 +23,10 @@ Priority levels range from 0 to 7.
 `delay()` and `yield()` free the CPU for other tasks, while delayMicroseconds() does not.
 
 
+## Web Server
+
+Example code:
+* https://github.com/Links2004/arduinoWebSockets/tree/master/examples/esp8266_pico
+* https://github.com/earlephilhower/arduino-pico/tree/master/libraries/WebServer/examples
+
 ## Licensing and Credits
