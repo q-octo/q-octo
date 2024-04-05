@@ -8,7 +8,7 @@
 
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
 #define DEBUG_LOG_RC_CHANNELS 1
-#define DEBUG_LOG_RC_LINK_STATS 1
+#define DEBUG_LOG_RC_LINK_STATS 0
 #define BROADCAST_FREQUENCY 500 // ms
 
 CRSFforArduino *crsf = nullptr;
@@ -41,7 +41,7 @@ const char *rcChannelNames[] = {
 QueueHandle_t rcSendQueue;
 TaskMessage::Message taskMessage;
 
-#define RC_CHANNELS_LOG_FREQUENCY 500   // ms
+#define RC_CHANNELS_LOG_FREQUENCY 10    // ms
 #define RC_LINK_STATS_LOG_FREQUENCY 500 // ms
 uint32_t lastRcChannelsLogMs = 0;
 uint32_t lastRcLinkStatsLogMs = 0;
@@ -126,11 +126,7 @@ void terminateCrsf()
 
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistics)
 {
-    // WARNING: Treat as an ISR callback!
 
-    // portYIELD_FROM_ISR requests a context switch to the highest priority task
-    // that is ready to run.
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     const uint32_t currentMillis = millis();
 #if DEBUG_LOG_RC_LINK_STATS
     if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY)
@@ -162,14 +158,12 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
                 },
             },
         };
-        xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        xQueueSend(dataManagerQueue, &taskMessage, 0);
     }
 }
 
 void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
 {
-    // WARNING: Treat as an ISR callback!
 
     /* This is your RC Channels Event Callback.
     Here, you have access to all 16 11-bit channels,
@@ -181,50 +175,10 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
 
     - failsafe - A boolean flag indicating the "Fail-safe" status.
     - value[16] - An array consisting of all 16 received RC channels.
-      NB: RC Channels are RAW values and are NOT in "microseconds" units.
+    NB: RC Channels are RAW values and are NOT in "microseconds" units.
     */
-
-    // portYIELD_FROM_ISR requests a context switch to the highest priority task
-    // that is ready to run.
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    if (rcData->failsafe)
-    {
-        if (!isFailsafeActive)
-        {
-            isFailsafeActive = true;
-            Serial.println("[WARN]: Failsafe detected.");
-            taskMessage = {.type = TaskMessage::Type::TX_LOST};
-            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        }
-    }
-    else
-    {
-        /* Set the failsafe status to false. */
-        if (isFailsafeActive)
-        {
-            isFailsafeActive = false;
-            Serial.println("[Sketch | INFO]: Failsafe cleared.");
-            taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
-            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        }
-        else
-        {
-            float motorRPM = mapRange(992, 2008, -30, 30, crsf->rcToUs(rcData->value[0]));
-            float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
-            taskMessage = {
-                .type = TaskMessage::Type::SET_MOTOR_SPEED_INDIVIDUAL,
-                .as = {.motorSpeedCombined = {.rpm = motorRPM, .direction = direction}},
-            };
-            xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        }
-    }
-
 #if DEBUG_LOG_RC_CHANNELS
-    static const uint32_t currentMillis = millis();
+    const uint32_t currentMillis = millis();
     if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY)
     {
         lastRcChannelsLogMs = currentMillis;
@@ -244,4 +198,36 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         Serial.println(">");
     }
 #endif
+
+    if (rcData->failsafe)
+    {
+        if (!isFailsafeActive)
+        {
+            isFailsafeActive = true;
+            Serial.println("[WARN]: Failsafe detected.");
+            taskMessage = {.type = TaskMessage::Type::TX_LOST};
+            xQueueSend(dataManagerQueue, &taskMessage, 0);
+        }
+    }
+    else
+    {
+        /* Set the failsafe status to false. */
+        if (isFailsafeActive)
+        {
+            isFailsafeActive = false;
+            Serial.println("[Sketch | INFO]: Failsafe cleared.");
+            taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
+            xQueueSend(dataManagerQueue, &taskMessage, 0);
+        }
+        else
+        {
+            float motorRPM = mapRange(992, 2008, -30, 30, crsf->rcToUs(rcData->value[0]));
+            float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
+            taskMessage = {
+                .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
+                .as = {.motorSpeedCombined = {.rpm = motorRPM, .direction = direction}},
+            };
+            xQueueSend(dataManagerQueue, &taskMessage, 0);
+        }
+    }
 }
