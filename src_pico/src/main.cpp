@@ -131,20 +131,10 @@ void taskWatchdog(void *pvParameters)
   Serial.println("taskWatchdog started");
   for (;;)
   {
-    Serial.println("taskWatchdog: tick");
-    printHeapStats();
+    Serial.printf("taskWatchdog: tick, free heap: %d\n", rp2040.getFreeHeap());
     delay(5000);
   }
 }
 
-void printHeapStats()
-{
-  HeapStats_t stats;
-  vPortGetHeapStats(&stats);
-  Serial.println("--- HEAP STATS ---");
-  Serial.printf("space:\t\t\t\t%zu\n", stats.xAvailableHeapSpaceInBytes);
-  Serial.printf("largest free block:\t%zu\n", stats.xSizeOfLargestFreeBlockInBytes);
-  Serial.printf("smallest free block:\t%zu\n", stats.xSizeOfSmallestFreeBlockInBytes);
-  Serial.printf("free block count:\t%zu\n", stats.xNumberOfFreeBlocks);
-}
+
 
