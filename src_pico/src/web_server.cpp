@@ -11,19 +11,9 @@
 #define AUTO_RESTART_WEBSOCKETS 0
 #define RESTART_WEBSOCKETS_FREQUENCY 1000 * 15 // 15 seconds
 
-/*
-
-We need to establish a format for sending messages across the web socket
-connection.
-
-First action will likely be the server sending all current configuration info.
-I imagine that a key-value system will work for all the properties to be
-managed, this way we can add new configurations with minimal changes everywhere.
-*/
-
 IPAddress apIP(192, 168, 4, 1);
-WebServer webServer(80);
-WebSocketsServer webSocket = WebSocketsServer(81);
+WebServer *webServer;
+WebSocketsServer *webSocket;
 
 bool webServerIsRunning = false;
 uint32_t lastWebSocketRestart = 0;
@@ -46,13 +36,16 @@ void WSWebServer::start()
     Serial.print("AP IP address: ");
     Serial.println(WiFi.softAPIP() + " (rover.local)");
 
-    webServer.on("/", handleRoot);
+    webServer = new WebServer(80);
+
+    webServer->on("/", handleRoot);
     // webServer.onNotFound(handleRoot);
-    webServer.begin();
+    webServer->begin();
     Serial.println("HTTP server started");
 
-    webSocket.begin();
-    webSocket.onEvent(webSocketEvent);
+    webSocket = new WebSocketsServer(81);
+    webSocket->begin();
+    webSocket->onEvent(webSocketEvent);
     Serial.println("Web socket server started");
 
     // Setup MDNS responder (creates rover.local domain within the AP)
@@ -73,8 +66,12 @@ void WSWebServer::start()
 
 void WSWebServer::stop()
 {
-    webSocket.close();
-    webServer.close();
+    webSocket->close();
+    delete webSocket;
+    webSocket = nullptr;
+    webServer->close();
+    delete webServer;
+    webServer = nullptr;
     MDNS.close();
     WiFi.softAPdisconnect();
 
@@ -85,8 +82,8 @@ void WSWebServer::loop()
 {
     if (webServerIsRunning)
     {
-        webServer.handleClient();
-        webSocket.loop();
+        webServer->handleClient();
+        webSocket->loop();
         MDNS.update();
 #if AUTO_RESTART_WEBSOCKETS
         const uint32_t currentMs = millis();
@@ -109,7 +106,7 @@ void handleRoot()
     digitalWrite(LED_BUILTIN, 1);
     size_t htmlSize;
     const char *html = mg_unpack("/index.html", &htmlSize, nullptr);
-    webServer.send(200, "text/html", html, htmlSize);
+    webServer->send(200, "text/html", html, htmlSize);
     digitalWrite(LED_BUILTIN, 0);
 }
 
@@ -122,11 +119,11 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         break;
     case WStype_CONNECTED:
     {
-        IPAddress ip = webSocket.remoteIP(num);
+        IPAddress ip = webSocket->remoteIP(num);
         Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
 
         // send message to client
-        webSocket.sendTXT(num, "Connected");
+        webSocket->sendTXT(num, "Connected");
     }
     break;
     case WStype_TEXT:
@@ -151,6 +148,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 void restartWebSocket()
 {
     Serial.println("Restarting web socket server");
-    webSocket.close();
-    webSocket.begin();
+    webSocket->close();
+    webSocket->begin();
 }
