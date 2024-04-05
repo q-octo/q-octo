@@ -40,7 +40,7 @@ void taskDataManager(void *pvParameters)
       case TaskMessage::Type::STATE_MOTORS:
         displayMessage = {
             .type = TaskDisplay::MessageType::MOTORS,
-            .as = {.motors = message.motors},
+            .as = {.motors = message.as.motors},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         // Can send the message to other tasks such as the web server
@@ -49,26 +49,26 @@ void taskDataManager(void *pvParameters)
       case TaskMessage::Type::STATE_BATTERY:
         displayMessage = {
             .type = TaskDisplay::MessageType::BATTERY,
-            .as = {.battery = message.battery},
+            .as = {.battery = message.as.battery},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         rcMessage = {
             .type = TaskRC::MessageType::BATTERY,
-            .as = {.battery = message.battery},
+            .as = {.battery = message.as.battery},
         };
         xQueueSend(rcSendQueue, &rcMessage, 0);
         break;
       case TaskMessage::Type::STATE_RC:
         displayMessage = {
             .type = TaskDisplay::MessageType::RC,
-            .as = {.rc = message.rc},
+            .as = {.rc = message.as.rc},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
       case TaskMessage::Type::STATE_DIAGNOSTICS:
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .as = {.diagnostics = message.diagnostics},
+            .as = {.diagnostics = message.as.diagnostics},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
@@ -96,14 +96,14 @@ void taskDataManager(void *pvParameters)
       case TaskMessage::Type::SET_MOTOR_SPEED_COMBINED:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::SET_SPEED_COMBINED,
-            .as = {.speedCombined = message.motorSpeedCombined},
+            .as = {.speedCombined = message.as.motorSpeedCombined},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;
       case TaskMessage::Type::SET_MOTOR_SPEED_INDIVIDUAL:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::SET_SPEED_INDIVIDUAL,
-            .as = {.speedIndividual = message.motorSpeedIndividual},
+            .as = {.speedIndividual = message.as.motorSpeedIndividual},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;
@@ -120,13 +120,13 @@ void taskDataManager(void *pvParameters)
       case TaskMessage::CAN_MESSAGE_MOTOR_L:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_L,
-            .as = {.canMessage = message.canMessage},
+            .as = {.canMessage = message.as.canMessage},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
       case TaskMessage::CAN_MESSAGE_MOTOR_R:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_R,
-            .as = {.canMessage = message.canMessage},
+            .as = {.canMessage = message.as.canMessage},
         };
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;

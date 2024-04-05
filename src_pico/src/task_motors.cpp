@@ -120,7 +120,7 @@ void taskMotors(void *pvParameters)
               },
       };
       TaskMessage::Message message = {.type = TaskMessage::Type::STATE_MOTORS,
-                                      .motors = motors};
+                                      .as = {.motors = motors}};
       xQueueSend(dataManagerQueue, &message, 0);
     }
 

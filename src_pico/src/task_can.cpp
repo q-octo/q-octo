@@ -27,8 +27,7 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
   // TODO handle messages from the rotary encoder
 
   TaskMessage::Message message = {
-      .canMessage = {.id = packetId, .data = packetData},
-  };
+      .as = {.canMessage = {.id = packetId, .data = packetData}}};
   switch ((packetId & 0xFF00) >> 8)
   {
   case CYBERGEAR_CAN_ID_L:

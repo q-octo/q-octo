@@ -86,6 +86,7 @@ namespace TaskMessage
     uint8_t* data;
   } CanMessage;
 
+
   typedef struct
   {
     Type type;
@@ -98,8 +99,7 @@ namespace TaskMessage
       SetMotorSpeedIndividual motorSpeedIndividual;
       SetMotorSpeedCombined motorSpeedCombined;
       CanMessage canMessage;
-
-    };
+    } as;
   } Message;
 
 }

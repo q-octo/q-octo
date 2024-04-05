@@ -153,12 +153,15 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
         lastBroadcastMs = currentMillis;
         taskMessage = {
             .type = TaskMessage::Type::STATE_RC,
-            .rc = {
-                .rssi = linkStatistics.rssi,
-                .linkQuality = linkStatistics.lqi,
-                .signalNoiseRatio = linkStatistics.snr,
-                .tx_power = linkStatistics.tx_power,
-            }};
+            .as = {
+                .rc = {
+                    .rssi = linkStatistics.rssi,
+                    .linkQuality = linkStatistics.lqi,
+                    .signalNoiseRatio = linkStatistics.snr,
+                    .tx_power = linkStatistics.tx_power,
+                },
+            },
+        };
         xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
@@ -213,10 +216,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
             float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
             taskMessage = {
                 .type = TaskMessage::Type::SET_MOTOR_SPEED_INDIVIDUAL,
-                .motorSpeedCombined = {
-                    .rpm = motorRPM,
-                    .direction = direction,
-                },
+                .as = {.motorSpeedCombined = {.rpm = motorRPM, .direction = direction}},
             };
             xQueueSendFromISR(dataManagerQueue, &taskMessage, &xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
