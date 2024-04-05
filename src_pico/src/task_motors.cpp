@@ -22,7 +22,7 @@ XiaomiCyberGearDriver cybergearR =
     XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
 
 QueueHandle_t controlMotorsQueue;
-bool motorsEnabled = false;
+bool motorsEnabled = true;
 
 uint32_t lastStatusRequestMs = 0;
 uint32_t lastStatusBroadcastMs = 0;
@@ -39,9 +39,6 @@ void taskControlMotors(void *pvParameters)
     vTaskDelete(nullptr);
   }
   initMotors();
-  // for (;;) {
-  //   debugAlternateMotorSpeed();
-  // }
 
   TaskControlMotors::Message message;
   for (;;)
@@ -133,6 +130,7 @@ void taskMotors(void *pvParameters)
 
 void setSpeedIndividual(float speedL, float speedR)
 {
+  Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
@@ -151,12 +149,14 @@ void initMotors()
 
 void debugAlternateMotorSpeed()
 {
+  Serial.println("L: 0 R: 2");
   cybergearR.set_speed_ref(0);
   cybergearL.set_speed_ref(2);
-  delay(1000);
+  delayMicroseconds(1000 * 1000);
+  Serial.println("L: 2 R: 0");
   cybergearL.set_speed_ref(0);
   cybergearR.set_speed_ref(2);
-  delay(1000);
+  delayMicroseconds(1000 * 1000);
 }
 
 void debugPrintMotorStatus()

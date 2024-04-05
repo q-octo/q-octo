@@ -8,9 +8,10 @@
 #include "task_motors.h"
 #include "task_rc.h"
 #include "task_display.h"
+#include "task_can.h"
 #include "web_server.h"
 
-#define ENABLE_CAN 0
+#define ENABLE_CAN 1
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
 #define START_WEB_SERVER_ON_STARTUP 1
@@ -47,6 +48,10 @@ void setup()
     ;
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
+#if ENABLE_CAN
+  // IMPORTANT that this occurs outside of a FreeRTOS task
+  CanCommunication::init(onReceiveCanPacket); 
+#endif
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow

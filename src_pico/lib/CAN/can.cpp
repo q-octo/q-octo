@@ -9,6 +9,8 @@
 #define CAN_BAUDRATE (1000000) // 1Mbit/s (determined by the motor)
 Adafruit_MCP2515 mcp(CS_PIN);
 
+#define DEBUG_CAN 0
+
 PacketCallback _onPacketReceived;
 
 void CanCommunication::init(PacketCallback onPacketReceived)
@@ -28,10 +30,12 @@ void CanCommunication::checkForPacket()
 
     if (packetSize)
     {
+
+        bool extended = mcp.packetExtended();
+#if DEBUG_CAN
         // received a packet
         Serial.print("Received ");
 
-        bool extended = mcp.packetExtended();
         if (extended)
         {
             Serial.print("extended ");
@@ -45,16 +49,16 @@ void CanCommunication::checkForPacket()
 
         Serial.print("packet with id 0x");
         Serial.print(mcp.packetId(), HEX);
-
+#endif
         if (mcp.packetRtr())
         {
-            Serial.print(" and requested length ");
-            Serial.println(mcp.packetDlc());
+            // Serial.print(" and requested length ");
+            // Serial.println(mcp.packetDlc());
         }
         else
         {
-            Serial.print(" and length ");
-            Serial.println(packetSize);
+            // Serial.print(" and length ");
+            // Serial.println(packetSize);
             uint8_t packetData[8] = {0};
             int i = 0;
             // only print packet data for non-RTR packets

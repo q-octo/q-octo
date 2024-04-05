@@ -41,7 +41,7 @@ const char *rcChannelNames[] = {
 QueueHandle_t rcSendQueue;
 TaskMessage::Message taskMessage;
 
-#define RC_CHANNELS_LOG_FREQUENCY 10    // ms
+#define RC_CHANNELS_LOG_FREQUENCY 500   // ms
 #define RC_LINK_STATS_LOG_FREQUENCY 500 // ms
 uint32_t lastRcChannelsLogMs = 0;
 uint32_t lastRcLinkStatsLogMs = 0;
@@ -215,17 +215,29 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         if (isFailsafeActive)
         {
             isFailsafeActive = false;
-            Serial.println("[Sketch | INFO]: Failsafe cleared.");
+            Serial.println("[INFO]: Failsafe cleared.");
             taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
             xQueueSend(dataManagerQueue, &taskMessage, 0);
         }
         else
         {
-            float motorRPM = mapRange(992, 2008, -30, 30, crsf->rcToUs(rcData->value[0]));
-            float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
+            // float motorRPM = mapRange(992, 2008, -10, 10, crsf->rcToUs(rcData->value[0]));
+            // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
+            float rpm = 0;
+            auto rcValue = crsf->rcToUs(rcData->value[0]);
+            if (rcValue > 1800) {
+                rpm = 5;
+            }
+            else if (rcValue < 1200) {
+                rpm = -5;
+            }
+            else {
+                rpm = 0;
+            }
+            
             taskMessage = {
                 .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
-                .as = {.motorSpeedCombined = {.rpm = motorRPM, .direction = direction}},
+                .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
             };
             xQueueSend(dataManagerQueue, &taskMessage, 0);
         }
