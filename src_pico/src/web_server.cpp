@@ -174,6 +174,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     break;
     case WStype_TEXT:
         Serial.printf("[%u] get Text: %s\n", num, payload);
+        
+        if (strcmp((char *)payload, "#000000") == 0)
+        {
+            Serial.println("restarting web server");
+            WSWebServer::stop();
+            WSWebServer::start();
+        }
 
         // send message to client
         // webSocket.sendTXT(num, "message here");
