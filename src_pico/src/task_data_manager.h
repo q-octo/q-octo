@@ -23,6 +23,10 @@ namespace TaskMessage
     TX_LOST,
     // The RC signal was restored
     TX_RESTORED,
+    CAN_MESSAGE_MOTOR_L,
+    CAN_MESSAGE_MOTOR_R,
+    CAN_MESSAGE_ROT_ENC_L,
+    CAN_MESSAGE_ROT_ENC_R,
   } Type;
 
   typedef struct
@@ -78,6 +82,12 @@ namespace TaskMessage
 
   typedef struct
   {
+    uint32_t id;
+    uint8_t* data;
+  } CanMessage;
+
+  typedef struct
+  {
     Type type;
     union
     {
@@ -87,6 +97,8 @@ namespace TaskMessage
       Diagnostics diagnostics;
       SetMotorSpeedIndividual motorSpeedIndividual;
       SetMotorSpeedCombined motorSpeedCombined;
+      CanMessage canMessage;
+
     };
   } Message;
 

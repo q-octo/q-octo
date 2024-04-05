@@ -5,10 +5,9 @@
 
 #include <WiFi.h>
 #include "can.h"
-#include "task_control_motors.h"
+#include "task_motors.h"
 #include "task_rc.h"
 #include "task_display.h"
-#include "task_motors.h"
 #include "web_server.h"
 
 #define ENABLE_CAN 0
@@ -19,16 +18,8 @@
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
 
-void printTaskStatus();
-
-void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
-                        bool extended);
-
 void taskWatchdog(void *pvParameters);
-
-void taskDebug(void *pvParameters);
-
-void taskCAN(void *pvParameters);
+void printTaskStatus();
 void printHeapStats();
 
 TaskHandle_t watchdogHandle = nullptr;
@@ -55,10 +46,6 @@ void setup()
     ;
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
-#if ENABLE_CAN
-  CanCommunication::init(onReceiveCanPacket);
-#endif
-
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
@@ -161,33 +148,3 @@ void printHeapStats()
   Serial.printf("free block count:\t%zu\n", stats.xNumberOfFreeBlocks);
 }
 
-void taskCAN(void *pvParameters)
-{
-  (void)pvParameters; //  To avoid warnings
-  Serial.println("taskCAN started");
-  for (;;)
-  {
-    CanCommunication::checkForPacket();
-    delay(1);
-  }
-}
-
-void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
-                        bool extended)
-{
-  Serial.print("main.cpp: Received packet with id 0x");
-  Serial.print(packetId, HEX);
-
-  switch ((packetId & 0xFF00) >> 8)
-  {
-  case CYBERGEAR_CAN_ID_L:
-    cybergearL.process_message(packetData);
-    break;
-  case CYBERGEAR_CAN_ID_R:
-    cybergearR.process_message(packetData);
-    break;
-  default:
-    Serial.println("main.cpp: Received packet from unknown device");
-    break;
-  }
-}

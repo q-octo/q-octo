@@ -1,7 +1,7 @@
 #include "task_data_manager.h"
 #include "task_display.h"
 #include "task_rc.h"
-#include "task_control_motors.h"
+#include "task_motors.h"
 
 QueueHandle_t dataManagerQueue;
 
@@ -38,7 +38,6 @@ void taskDataManager(void *pvParameters)
       switch (message.type)
       {
       case TaskMessage::Type::STATE_MOTORS:
-        // Serial.println("taskDataManager: STATE_MOTORS received");
         displayMessage = {
             .type = TaskDisplay::MessageType::MOTORS,
             .as = {.motors = message.motors},
@@ -117,6 +116,22 @@ void taskDataManager(void *pvParameters)
         controlMotorsMessage = {.type = TaskControlMotors::MessageType::ENABLE};
         xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         // Update display status
+        break;
+      case TaskMessage::CAN_MESSAGE_MOTOR_L:
+        controlMotorsMessage = {
+            .type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_L,
+            .as = {.canMessage = message.canMessage},
+        };
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+      case TaskMessage::CAN_MESSAGE_MOTOR_R:
+        controlMotorsMessage = {
+            .type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_R,
+            .as = {.canMessage = message.canMessage},
+        };
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        break;
+      case TaskMessage::CAN_MESSAGE_ROT_ENC_L:
+      case TaskMessage::CAN_MESSAGE_ROT_ENC_R:
         break;
       default:
         Serial.println("[ERROR] Unknown message type");
