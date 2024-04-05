@@ -8,6 +8,9 @@
 #include <LEAmDNS.h>
 #include "packed_fs.h"
 
+#define AUTO_RESTART_WEBSOCKETS 0
+#define RESTART_WEBSOCKETS_FREQUENCY 1000 * 15 // 15 seconds
+
 /*
 
 We need to establish a format for sending messages across the web socket
@@ -23,9 +26,11 @@ WebServer webServer(80);
 WebSocketsServer webSocket = WebSocketsServer(81);
 
 bool webServerIsRunning = false;
+uint32_t lastWebSocketRestart = 0;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
 void handleRoot();
+void restartWebSocket();
 
 void WSWebServer::start()
 {
@@ -78,16 +83,32 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
-    webServer.handleClient();
-    webSocket.loop();
-    MDNS.update();
+    if (webServerIsRunning)
+    {
+        webServer.handleClient();
+        webSocket.loop();
+        MDNS.update();
+#if AUTO_RESTART_WEBSOCKETS
+        const uint32_t currentMs = millis();
+        if (lastWebSocketRestart == 0)
+        {
+            // First run
+            lastWebSocketRestart = currentMs;
+        }
+        if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
+        {
+            restartWebSocket();
+            lastWebSocketRestart = currentMs;
+        }
+#endif
+    }
 }
 
 void handleRoot()
 {
     digitalWrite(LED_BUILTIN, 1);
     size_t htmlSize;
-    const char* html = mg_unpack("/index.html", &htmlSize, nullptr);
+    const char *html = mg_unpack("/index.html", &htmlSize, nullptr);
     webServer.send(200, "text/html", html, htmlSize);
     digitalWrite(LED_BUILTIN, 0);
 }
@@ -125,4 +146,11 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         // webSocket.sendBIN(num, payload, length);
         break;
     }
+}
+
+void restartWebSocket()
+{
+    Serial.println("Restarting web socket server");
+    webSocket.close();
+    webSocket.begin();
 }
