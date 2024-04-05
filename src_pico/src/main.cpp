@@ -29,6 +29,7 @@ void taskWatchdog(void *pvParameters);
 void taskDebug(void *pvParameters);
 
 void taskCAN(void *pvParameters);
+void printHeapStats();
 
 TaskHandle_t watchdogHandle = nullptr;
 TaskHandle_t receiveFromRCHandle = nullptr;
@@ -39,7 +40,6 @@ TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
 
-
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
                                                   {eBlocked, "Blocked"},
@@ -47,12 +47,12 @@ std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eDeleted, "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
 
-
 void setup()
 {
   Serial.begin(115200);
   // Wait for serial connection to be established
-  while (!Serial);
+  while (!Serial)
+    ;
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
 #if ENABLE_CAN
@@ -68,7 +68,7 @@ void setup()
 
 #if ENABLE_DISPLAY
   // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (2^1), nullptr, 3, &displayHandle);
+  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (1 << 1), nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_1);
 #endif
 
@@ -138,25 +138,27 @@ void printTaskStatus()
   delete[] pxTaskStatusArray;
 }
 
-uint32_t getTotalHeap(void) {
-    extern char __StackLimit, __bss_end__;
-    return &__StackLimit - &__bss_end__;
-}
-
-uint32_t getFreeHeap(void) {
-    struct mallinfo m = mallinfo();
-    return getTotalHeap() - m.uordblks;
-}
-
 void taskWatchdog(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskWatchdog started");
   for (;;)
   {
-    Serial.printf("taskWatchdog tick, free heap: %lu\n", getFreeHeap());
+    Serial.println("taskWatchdog: tick");
+    printHeapStats();
     delay(5000);
   }
+}
+
+void printHeapStats()
+{
+  HeapStats_t stats;
+  vPortGetHeapStats(&stats);
+  Serial.println("--- HEAP STATS ---");
+  Serial.printf("space:\t\t\t\t%zu\n", stats.xAvailableHeapSpaceInBytes);
+  Serial.printf("largest free block:\t%zu\n", stats.xSizeOfLargestFreeBlockInBytes);
+  Serial.printf("smallest free block:\t%zu\n", stats.xSizeOfSmallestFreeBlockInBytes);
+  Serial.printf("free block count:\t%zu\n", stats.xNumberOfFreeBlocks);
 }
 
 void taskCAN(void *pvParameters)
