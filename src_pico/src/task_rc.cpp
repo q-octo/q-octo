@@ -55,7 +55,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t);
 void taskReceiveFromRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
-    Serial.println("taskCRSF started");
+    Serial.println("taskReceiveFromRC started");
     crsf = new CRSFforArduino();
 
     /* Initialise CRSF for Arduino, and clean up
