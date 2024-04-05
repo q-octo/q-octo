@@ -27,5 +27,3 @@ typedef struct {
 }
 
 extern QueueHandle_t webServerQueue;
-
-void taskWebServer(void *pvParameters);

@@ -56,7 +56,7 @@ void WSWebServer::start()
     else
     {
         Serial.println("mDNS responder started");
-        // Add service to MDNS-SD
+        // Add service to mDNS
         MDNS.addService("http", "tcp", 80);
         MDNS.addService("ws", "tcp", 81);
     }
@@ -66,78 +66,85 @@ void WSWebServer::start()
 
 void WSWebServer::stop()
 {
-    webSocket->close();
-    delete webSocket;
-    webSocket = nullptr;
-    webServer->close();
-    delete webServer;
-    webServer = nullptr;
+    Serial.println("Stopping web server");
     MDNS.close();
-    WiFi.softAPdisconnect();
+    Serial.println("mDNS responder stopped");
+
+    if (webSocket != nullptr)
+    {
+        webSocket->close();
+        delete webSocket;
+        webSocket = nullptr;
+        Serial.println("Web socket server stopped");
+    }
+
+    if (webServer != nullptr)
+    {
+        webServer->close();
+        delete webServer;
+        webServer = nullptr;
+        Serial.println("HTTP server stopped");
+    }
+
+    if (WiFi.connected())
+    {
+        WiFi.softAPdisconnect();
+        Serial.println("AP disconnected (web server stopped)");
+    }
 
     webServerIsRunning = false;
 }
 
 void WSWebServer::loop()
 {
-    if (!webServerIsRunning)
-        return;
-    webServer->handleClient();
-    webSocket->loop();
-    MDNS.update();
-#if AUTO_RESTART_WEBSOCKETS
-    const uint32_t currentMs = millis();
-    if (lastWebSocketRestart == 0)
-    {
-        // First run
-        lastWebSocketRestart = currentMs;
-    }
-    if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
-    {
-        restartWebSocket();
-        lastWebSocketRestart = currentMs;
-    }
-#endif
-}
-
-void taskWebServer(void *pvParameters) {
-    (void)pvParameters; //  To avoid warnings
-    Serial.println("taskWebServer started");
-    webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+    // Initialise the queue
     if (webServerQueue == nullptr)
     {
-        Serial.println("Failed to create webServerQueue");
-        vTaskDelete(nullptr);
-    }
-    // TODO verify that this approach works
-    // The documentation states this:
-    // FreeRTOS is supported only on core 0 and from within setup and loop, 
-    // not tasks, due to the requirement for a very different LWIP 
-    // implementation.
-    
-    // This is a core 0 task so it may be problematic.
-
-
-
-    WSWebServer::Message message;
-    for (;;)
-    {
-        if (xQueueReceive(webServerQueue, &message, portMAX_DELAY))
+        webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+        if (webServerQueue == nullptr)
         {
-            switch (message.type)
-            {
-            case WSWebServer::MessageType::ENABLE:
-                Serial.println("Received web server ENABLE message");
-                WSWebServer::start();
-                break;
-            case WSWebServer::MessageType::DISABLE:
-                Serial.println("Received web server DISABLE message");
-                WSWebServer::stop();
-                break;
-            }
+            Serial.println("Failed to create webServerQueue");
+            return;
         }
     }
 
+    WSWebServer::Message message;
+    BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
+    const bool messageReceived = xStatus == pdPASS;
+    if (messageReceived)
+    {
+        switch (message.type)
+        {
+        case WSWebServer::MessageType::ENABLE:
+            Serial.println("Received web server ENABLE message");
+            WSWebServer::start();
+            break;
+        case WSWebServer::MessageType::DISABLE:
+            Serial.println("Received web server DISABLE message");
+            WSWebServer::stop();
+            break;
+        }
+    }
+
+    if (webServerIsRunning)
+    {
+        webServer->handleClient();
+        webSocket->loop();
+        MDNS.update();
+#if AUTO_RESTART_WEBSOCKETS
+        const uint32_t currentMs = millis();
+        if (lastWebSocketRestart == 0)
+        {
+            // First run
+            lastWebSocketRestart = currentMs;
+        }
+        if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
+        {
+            restartWebSocket();
+            lastWebSocketRestart = currentMs;
+        }
+#endif
+    }
 }
 
 void handleRoot()
@@ -187,6 +194,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 void restartWebSocket()
 {
     Serial.println("Restarting web socket server");
+
     webSocket->close();
     webSocket->begin();
 }

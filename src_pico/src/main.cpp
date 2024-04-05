@@ -13,7 +13,7 @@
 #define ENABLE_CAN 0
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
-#define START_WEB_SERVER_ON_STARTUP 1
+#define START_WEB_SERVER_ON_STARTUP 0
 #define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -38,7 +38,6 @@ std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eSuspended, "Suspended"},
                                                   {eDeleted, "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
-TaskMessage::Message tempMessage;
 
 void setup()
 {
@@ -87,15 +86,10 @@ void setup()
   vTaskCoreAffinitySet(motorsHandle, CORE_1);
 #endif
 
-  // Core 0
-  xTaskCreate(taskWebServer, "webServer", configMINIMAL_STACK_SIZE, nullptr, 1, &webServerHandle);
-  vTaskCoreAffinitySet(webServerHandle, CORE_0);
-
 #if START_WEB_SERVER_ON_STARTUP
-  tempMessage = {.type = TaskMessage::Type::ENABLE_WEB_SERVER};
-  xQueueSend(dataManagerQueue, &tempMessage, 0);
-  // WSWebServer::start();
+  WSWebServer::start();
 #endif
+
 }
 
 // Handled by FreeRTOS
