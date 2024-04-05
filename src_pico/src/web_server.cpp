@@ -14,7 +14,7 @@
 IPAddress apIP(192, 168, 4, 1);
 WebServer *webServer;
 WebSocketsServer *webSocket;
-
+QueueHandle_t webServerQueue;
 bool webServerIsRunning = false;
 uint32_t lastWebSocketRestart = 0;
 
@@ -80,25 +80,64 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
-    if (webServerIsRunning)
-    {
-        webServer->handleClient();
-        webSocket->loop();
-        MDNS.update();
+    if (!webServerIsRunning)
+        return;
+    webServer->handleClient();
+    webSocket->loop();
+    MDNS.update();
 #if AUTO_RESTART_WEBSOCKETS
-        const uint32_t currentMs = millis();
-        if (lastWebSocketRestart == 0)
-        {
-            // First run
-            lastWebSocketRestart = currentMs;
-        }
-        if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
-        {
-            restartWebSocket();
-            lastWebSocketRestart = currentMs;
-        }
-#endif
+    const uint32_t currentMs = millis();
+    if (lastWebSocketRestart == 0)
+    {
+        // First run
+        lastWebSocketRestart = currentMs;
     }
+    if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
+    {
+        restartWebSocket();
+        lastWebSocketRestart = currentMs;
+    }
+#endif
+}
+
+void taskWebServer(void *pvParameters) {
+    (void)pvParameters; //  To avoid warnings
+    Serial.println("taskWebServer started");
+    webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+    if (webServerQueue == nullptr)
+    {
+        Serial.println("Failed to create webServerQueue");
+        vTaskDelete(nullptr);
+    }
+    // TODO verify that this approach works
+    // The documentation states this:
+    // FreeRTOS is supported only on core 0 and from within setup and loop, 
+    // not tasks, due to the requirement for a very different LWIP 
+    // implementation.
+    
+    // This is a core 0 task so it may be problematic.
+
+
+
+    WSWebServer::Message message;
+    for (;;)
+    {
+        if (xQueueReceive(webServerQueue, &message, portMAX_DELAY))
+        {
+            switch (message.type)
+            {
+            case WSWebServer::MessageType::ENABLE:
+                Serial.println("Received web server ENABLE message");
+                WSWebServer::start();
+                break;
+            case WSWebServer::MessageType::DISABLE:
+                Serial.println("Received web server DISABLE message");
+                WSWebServer::stop();
+                break;
+            }
+        }
+    }
+
 }
 
 void handleRoot()

@@ -13,7 +13,7 @@
 #define ENABLE_CAN 0
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
-#define ENABLE_WEB_SERVER 1
+#define START_WEB_SERVER_ON_STARTUP 1
 #define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -30,6 +30,7 @@ TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
+TaskHandle_t webServerHandle = nullptr;
 
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
@@ -37,6 +38,7 @@ std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eSuspended, "Suspended"},
                                                   {eDeleted, "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
+TaskMessage::Message tempMessage;
 
 void setup()
 {
@@ -84,6 +86,16 @@ void setup()
   xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_1);
 #endif
+
+  // Core 0
+  xTaskCreate(taskWebServer, "webServer", configMINIMAL_STACK_SIZE, nullptr, 1, &webServerHandle);
+  vTaskCoreAffinitySet(webServerHandle, CORE_0);
+
+#if START_WEB_SERVER_ON_STARTUP
+  tempMessage = {.type = TaskMessage::Type::ENABLE_WEB_SERVER};
+  xQueueSend(dataManagerQueue, &tempMessage, 0);
+  // WSWebServer::start();
+#endif
 }
 
 // Handled by FreeRTOS
@@ -97,10 +109,7 @@ void loop()
     printTaskStatus();
   }
 #endif
-#if ENABLE_WEB_SERVER
-  WSWebServer::start();
   WSWebServer::loop();
-#endif
   // It appears that a task labelled CORE0 runs this loop in a task
   // So if this loop never blocks, no other task on core 0 will run!
   delay(1);
@@ -135,6 +144,3 @@ void taskWatchdog(void *pvParameters)
     delay(5000);
   }
 }
-
-
-

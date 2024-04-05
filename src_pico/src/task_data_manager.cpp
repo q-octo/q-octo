@@ -2,12 +2,14 @@
 #include "task_display.h"
 #include "task_rc.h"
 #include "task_motors.h"
+#include "web_server.h"
 
 QueueHandle_t dataManagerQueue;
 
 TaskDisplay::Message displayMessage;
 TaskRC::Message rcMessage;
 TaskControlMotors::Message controlMotorsMessage;
+WSWebServer::Message webServerMessage;
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -72,23 +74,23 @@ void taskDataManager(void *pvParameters)
         };
         xQueueSend(displayQueue, &displayMessage, 0);
         break;
-      case TaskMessage::Type::ENABLE_DIAGNOSTICS:
-        // TODO(niall) enable web server
-        // For now, just reply immediately
+      case TaskMessage::Type::ENABLE_WEB_SERVER:
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
             .as = {.diagnostics = {.diagnosticsMode = true}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
+        webServerMessage = {.type = WSWebServer::MessageType::ENABLE};
+        xQueueSend(webServerQueue, &webServerMessage, 0);
         break;
-      case TaskMessage::Type::DISABLE_DIAGNOSTICS:
-        // TODO(niall) disable web server
-        // For now, just reply immediately
+      case TaskMessage::Type::DISABLE_WEB_SERVER:
         displayMessage = {
             .type = TaskDisplay::MessageType::DIAGNOSTICS,
             .as = {.diagnostics = {.diagnosticsMode = false}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
+        webServerMessage = {.type = WSWebServer::MessageType::DISABLE};
+        xQueueSend(webServerQueue, &webServerMessage, 0);
       case TaskMessage::Type::ENABLE_MOTORS:
         break;
       case TaskMessage::Type::DISABLE_MOTORS:
