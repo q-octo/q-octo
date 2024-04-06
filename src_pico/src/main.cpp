@@ -60,36 +60,36 @@ void setup()
  
 #if ENABLE_WATCHDOG
   xTaskCreate(taskWatchdog, "watchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
-  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
+  vTaskCoreAffinitySet(watchdogHandle, CORE_1);
 #endif
 #if ENABLE_DISPLAY
   xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (1 << 1), nullptr, 3, &displayHandle);
-  vTaskCoreAffinitySet(displayHandle, CORE_0);
+  vTaskCoreAffinitySet(displayHandle, CORE_1);
 #endif
 #if ENABLE_MOTORS
   xTaskCreate(taskControlMotors, "ctrlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
-  vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
+  vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
 #endif
 #if ENABLE_RC
   xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
-  vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
+  vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
 #endif
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
-  vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
+  vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
 #if ENABLE_RC
   xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
-  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
+  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
 #endif
 #if ENABLE_CAN
   xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, nullptr, 1, &canHandle);
-  vTaskCoreAffinitySet(canHandle, CORE_0);
+  vTaskCoreAffinitySet(canHandle, CORE_1);
 #endif
 #if ENABLE_MOTORS
   // Producer
   xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
-  vTaskCoreAffinitySet(motorsHandle, CORE_0);
+  vTaskCoreAffinitySet(motorsHandle, CORE_1);
 #endif
 
 #if START_WEB_SERVER_ON_STARTUP
