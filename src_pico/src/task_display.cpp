@@ -74,27 +74,33 @@ float motorRRPM = 0.0;
 float motorRtorque = 0.0;
 float motorRposition = 0.0;
 
-void taskDisplay(void *pvParameters) {
+void taskDisplay(void *pvParameters)
+{
   (void)pvParameters; // To avoid warnings
   Serial.println("taskDisplay started");
   displayQueue = xQueueCreate(10, sizeof(TaskDisplay::Message));
-  if (displayQueue == nullptr) {
+  if (displayQueue == nullptr)
+  {
     Serial.println("Failed to create displayQueue");
     vTaskDelete(nullptr);
   }
 
   st7789.set_backlight(255);
   led.set_brightness(0); // Turn LED off.
+  repaintDisplay();
 
   // Display is 240x135 pixels
-  for (;;) {
+  for (;;)
+  {
     TaskDisplay::Message message;
     BaseType_t xStatus = xQueueReceive(displayQueue, &message, xTicksToWait);
     const bool messageReceived = xStatus == pdPASS;
 
-    if (messageReceived) {
+    if (messageReceived)
+    {
       // Serial.println("Message received");
-      switch (message.type) {
+      switch (message.type)
+      {
       case TaskDisplay::MessageType::MOTORS:
         motorLtemperature = message.as.motors.left.temperature;
         motorLRPM = message.as.motors.left.RPM;
@@ -122,25 +128,30 @@ void taskDisplay(void *pvParameters) {
 
     // Blink the LED every second to show that the data is live
     const uint32_t currentMillis = millis();
-    if (currentMillis - lastBlinkMillis >= 1000) {
+    if (currentMillis - lastBlinkMillis >= 1000)
+    {
       lastBlinkMillis = currentMillis;
       blinkLED();
     }
     // Repaint the screen every 32ms (30fps)
-    if (currentMillis - lastRepaintMillis >= 32) {
+    if (currentMillis - lastRepaintMillis >= 32)
+    {
       lastRepaintMillis = currentMillis;
       repaintDisplay();
     }
   }
 }
 
-void blinkLED() {
+void blinkLED()
+{
   led.set_rgb(76, 176, 80); // Green
   led.set_brightness(ledState ? 0 : 100);
   ledState = !ledState;
 }
 
-void repaintDisplay() {
+void repaintDisplay()
+{
+  Serial.println("Repainting display");
   // bitmap6, bitmap8, bitmap14_outline
   graphics.set_font("bitmap8");
 
@@ -157,12 +168,10 @@ void repaintDisplay() {
   leftMotorRect.deflate(2);
   SET_PEN_BLACK()
   // Format string based on motorLtemperature, motorLRPM, motorLposition
-  
-
 
   std::ostringstream oss;
   oss << "L " << motorLtemperature << "°C " << motorLRPM << "RPM " << motorLposition << "°";
-  graphics.text( oss.str(), Point(leftMotorRect.x, leftMotorRect.y),
+  graphics.text(oss.str(), Point(leftMotorRect.x, leftMotorRect.y),
                 leftMotorRect.w);
 
   // Right Motor
@@ -173,7 +182,7 @@ void repaintDisplay() {
   SET_PEN_BLACK()
 
   oss.str("");
-        oss << "R " << motorRtemperature << "°C " << motorRRPM << "RPM " << motorRposition << "°";
+  oss << "R " << motorRtemperature << "°C " << motorRRPM << "RPM " << motorRposition << "°";
   graphics.text(oss.str(), Point(rightMotorRect.x, rightMotorRect.y),
                 rightMotorRect.w);
 
@@ -186,10 +195,13 @@ void repaintDisplay() {
   Rect wifiRect(motorBoxWidth + 2, 0, 240 - motorBoxWidth, 36);
   // graphics.rectangle(wifiRect);
   wifiRect.deflate(2);
-  if (button_x.raw()) {
+  if (button_x.raw())
+  {
     SET_PEN_RED()
     graphics.text("WiFi  ON", Point(wifiRect.x, wifiRect.y), wifiRect.w);
-  } else {
+  }
+  else
+  {
     SET_PEN_BLACK()
     graphics.text("WiFi OFF", Point(wifiRect.x, wifiRect.y), wifiRect.w);
   }

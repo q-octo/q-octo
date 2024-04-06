@@ -9,17 +9,19 @@
 #include "task_rc.h"
 #include "task_display.h"
 #include "task_can.h"
+#include "task_watchdog.h"
 #include "web_server.h"
 
-#define ENABLE_CAN 1
+#define ENABLE_CAN 0
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
-#define START_WEB_SERVER_ON_STARTUP 1
+#define ENABLE_WATCHDOG 1
+#define ENABLE_RC 0
+#define START_WEB_SERVER_ON_STARTUP 0
 #define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
 
-void taskWatchdog(void *pvParameters);
 void printTaskStatus();
 void printHeapStats();
 
@@ -55,40 +57,39 @@ void setup()
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
-
+ 
+#if ENABLE_WATCHDOG
   xTaskCreate(taskWatchdog, "watchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
-  vTaskCoreAffinitySet(watchdogHandle, CORE_1);
-
-#if ENABLE_DISPLAY
-  // Consumer (unless it is toggling diagnostics mode)
-  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (1 << 1), nullptr, 3, &displayHandle);
-  vTaskCoreAffinitySet(displayHandle, CORE_1);
+  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
 #endif
-
+#if ENABLE_DISPLAY
+  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (1 << 1), nullptr, 3, &displayHandle);
+  vTaskCoreAffinitySet(displayHandle, CORE_0);
+#endif
 #if ENABLE_MOTORS
   xTaskCreate(taskControlMotors, "ctrlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
-  vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
+  vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
 #endif
-
+#if ENABLE_RC
   xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
-  vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
-
+  vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
+#endif
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
-  vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
-
-  // Producer
+  vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
+#if ENABLE_RC
   xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
-  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
+  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
+#endif
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, NULL, 1, &canHandle);
-  vTaskCoreAffinitySet(canHandle, CORE_1);
+  xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, nullptr, 1, &canHandle);
+  vTaskCoreAffinitySet(canHandle, CORE_0);
 #endif
 #if ENABLE_MOTORS
   // Producer
   xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
-  vTaskCoreAffinitySet(motorsHandle, CORE_1);
+  vTaskCoreAffinitySet(motorsHandle, CORE_0);
 #endif
 
 #if START_WEB_SERVER_ON_STARTUP
@@ -131,15 +132,4 @@ void printTaskStatus()
                   pxTaskStatusArray[i].ulRunTimeCounter);
   }
   delete[] pxTaskStatusArray;
-}
-
-void taskWatchdog(void *pvParameters)
-{
-  (void)pvParameters; //  To avoid warnings
-  Serial.println("taskWatchdog started");
-  for (;;)
-  {
-    Serial.printf("taskWatchdog: tick, free heap: %d\n", rp2040.getFreeHeap());
-    delay(5000);
-  }
 }
