@@ -56,7 +56,13 @@ void taskReceiveFromRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
     Serial.println("taskReceiveFromRC started");
-    crsf = new CRSFforArduino();
+    // Serial1.setTX(12);
+    // Serial1.setRX(13);
+    // crsf = new CRSFforArduino(); 
+    
+    Serial2.setTX(4);
+    Serial2.setRX(5);
+    crsf = new CRSFforArduino(&Serial2); 
 
     /* Initialise CRSF for Arduino, and clean up
     any allocated resources if initialisation fails. */
