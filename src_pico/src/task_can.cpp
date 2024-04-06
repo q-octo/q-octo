@@ -22,6 +22,7 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
 {
   Serial.print("Received packet with id 0x");
   Serial.print(packetId, HEX);
+  Serial.println();
 
   // TODO handle messages from the rotary encoder
 
