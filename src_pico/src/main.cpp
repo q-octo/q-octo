@@ -12,7 +12,7 @@
 #include "task_watchdog.h"
 #include "web_server.h"
 
-#define ENABLE_CAN 0
+#define ENABLE_CAN 1
 #define ENABLE_MOTORS 0
 #define ENABLE_DISPLAY 0
 #define ENABLE_WATCHDOG 1
