@@ -199,6 +199,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
     }
 #endif
 
+    // TODO xQueueSend ticksToWait may need to be set as this task is running on core 0
     if (rcData->failsafe)
     {
         if (!isFailsafeActive)

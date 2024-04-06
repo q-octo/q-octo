@@ -13,8 +13,8 @@
 #include "web_server.h"
 
 #define ENABLE_CAN 0
-#define ENABLE_MOTORS 1
-#define ENABLE_DISPLAY 1
+#define ENABLE_MOTORS 0
+#define ENABLE_DISPLAY 0
 #define ENABLE_WATCHDOG 1
 #define ENABLE_RC 1
 #define START_WEB_SERVER_ON_STARTUP 0
@@ -72,7 +72,7 @@ void setup()
 #endif
 #if ENABLE_RC
   xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
-  vTaskCoreAffinitySet(sendToRCHandle, CORE_1);
+  vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
 #endif
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
@@ -80,7 +80,7 @@ void setup()
   vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
 #if ENABLE_RC
   xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
-  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_1);
+  vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
 #endif
 #if ENABLE_CAN
   xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, nullptr, 1, &canHandle);
