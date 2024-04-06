@@ -16,7 +16,7 @@
 #define ENABLE_MOTORS 1
 #define ENABLE_DISPLAY 1
 #define ENABLE_WATCHDOG 1
-#define ENABLE_RC 0
+#define ENABLE_RC 1
 #define START_WEB_SERVER_ON_STARTUP 0
 #define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)

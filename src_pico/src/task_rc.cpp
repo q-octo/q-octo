@@ -235,11 +235,11 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
                 rpm = 0;
             }
             
-            taskMessage = {
-                .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
-                .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
-            };
-            xQueueSend(dataManagerQueue, &taskMessage, 0);
+            // taskMessage = {
+            //     .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
+            //     .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
+            // };
+            // xQueueSend(dataManagerQueue, &taskMessage, 0);
         }
     }
 }

@@ -151,7 +151,6 @@ void blinkLED()
 
 void repaintDisplay()
 {
-  Serial.println("Repainting display");
   // bitmap6, bitmap8, bitmap14_outline
   graphics.set_font("bitmap8");
 
