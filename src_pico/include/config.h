@@ -1,7 +1,7 @@
 #pragma once
 
 #define CFG_ENABLE_CAN 1
-#define CFG_ENABLE_MOTORS 0
+#define CFG_ENABLE_MOTORS 1
 #define CFG_ENABLE_DISPLAY 0
 #define CFG_ENABLE_WATCHDOG 0
 #define CFG_ENABLE_RC 1

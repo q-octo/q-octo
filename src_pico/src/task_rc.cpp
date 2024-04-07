@@ -6,11 +6,13 @@
 
 #include "CRSFforArduino.hpp"
 #include "task_rc.h"
+#include <Arduino-CRSF.h>
 
+#define FULL_CRSF_FEATURES 0
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
 #define DEBUG_LOG_RC_CHANNELS 1
 #define DEBUG_LOG_RC_LINK_STATS 0
-#define BROADCAST_FREQUENCY 500 // ms
+#define BROADCAST_FREQUENCY 800 // ms
 
 CRSFforArduino *crsf = nullptr;
 
@@ -47,11 +49,17 @@ TaskMessage::Message taskMessage;
 uint32_t lastRcChannelsLogMs = 0;
 uint32_t lastRcLinkStatsLogMs = 0;
 uint32_t lastBroadcastMs = 0;
+float lastRPM = 0;
 
 void terminateCrsf();
 /* RC Channels Event Callback. */
-void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData);
+// void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData);
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t);
+void onReceiveChannels(const uint16_t channels[]);
+void onFailsafeActivated();
+void onFailsafeCleared();
+
+CRSF crsf2;
 
 void taskReceiveFromRC(void *pvParameters)
 {
@@ -59,10 +67,11 @@ void taskReceiveFromRC(void *pvParameters)
     Serial.println("taskReceiveFromRC started");
     // Serial1.setTX(12);
     // Serial1.setRX(13);
-    // crsf = new CRSFforArduino();
+    crsf = new CRSFforArduino();
 
     Serial2.setTX(8);
     Serial2.setRX(9);
+#if FULL_CRSF_FEATURES
     crsf = new CRSFforArduino(&Serial2);
 
     /* Initialise CRSF for Arduino, and clean up
@@ -70,7 +79,14 @@ void taskReceiveFromRC(void *pvParameters)
     if (crsf->begin())
     {
         crsf->setLinkStatisticsCallback(onLinkStatisticsUpdate);
-        crsf->setRcChannelsCallback(onReceiveRcChannels);
+        crsf->setRcChannelsCallback([](serialReceiverLayer::rcChannels_t *rcData)
+                                    {
+            if (rcData->failsafe) { if (!isFailsafeActive) onFailsafeActivated(); }
+            else {
+            /* Set the failsafe status to false. */
+            if (isFailsafeActive) { onFailsafeCleared(); }
+            onReceiveChannels(rcData->value);
+        } });
         /* Constrain the RC Channels Count to the maximum number
           of channels that are specified by The Crossfire Protocol.*/
         rcChannelCount = rcChannelCount > crsfProtocol::RC_CHANNEL_COUNT ? crsfProtocol::RC_CHANNEL_COUNT : rcChannelCount;
@@ -83,10 +99,25 @@ void taskReceiveFromRC(void *pvParameters)
         terminateCrsf();
         return;
     }
-
+#else
+    crsf2.begin(&Serial2, 420000);
+    isFailsafeActive = !crsf2.isConnected();
+    crsf2.onDataReceived([](const uint16_t channels[])
+                         {
+        if (isFailsafeActive)
+        {
+            onFailsafeCleared();
+        } 
+        onReceiveChannels(channels); });
+    crsf2.onDisconnected(onFailsafeActivated);
+#endif
     for (;;)
     {
+#if FULL_CRSF_FEATURES
         crsf->update();
+#else
+        crsf2.readPacket();
+#endif
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
@@ -102,16 +133,22 @@ void taskSendToRC(void *pvParameters)
         vTaskDelete(nullptr);
     }
 
+    TaskRC::Message message;
 #if !CFG_ENABLE_RC
     Serial.println("RC disabled, blocking indefinitely");
     for (;;)
     {
-        TaskRC::Message message;
         xQueueReceive(rcSendQueue, &message, portMAX_DELAY);
     }
 #endif
 
-    TaskRC::Message message;
+#if !FULL_CRSF_FEATURES
+    // Unable to send telemetry data, block indefinitely
+    for (;;)
+    {
+        xQueueReceive(rcSendQueue, &message, portMAX_DELAY);
+    }
+#else
     for (;;)
     {
         if (xQueueReceive(rcSendQueue, &message, portMAX_DELAY))
@@ -131,13 +168,16 @@ void taskSendToRC(void *pvParameters)
             }
         }
     }
+#endif
 }
 
 void terminateCrsf()
 {
+#if FULL_CRSF_FEATURES
     crsf->end();
     delete crsf;
     crsf = nullptr;
+#endif
 }
 
 void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistics)
@@ -178,21 +218,13 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
     }
 }
 
-void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
+uint16_t rcToUs(uint16_t rc)
 {
+    return (uint16_t)((rc * 0.62477120195241F) + 881);
+}
 
-    /* This is your RC Channels Event Callback.
-    Here, you have access to all 16 11-bit channels,
-    plus an additional "failsafe" flag that tells you whether-or-not
-    your receiver is connected to your controller's transmitter module.
-
-    Using the rcData parameter that was passed in,
-    you have access to the following:
-
-    - failsafe - A boolean flag indicating the "Fail-safe" status.
-    - value[16] - An array consisting of all 16 received RC channels.
-    NB: RC Channels are RAW values and are NOT in "microseconds" units.
-    */
+void onReceiveChannels(const uint16_t channels[])
+{
 #if DEBUG_LOG_RC_CHANNELS
     const uint32_t currentMillis = millis();
     if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive)
@@ -204,7 +236,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
         {
             Serial.print(rcChannelNames[i]);
             Serial.print(": ");
-            Serial.print(crsf->rcToUs(rcData->value[i]));
+            Serial.print(rcToUs(channels[i]));
 
             if (i < (rcChannelCount - 1))
             {
@@ -215,51 +247,38 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
     }
 #endif
 
-    // TODO xQueueSend ticksToWait may need to be set as this task is running on core 0
-    if (rcData->failsafe)
+    // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
+    float rpm = mapRange(992, 2008, -10, 10, rcToUs(channels[0]));
+    if (lastRPM != rpm)
     {
-        if (!isFailsafeActive)
-        {
-            isFailsafeActive = true;
-            Serial.println("[WARN]: Failsafe detected.");
-            taskMessage = {.type = TaskMessage::Type::TX_LOST};
-            xQueueSend(dataManagerQueue, &taskMessage, 0);
-        }
+        lastRPM = rpm;
+        taskMessage = {
+            .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
+            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
+        };
+        xQueueSend(dataManagerQueue, &taskMessage, 0);
     }
-    else
-    {
-        /* Set the failsafe status to false. */
-        if (isFailsafeActive)
-        {
-            isFailsafeActive = false;
-            Serial.println("[INFO]: Failsafe cleared.");
-            taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
-            xQueueSend(dataManagerQueue, &taskMessage, 0);
-        }
-        else
-        {
-            // float motorRPM = mapRange(992, 2008, -10, 10, crsf->rcToUs(rcData->value[0]));
-            // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
-            float rpm = 0;
-            auto rcValue = crsf->rcToUs(rcData->value[0]);
-            if (rcValue > 1800)
-            {
-                rpm = 5;
-            }
-            else if (rcValue < 1200)
-            {
-                rpm = -5;
-            }
-            else
-            {
-                rpm = 0;
-            }
+}
 
-            // taskMessage = {
-            //     .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
-            //     .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
-            // };
-            // xQueueSend(dataManagerQueue, &taskMessage, 0);
-        }
+void onFailsafeActivated()
+{
+    if (isFailsafeActive)
+    {
+        return;
     }
+    isFailsafeActive = true;
+    Serial.println("[WARN]: Failsafe detected.");
+    taskMessage = {.type = TaskMessage::Type::TX_LOST};
+    xQueueSend(dataManagerQueue, &taskMessage, 0);
+}
+void onFailsafeCleared()
+{
+    if (!isFailsafeActive)
+    {
+        return;
+    }
+    isFailsafeActive = false;
+    Serial.println("[INFO]: Failsafe cleared.");
+    taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
+    xQueueSend(dataManagerQueue, &taskMessage, 0);
 }

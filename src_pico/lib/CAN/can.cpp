@@ -69,10 +69,10 @@ void CanCommunication::checkForPacket()
             }
             _onPacketReceived(packetSize, mcp.packetId(), packetData, extended);
 
-            Serial.println();
+            // Serial.println();
         }
 
-        Serial.println();
+        // Serial.println();
     }
 }
 

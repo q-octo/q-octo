@@ -12,8 +12,6 @@
 
 void initMotors();
 
-void debugAlternateMotorSpeed();
-
 void debugPrintMotorStatus();
 void setSpeedIndividual(float speedL, float speedR);
 
@@ -50,6 +48,12 @@ void taskControlMotors(void *pvParameters)
 
   initMotors();
 
+  // for (;;)
+  // {
+  //   TaskControlMotors::Message message;
+  //   xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY);
+  // }
+
   TaskControlMotors::Message message;
   for (;;)
   {
@@ -69,7 +73,7 @@ void taskControlMotors(void *pvParameters)
         break;
       case TaskControlMotors::SET_SPEED_COMBINED:
         // TODO implement mixing
-        setSpeedIndividual(message.as.speedCombined.rpm,
+        setSpeedIndividual(-message.as.speedCombined.rpm,
                            message.as.speedCombined.rpm);
         break;
       case TaskControlMotors::SET_SPEED_INDIVIDUAL:
@@ -91,13 +95,14 @@ void taskMotors(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskMotors started");
-  
-  for (;;) {
-    setSpeedIndividual(0, 2);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    setSpeedIndividual(2, 0);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-  }
+
+  // for (;;)
+  // {
+  //   setSpeedIndividual(0, 2);
+  //   vTaskDelay(pdMS_TO_TICKS(1000));
+  //   setSpeedIndividual(2, 0);
+  //   vTaskDelay(pdMS_TO_TICKS(1000));
+  // }
 
   for (;;)
   {
@@ -147,7 +152,7 @@ void taskMotors(void *pvParameters)
 
 void setSpeedIndividual(float speedL, float speedR)
 {
-  Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
+  // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
@@ -164,17 +169,6 @@ void initMotors()
   cybergearR.enable_motor();
 }
 
-void debugAlternateMotorSpeed()
-{
-  Serial.println("L: 0 R: 2");
-  cybergearR.set_speed_ref(0);
-  cybergearL.set_speed_ref(2);
-  delayMicroseconds(1000 * 1000);
-  Serial.println("L: 2 R: 0");
-  cybergearL.set_speed_ref(0);
-  cybergearR.set_speed_ref(2);
-  delayMicroseconds(1000 * 1000);
-}
 
 void debugPrintMotorStatus()
 {

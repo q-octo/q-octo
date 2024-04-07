@@ -33,13 +33,13 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
   {
   case CYBERGEAR_CAN_ID_L:
     message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_L;
-    Serial.println("Received packet from left motor");
+    // Serial.println("Received packet from left motor");
     cybergearL.process_message(packetData);
     // xQueueSend(dataManagerQueue, &message, 0);
     break;
   case CYBERGEAR_CAN_ID_R:
     message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_R;
-    Serial.println("Received packet from right motor");
+    // Serial.println("Received packet from right motor");
     cybergearR.process_message(packetData);
     // xQueueSend(dataManagerQueue, &message, 0);
     break;
