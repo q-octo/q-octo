@@ -59,7 +59,7 @@ void onReceiveChannels(const uint16_t channels[]);
 void onFailsafeActivated();
 void onFailsafeCleared();
 
-CRSF crsf2;
+CRSF* crsf2 = nullptr;
 
 void taskReceiveFromRC(void *pvParameters)
 {
@@ -67,7 +67,6 @@ void taskReceiveFromRC(void *pvParameters)
     Serial.println("taskReceiveFromRC started");
     // Serial1.setTX(12);
     // Serial1.setRX(13);
-    crsf = new CRSFforArduino();
 
     Serial2.setTX(8);
     Serial2.setRX(9);
@@ -100,23 +99,24 @@ void taskReceiveFromRC(void *pvParameters)
         return;
     }
 #else
-    crsf2.begin(&Serial2, 420000);
-    isFailsafeActive = !crsf2.isConnected();
-    crsf2.onDataReceived([](const uint16_t channels[])
+    crsf2 = new CRSF();
+    crsf2->begin(&Serial2, 420000);
+    isFailsafeActive = !crsf2->isConnected();
+    crsf2->onDataReceived([](const uint16_t channels[])
                          {
         if (isFailsafeActive)
         {
             onFailsafeCleared();
         } 
         onReceiveChannels(channels); });
-    crsf2.onDisconnected(onFailsafeActivated);
+    crsf2->onDisconnected(onFailsafeActivated);
 #endif
     for (;;)
     {
 #if FULL_CRSF_FEATURES
         crsf->update();
 #else
-        crsf2.readPacket();
+        crsf2->readPacket();
 #endif
         vTaskDelay(pdMS_TO_TICKS(1));
     }
@@ -177,6 +177,9 @@ void terminateCrsf()
     crsf->end();
     delete crsf;
     crsf = nullptr;
+#else
+    delete crsf2;
+    crsf2 = nullptr;
 #endif
 }
 
