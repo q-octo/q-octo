@@ -61,8 +61,8 @@ void taskReceiveFromRC(void *pvParameters)
     // Serial1.setRX(13);
     // crsf = new CRSFforArduino();
 
-    Serial2.setTX(4);
-    Serial2.setRX(5);
+    Serial2.setTX(8);
+    Serial2.setRX(9);
     crsf = new CRSFforArduino(&Serial2);
 
     /* Initialise CRSF for Arduino, and clean up
@@ -195,7 +195,7 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
     */
 #if DEBUG_LOG_RC_CHANNELS
     const uint32_t currentMillis = millis();
-    if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY)
+    if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive)
     {
         lastRcChannelsLogMs = currentMillis;
 
