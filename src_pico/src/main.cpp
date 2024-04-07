@@ -13,10 +13,10 @@
 #include "web_server.h"
 
 #define ENABLE_CAN 1
-#define ENABLE_MOTORS 0
-#define ENABLE_DISPLAY 0
-#define ENABLE_WATCHDOG 1
-#define ENABLE_RC 1
+#define ENABLE_MOTORS 1
+#define ENABLE_DISPLAY 1
+#define ENABLE_WATCHDOG 0
+#define ENABLE_RC 0
 #define START_WEB_SERVER_ON_STARTUP 0
 #define DEBUG_LIST_TASKS 0
 #define CORE_0 (1 << 0)
@@ -57,39 +57,42 @@ void setup()
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
- 
+
+  // We likely only needed this for the controlMotor task?
+  const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
+
 #if ENABLE_WATCHDOG
-  xTaskCreate(taskWatchdog, "watchdog", configMINIMAL_STACK_SIZE, nullptr, 7, &watchdogHandle);
-  vTaskCoreAffinitySet(watchdogHandle, CORE_1);
+  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 7, &watchdogHandle);
+  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
 #endif
 #if ENABLE_DISPLAY
-  xTaskCreate(taskDisplay, "display", configMINIMAL_STACK_SIZE * (1 << 1), nullptr, 3, &displayHandle);
-  vTaskCoreAffinitySet(displayHandle, CORE_1);
+  xTaskCreate(taskDisplay, "display", stackSize, nullptr, 7, &displayHandle);
+  vTaskCoreAffinitySet(displayHandle, CORE_0);
 #endif
 #if ENABLE_MOTORS
-  xTaskCreate(taskControlMotors, "ctrlMotors", configMINIMAL_STACK_SIZE, nullptr, 3, &controlMotorsHandle);
-  vTaskCoreAffinitySet(controlMotorsHandle, CORE_1);
+  xTaskCreate(taskControlMotors, "ctrlMotors", stackSize, nullptr, 7, &controlMotorsHandle);
+  vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
 #endif
 #if ENABLE_RC
-  xTaskCreate(taskSendToRC, "sndToRC", configMINIMAL_STACK_SIZE, nullptr, 3, &sendToRCHandle);
+  xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 7, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
 #endif
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
-  xTaskCreate(taskDataManager, "dataManager", configMINIMAL_STACK_SIZE, nullptr, 2, &dataManagerHandle);
-  vTaskCoreAffinitySet(dataManagerHandle, CORE_1);
+  xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 6, &dataManagerHandle);
+  vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
 #if ENABLE_RC
-  xTaskCreate(taskReceiveFromRC, "recFromRC", configMINIMAL_STACK_SIZE, nullptr, 1, &receiveFromRCHandle);
+  xTaskCreate(taskReceiveFromRC, "recFromRC", stackSize, nullptr, 5, &receiveFromRCHandle);
   vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
 #endif
 #if ENABLE_CAN
-  xTaskCreate(taskCAN, "can", configMINIMAL_STACK_SIZE, nullptr, 1, &canHandle);
-  vTaskCoreAffinitySet(canHandle, CORE_1);
+  xTaskCreate(taskCAN, "can", stackSize, nullptr, 5, &canHandle);
+  vTaskCoreAffinitySet(canHandle, CORE_0);
 #endif
 #if ENABLE_MOTORS
   // Producer
-  xTaskCreate(taskMotors, "motors", configMINIMAL_STACK_SIZE, nullptr, 1, &motorsHandle);
-  vTaskCoreAffinitySet(motorsHandle, CORE_1);
+  xTaskCreate(taskMotors, "motors", stackSize, nullptr, 5, &motorsHandle);
+  vTaskCoreAffinitySet(motorsHandle, CORE_0);
 #endif
 
 #if START_WEB_SERVER_ON_STARTUP
