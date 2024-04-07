@@ -1,3 +1,4 @@
+#include "config.h"
 #include <Arduino.h> // Always include this first
 #include "FreeRTOS.h"
 #include "task.h"
@@ -58,11 +59,11 @@ void taskReceiveFromRC(void *pvParameters)
     Serial.println("taskReceiveFromRC started");
     // Serial1.setTX(12);
     // Serial1.setRX(13);
-    // crsf = new CRSFforArduino(); 
-    
+    // crsf = new CRSFforArduino();
+
     Serial2.setTX(4);
     Serial2.setRX(5);
-    crsf = new CRSFforArduino(&Serial2); 
+    crsf = new CRSFforArduino(&Serial2);
 
     /* Initialise CRSF for Arduino, and clean up
     any allocated resources if initialisation fails. */
@@ -86,7 +87,7 @@ void taskReceiveFromRC(void *pvParameters)
     for (;;)
     {
         crsf->update();
-        delay(1);
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 
@@ -100,6 +101,15 @@ void taskSendToRC(void *pvParameters)
         Serial.println("Failed to create rcSendQueue");
         vTaskDelete(nullptr);
     }
+
+#if !CFG_ENABLE_RC
+    Serial.println("RC disabled, blocking indefinitely");
+    for (;;)
+    {
+        TaskRC::Message message;
+        xQueueReceive(rcSendQueue, &message, portMAX_DELAY);
+    }
+#endif
 
     TaskRC::Message message;
     for (;;)
@@ -232,16 +242,19 @@ void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData)
             // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
             float rpm = 0;
             auto rcValue = crsf->rcToUs(rcData->value[0]);
-            if (rcValue > 1800) {
+            if (rcValue > 1800)
+            {
                 rpm = 5;
             }
-            else if (rcValue < 1200) {
+            else if (rcValue < 1200)
+            {
                 rpm = -5;
             }
-            else {
+            else
+            {
                 rpm = 0;
             }
-            
+
             // taskMessage = {
             //     .type = TaskMessage::Type::SET_MOTOR_SPEED_COMBINED,
             //     .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},

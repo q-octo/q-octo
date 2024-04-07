@@ -1,3 +1,4 @@
+#include "config.h"
 #include "task_watchdog.h"
 
 #define WATCHDOG_TIMEOUT 5000
@@ -20,6 +21,14 @@ void taskWatchdog(void *pvParameters)
         Serial.println("Failed to create watchdogQueue");
         vTaskDelete(nullptr);
     }
+#if !CFG_ENABLE_WATCHDOG
+    Serial.println("Watchdog disabled, blocking indefinitely");
+    for (;;)
+    {
+        Task message;
+        xQueueReceive(watchdogQueue, &message, portMAX_DELAY);
+    }
+#endif
 
     // if (watchdog_caused_reboot())
     // {

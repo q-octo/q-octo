@@ -28,3 +28,4 @@ namespace TaskDisplay
 extern QueueHandle_t displayQueue;
 
 void taskDisplay(void *pvParameters);
+void taskDisplayPlaceholder(void *pvParameters);

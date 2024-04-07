@@ -16,7 +16,7 @@ typedef enum {
   numValues
 } Task;
 
-extern QueueHandle_t displayQueue;
+extern QueueHandle_t watchdogQueue;
 
 
 void taskWatchdog(void *pvParameters);

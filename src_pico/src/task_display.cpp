@@ -1,4 +1,4 @@
-
+#include "config.h"
 #include <Arduino.h> // Always include this first
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -84,6 +84,15 @@ void taskDisplay(void *pvParameters)
     Serial.println("Failed to create displayQueue");
     vTaskDelete(nullptr);
   }
+
+#if !CFG_ENABLE_DISPLAY
+  Serial.println("Display disabled, blocking indefinitely");
+  for (;;)
+  {
+    TaskDisplay::Message message;
+    xQueueReceive(displayQueue, &message, portMAX_DELAY);
+  }
+#endif
 
   st7789.set_backlight(255);
   led.set_brightness(0); // Turn LED off.

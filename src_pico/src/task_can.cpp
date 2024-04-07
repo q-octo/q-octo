@@ -13,15 +13,16 @@ void taskCAN(void *pvParameters)
   for (;;)
   {
     CanCommunication::checkForPacket();
-    delay(1);
+    vTaskDelay(pdMS_TO_TICKS(1));
+
   }
 }
 
 void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
                         bool extended)
 {
-  Serial.print("Received packet with id 0x");
-  Serial.print(packetId, HEX);
+  // Serial.print("Received packet with id 0x");
+  // Serial.print(packetId, HEX);
   Serial.println();
 
   // TODO handle messages from the rotary encoder

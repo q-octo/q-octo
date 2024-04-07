@@ -29,4 +29,8 @@ Example code:
 * https://github.com/Links2004/arduinoWebSockets/tree/master/examples/esp8266_pico
 * https://github.com/earlephilhower/arduino-pico/tree/master/libraries/WebServer/examples
 
+## Configurations
+
+Include `config.h` to use any of the `CFG_<config name>` properties
+
 ## Licensing and Credits

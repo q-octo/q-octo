@@ -1,3 +1,4 @@
+#include "config.h"
 #include "task_motors.h"
 
 #include "FreeRTOS.h"
@@ -38,6 +39,15 @@ void taskControlMotors(void *pvParameters)
     Serial.println("Failed to create dataManagerQueue");
     vTaskDelete(nullptr);
   }
+#if !CFG_ENABLE_MOTORS
+  Serial.println("Motors disabled, blocking indefinitely");
+  for (;;)
+  {
+    TaskControlMotors::Message message;
+    xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY);
+  }
+#endif
+
   initMotors();
 
   TaskControlMotors::Message message;
@@ -81,6 +91,13 @@ void taskMotors(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskMotors started");
+  
+  for (;;) {
+    setSpeedIndividual(0, 2);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    setSpeedIndividual(2, 0);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
 
   for (;;)
   {
@@ -124,7 +141,7 @@ void taskMotors(void *pvParameters)
     // When the motor CAN data was monitored via a saleae logic analyzer, it was
     // sending a constant stream of messages. Do we receive these messages, are
     // they status updates? If so, we could avoid this polling approach
-    delay(1);
+    vTaskDelay(pdMS_TO_TICKS(1));
   }
 }
 
