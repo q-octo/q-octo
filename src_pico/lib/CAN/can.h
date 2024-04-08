@@ -1,6 +1,4 @@
-#ifndef CAN_H
-#define CAN_H
-
+#pragma once
 #include <Adafruit_MCP2515.h>
 
 typedef void (*PacketCallback)(int packetLength, uint32_t packetId, uint8_t *packetData, bool extended);
@@ -12,5 +10,3 @@ public:
     static void checkForPacket();
     static void sendCANPacket(uint32_t id, uint8_t *data);
 };
-
-#endif // CAN_H

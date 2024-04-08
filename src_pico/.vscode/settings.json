@@ -15,6 +15,10 @@
         "istream": "cpp",
         "numeric": "cpp",
         "ostream": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "map": "cpp",
+        "cmath": "cpp",
+        "iosfwd": "cpp",
+        "cstdlib": "cpp"
     }
 }

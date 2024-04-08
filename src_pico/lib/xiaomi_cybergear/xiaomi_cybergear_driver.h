@@ -1,4 +1,6 @@
 // #include "driver/twai.h"
+#ifndef XIAOMI_CYBERGEAR_DRIVER_H
+#define XIAOMI_CYBERGEAR_DRIVER_H
 #include "xiaomi_cybergear_defs.h"
 #include <cstdint>
 
@@ -15,11 +17,6 @@ class XiaomiCyberGearDriver {
         XiaomiCyberGearDriver(uint8_t master_can_id, uint8_t cybergear_can_id);
         virtual ~XiaomiCyberGearDriver();
 
-        /**
-         * @retval -1 Error
-         * @retval 0 OK
-         */
-        // int init_twai(uint8_t rx_pin, uint8_t tx_pin, bool serial_debug=false);
         void init_motor(uint8_t mode);
         void enable_motor();
         void stop_motor();
@@ -65,3 +62,4 @@ class XiaomiCyberGearDriver {
         bool _use_serial_debug;
         XiaomiCyberGearStatus _status;
 };
+#endif // XIAOMI_CYBERGEAR_DRIVER_H
