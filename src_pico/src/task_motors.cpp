@@ -141,6 +141,14 @@ void taskMotors(void *pvParameters)
       TaskMessage::Message message = {.type = TaskMessage::Type::STATE_MOTORS,
                                       .as = {.motors = motors}};
       xQueueSend(dataManagerQueue, &message, 0);
+      /*TaskMessage::Battery battery = {
+          .voltage = 120.0f,
+          .current = 100.0f,
+          .fuel = static_cast<uint16_t>((currentMillis % 24)) * 10,
+      };
+      message = {.type = TaskMessage::Type::STATE_BATTERY,
+                 .as = {.battery = battery}};
+      xQueueSend(dataManagerQueue, &message, 0);*/
     }
 
     // When the motor CAN data was monitored via a saleae logic analyzer, it was

@@ -8,10 +8,10 @@
 #include "task_rc.h"
 #include <Arduino-CRSF.h>
 
-#define FULL_CRSF_FEATURES 0
+#define FULL_CRSF_FEATURES 1
 #define DEBUG_LOG_RC_CHANNELS 1
-#define DEBUG_LOG_RC_LINK_STATS 0
-#define BROADCAST_FREQUENCY 800 // ms
+#define DEBUG_LOG_RC_LINK_STATS 1
+#define BROADCAST_FREQUENCY 500 // ms
 
 #define TICKS_TO_US(x) ((x - 992) * 5 / 8 + 1500)
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
@@ -46,8 +46,8 @@ const char *rcChannelNames[] = {
 QueueHandle_t rcSendQueue;
 TaskMessage::Message taskMessage;
 
-#define RC_CHANNELS_LOG_FREQUENCY 500   // ms
-#define RC_LINK_STATS_LOG_FREQUENCY 500 // ms
+#define RC_CHANNELS_LOG_FREQUENCY 2000   // ms
+#define RC_LINK_STATS_LOG_FREQUENCY 2000 // ms
 uint32_t lastRcChannelsLogMs = 0;
 uint32_t lastRcLinkStatsLogMs = 0;
 uint32_t lastBroadcastMs = 0;
@@ -163,7 +163,7 @@ void taskSendToRC(void *pvParameters)
                     message.as.battery.voltage,
                     message.as.battery.current,
                     message.as.battery.fuel,
-                    100);
+                    42);
                 break;
             default:
                 Serial.println("[ERROR] unknown message type");
@@ -223,8 +223,6 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
         xQueueSend(dataManagerQueue, &taskMessage, 0);
     }
 }
-
-
 
 void onReceiveChannels(const uint16_t channels[])
 {
