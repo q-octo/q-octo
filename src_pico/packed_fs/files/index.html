@@ -2,10 +2,105 @@
 
 <head>
     <script>var connection = new WebSocket('ws://rover.local:81/', ['arduino']); connection.onopen = function () { connection.send('Connect ' + new Date()); }; connection.onerror = function (error) { console.log('WebSocket Error ', error); }; connection.onmessage = function (e) { console.log('Server: ', e.data); }; function sendRGB() { var r = parseInt(document.getElementById('r').value).toString(16); var g = parseInt(document.getElementById('g').value).toString(16); var b = parseInt(document.getElementById('b').value).toString(16); if (r.length < 2) { r = '0' + r; } if (g.length < 2) { g = '0' + g; } if (b.length < 2) { b = '0' + b; } var rgb = '#' + r + g + b; console.log('RGB: ' + rgb); connection.send(rgb); }</script>
+    <script src="./script.js"></script>
+    <style>
+
+        * {
+        box-sizing: border-box;
+        }
+
+        html { font-size: 22px; }
+        body { padding: 1rem; }
+
+        .item1 { grid-area: numbatt; }
+        .item2 { grid-area: controlsource; }
+        .item3 { grid-area: status; }
+        .item4 { grid-area: temp1; }
+        .item5 { grid-area: rpm1; }
+        .item6 { grid-area: angle1; }
+        .item7 { grid-area: wifi; }
+        .item8 { grid-area: temp2; }
+        .item9 { grid-area: rpm2; }
+        .item10 { grid-area: angle2; }
+        .item11 { grid-area: fuel; }
+        .item12 { grid-area: voltage; }
+        .item13 { grid-area: current; }
+        .item14 { grid-area: rssi; }
+        .item15 { grid-area: link; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            gap: 10px;
+            padding: 5px;
+            grid-template-areas: 
+            'numbatt controlsource controlsourse status'
+            'temp1 rpm1 angle1 angle1'
+            'temp2 rpm2 angle2 angle2'
+            'wifi wifi wifi wifi'
+            'fuel fuel fuel fuel'
+            'voltage voltage voltage voltage'
+            'current current current current'
+            'rssi rssi rssi rssi'
+            'link link link link';
+            background-color: #2196F3;
+        }
+
+        .grid-container > div {
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 10px 0;
+            font-size: 36px;
+        }
+
+        .input-container {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 10px;
+            padding: 5px;
+            grid-template-areas: 
+            'degreeOffset degreeOffset' 
+            'degreeOffset degreeOffset';
+            background-color: #2196F3;
+        }
+    </style>
 </head>
 
-<body>LED Control:<br /><br />R: <input id="r" type="range" min="0" max="255" step="1" oninput="sendRGB();" /><br />G:
-    <input id="g" type="range" min="0" max="255" step="1" oninput="sendRGB();" /><br />B: <input id="b" type="range"
-        min="0" max="255" step="1" oninput="sendRGB();" /><br /></body>
+<body>
+    <div class="grid-container">
+        <!-- Status -->
+            <div class="item1"> Batt <span id="no_batt">--</span> </div>
+            <div class="item2"> <span id="conn_type">--</span> </div>
+            <div class="item3"> <span id="status">--</span> </div>
+            <div class="item4"> <span id="temp1">--</span>C </div>
+            <div class="item5"> <span id="rpm1">--</span>RPM </div>
+            <div class="item6"> <span id="ang1">--</span>deg </div>
+            <div class="item7"> WiFi: <span id="wifi">--</span> </div>
+            <div class="item8"> <span id="temp2">--</span>C </div>
+            <div class="item9"> <span id="rpm2">--</span>RPM </div>
+            <div class="item10"> <span id="ang2">--</span>deg </div>
+            <div class="item11"> Fuel: <span id="fuel">--%</span> </div>
+            <div class="item12"> Voltage: <span id="voltage">--</span>V </div>
+            <div class="item13"> Current = <span id="current">--</span>A </div>
+            <div class="item14"> RSSI = <span id="rssi">--</span>dB </div>
+            <div class="item15"> LINK = <span id="link">--</span>% </div>
+    </div>
+
+    <div class="input-container">
+        <label for="degreeOffset">Degree Offset Left:</label>
+        <input type="number" id="degreeOffset" name="offset_left" min="0" max="360" step="1">
+    </div>
+    <div class="input-container">
+        <label for="degreeOffset">Degree Offset Right:</label>
+        <input type="number" id="degreeOffset" name="offset_right" min="0" max="360" step="1">
+    </div>
+
+    <div class="input-container">
+        <label for="speedLimit">Speed Limit (0-30 RPM):</label>
+        <input type="number" id="speedLimit" name="speedLimit" min="0" max="30" step="1">
+    </div>
+
+
+</body>
 
 </html>
