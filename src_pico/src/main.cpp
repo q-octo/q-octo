@@ -44,10 +44,6 @@ void setup()
     ;
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
-#if CFG_ENABLE_CAN
-  // IMPORTANT that this occurs outside of a FreeRTOS task
-  CanCommunication::init(onReceiveCanPacket); 
-#endif
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
@@ -55,29 +51,29 @@ void setup()
   // We likely only needed this for the controlMotor task?
   const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
 
-  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 7, &watchdogHandle);
+  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 3, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_0);
-  xTaskCreate(taskDisplay, "display", stackSize, nullptr, 7, &displayHandle);
+  xTaskCreate(taskDisplay, "display", stackSize, nullptr, 3, &displayHandle);
   vTaskCoreAffinitySet(displayHandle, CORE_0);
-  xTaskCreate(taskControlMotors, "ctrlMotors", stackSize, nullptr, 7, &controlMotorsHandle);
+  xTaskCreate(taskControlMotors, "ctrlMotors", stackSize, nullptr, 3, &controlMotorsHandle);
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
-  xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 7, &sendToRCHandle);
+  xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 3, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
-  xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 6, &dataManagerHandle);
+  xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
 #if CFG_ENABLE_RC
-  xTaskCreate(taskReceiveFromRC, "recFromRC", stackSize, nullptr, 5, &receiveFromRCHandle);
+  xTaskCreate(taskReceiveFromRC, "recFromRC", stackSize, nullptr, 1, &receiveFromRCHandle);
   vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
 #endif
 #if CFG_ENABLE_CAN
-  xTaskCreate(taskCAN, "can", stackSize, nullptr, 5, &canHandle);
+  xTaskCreate(taskCAN, "can", stackSize, nullptr, 1, &canHandle);
   vTaskCoreAffinitySet(canHandle, CORE_0);
 #endif
 #if CFG_ENABLE_MOTORS
   // Producer
-  xTaskCreate(taskMotors, "motors", stackSize, nullptr, 5, &motorsHandle);
+  xTaskCreate(taskMotors, "motors", stackSize, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_0);
 #endif
 

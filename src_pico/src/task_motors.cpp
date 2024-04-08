@@ -96,14 +96,6 @@ void taskMotors(void *pvParameters)
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskMotors started");
 
-  // for (;;)
-  // {
-  //   setSpeedIndividual(0, 2);
-  //   vTaskDelay(pdMS_TO_TICKS(1000));
-  //   setSpeedIndividual(2, 0);
-  //   vTaskDelay(pdMS_TO_TICKS(1000));
-  // }
-
   for (;;)
   {
     // send a request to the cybergear to receive motor status (position, speed,
@@ -141,14 +133,6 @@ void taskMotors(void *pvParameters)
       TaskMessage::Message message = {.type = TaskMessage::Type::STATE_MOTORS,
                                       .as = {.motors = motors}};
       xQueueSend(dataManagerQueue, &message, 0);
-      /*TaskMessage::Battery battery = {
-          .voltage = 120.0f,
-          .current = 100.0f,
-          .fuel = static_cast<uint16_t>((currentMillis % 24)) * 10,
-      };
-      message = {.type = TaskMessage::Type::STATE_BATTERY,
-                 .as = {.battery = battery}};
-      xQueueSend(dataManagerQueue, &message, 0);*/
     }
 
     // When the motor CAN data was monitored via a saleae logic analyzer, it was
