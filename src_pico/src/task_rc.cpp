@@ -9,10 +9,12 @@
 #include <Arduino-CRSF.h>
 
 #define FULL_CRSF_FEATURES 0
-#define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
 #define DEBUG_LOG_RC_CHANNELS 1
 #define DEBUG_LOG_RC_LINK_STATS 0
 #define BROADCAST_FREQUENCY 800 // ms
+
+#define TICKS_TO_US(x) ((x - 992) * 5 / 8 + 1500)
+#define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
 
 CRSFforArduino *crsf = nullptr;
 
@@ -59,7 +61,7 @@ void onReceiveChannels(const uint16_t channels[]);
 void onFailsafeActivated();
 void onFailsafeCleared();
 
-CRSF* crsf2 = nullptr;
+CRSF *crsf2 = nullptr;
 
 void taskReceiveFromRC(void *pvParameters)
 {
@@ -68,6 +70,7 @@ void taskReceiveFromRC(void *pvParameters)
     // Serial1.setTX(12);
     // Serial1.setRX(13);
 
+    // Serial1 = UART0, Serial2 = UART1.
     Serial2.setTX(8);
     Serial2.setRX(9);
 #if FULL_CRSF_FEATURES
@@ -103,7 +106,7 @@ void taskReceiveFromRC(void *pvParameters)
     crsf2->begin(&Serial2, 420000);
     isFailsafeActive = !crsf2->isConnected();
     crsf2->onDataReceived([](const uint16_t channels[])
-                         {
+                          {
         if (isFailsafeActive)
         {
             onFailsafeCleared();
@@ -221,10 +224,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
     }
 }
 
-uint16_t rcToUs(uint16_t rc)
-{
-    return (uint16_t)((rc * 0.62477120195241F) + 881);
-}
+
 
 void onReceiveChannels(const uint16_t channels[])
 {
@@ -239,7 +239,7 @@ void onReceiveChannels(const uint16_t channels[])
         {
             Serial.print(rcChannelNames[i]);
             Serial.print(": ");
-            Serial.print(rcToUs(channels[i]));
+            Serial.print(TICKS_TO_US(channels[i]));
 
             if (i < (rcChannelCount - 1))
             {
@@ -251,7 +251,7 @@ void onReceiveChannels(const uint16_t channels[])
 #endif
 
     // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
-    float rpm = mapRange(992, 2008, -10, 10, rcToUs(channels[0]));
+    float rpm = mapRange(992, 2008, -10, 10, TICKS_TO_US(channels[0]));
     if (lastRPM != rpm)
     {
         lastRPM = rpm;
