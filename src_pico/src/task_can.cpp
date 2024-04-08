@@ -10,7 +10,6 @@ void taskCAN(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
   Serial.println("taskCAN started");
-  CanCommunication::init(onReceiveCanPacket);
   for (;;)
   {
     CanCommunication::checkForPacket();

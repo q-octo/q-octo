@@ -44,6 +44,11 @@ void setup()
     ;
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
+#if CFG_ENABLE_CAN
+  // IMPORTANT that this occurs outside of a FreeRTOS task (maybe so that we 
+  // don't send a CAN message before CAN is initialized?)
+  CanCommunication::init(onReceiveCanPacket); 
+#endif
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
