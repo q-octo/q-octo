@@ -28,6 +28,11 @@
 
 static struct mg_mgr mgr;
 
+void send_ack() {
+    //static void uart_write_blocking (uart_inst_t *uart, const uint8_t *src, size_t len)
+    uart_write_blocking(UART_ID, "ACK\n", 4);
+}
+
 void uart_receive_task(void *pvParameters) {
     // Task to receive UART messages
     char receivedChar;
@@ -44,6 +49,7 @@ void uart_receive_task(void *pvParameters) {
                 // Process the received string
                 printf("Received string: %s\n", buffer);
                 // Reset buffer index for the next string
+                send_ack();
                 bufferIndex = 0;
             } else if (bufferIndex < MAX_STRING_SIZE - 1) {
                 // Add character to buffer if there's space
