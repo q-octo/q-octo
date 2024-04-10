@@ -19,10 +19,10 @@
 #define TEST_TASK_STACK_SIZE			(( configSTACK_DEPTH_TYPE ) 2048)
 
 // UART configuration
-#define UART_ID uart0
-#define BAUD_RATE 115200
-#define UART_TX_PIN 0
-#define UART_RX_PIN 1
+#define UART_ID uart1
+#define BAUD_RATE 9600
+#define UART_TX_PIN 4
+#define UART_RX_PIN 5
 #define MAX_STRING_SIZE 100 // Adjust based on your needs
 
 
@@ -31,6 +31,7 @@ static struct mg_mgr mgr;
 void send_ack() {
     //static void uart_write_blocking (uart_inst_t *uart, const uint8_t *src, size_t len)
     uart_write_blocking(UART_ID, "ACK\n", 4);
+    printf("Companion ACK\n");
 }
 
 void uart_receive_task(void *pvParameters) {
@@ -47,8 +48,10 @@ void uart_receive_task(void *pvParameters) {
                 // Null-terminate the string
                 buffer[bufferIndex] = '\0';
                 // Process the received string
-                printf("Received string: %s\n", buffer);
+                printf("Received: %s\n", buffer);
                 // Reset buffer index for the next string
+                // Sleep
+                vTaskDelay(pdMS_TO_TICKS(1000)); // Sleep for 1 second
                 send_ack();
                 bufferIndex = 0;
             } else if (bufferIndex < MAX_STRING_SIZE - 1) {
