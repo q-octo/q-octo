@@ -15,12 +15,29 @@ IPAddress apIP(192, 168, 4, 1);
 WebServer *webServer;
 WebSocketsServer *webSocket;
 QueueHandle_t webServerQueue;
+WSWebServer::Message message;
+
 bool webServerIsRunning = false;
 uint32_t lastWebSocketRestart = 0;
+
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
 void handleRoot();
 void restartWebSocket();
+
+void WSWebServer::init()
+{
+    // Initialise the queue
+    if (webServerQueue == nullptr)
+    {
+        webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+        if (webServerQueue == nullptr)
+        {
+            Serial.println("Failed to create webServerQueue");
+            return;
+        }
+    }
+}
 
 void WSWebServer::start()
 {
@@ -97,18 +114,6 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
-    // Initialise the queue
-    if (webServerQueue == nullptr)
-    {
-        webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
-        if (webServerQueue == nullptr)
-        {
-            Serial.println("Failed to create webServerQueue");
-            return;
-        }
-    }
-
-    WSWebServer::Message message;
     BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
     const bool messageReceived = xStatus == pdPASS;
     if (messageReceived)
@@ -174,7 +179,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     break;
     case WStype_TEXT:
         Serial.printf("[%u] get Text: %s\n", num, payload);
-        
+
         if (strcmp((char *)payload, "#000000") == 0)
         {
             Serial.println("restarting web server");

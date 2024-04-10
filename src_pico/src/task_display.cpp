@@ -57,6 +57,7 @@ Button button_y(PicoDisplay::Y);
 // Regardless of whether a message is received or not
 const TickType_t xTicksToWait = pdMS_TO_TICKS(32);
 QueueHandle_t displayQueue;
+TaskDisplay::Message message;
 
 // Internal state
 unsigned long lastBlinkMillis = 0;
@@ -89,7 +90,6 @@ void taskDisplay(void *pvParameters)
   Serial.println("Display disabled, blocking indefinitely");
   for (;;)
   {
-    TaskDisplay::Message message;
     xQueueReceive(displayQueue, &message, portMAX_DELAY);
   }
 #endif
@@ -101,13 +101,11 @@ void taskDisplay(void *pvParameters)
   // Display is 240x135 pixels
   for (;;)
   {
-    TaskDisplay::Message message;
     BaseType_t xStatus = xQueueReceive(displayQueue, &message, xTicksToWait);
     const bool messageReceived = xStatus == pdPASS;
 
     if (messageReceived)
     {
-      // Serial.println("Message received");
       switch (message.type)
       {
       case TaskDisplay::MessageType::MOTORS:

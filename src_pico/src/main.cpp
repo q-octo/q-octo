@@ -18,6 +18,7 @@
 
 void printTaskStatus();
 void printHeapStats();
+void initTasks();
 
 TaskHandle_t watchdogHandle = nullptr;
 TaskHandle_t receiveFromRCHandle = nullptr;
@@ -45,10 +46,40 @@ void setup()
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
 #if CFG_ENABLE_CAN
-  // IMPORTANT that this occurs outside of a FreeRTOS task (maybe so that we 
+  // IMPORTANT that this occurs outside of a FreeRTOS task (maybe so that we
   // don't send a CAN message before CAN is initialized?)
-  CanCommunication::init(onReceiveCanPacket); 
+  CanCommunication::init(onReceiveCanPacket);
 #endif
+  initTasks();
+#if CFG_ENABLE_WEB_SERVER
+  WSWebServer::init();
+#endif
+#if CFG_ENABLE_WEB_SERVER && CFG_START_WEB_SERVER_ON_STARTUP
+  WSWebServer::start();
+#endif
+}
+
+// Handled by FreeRTOS
+void loop()
+{
+#if CFG_DEBUG_LIST_TASKS
+  const uint32_t currentMillis = millis();
+  if (currentMillis - lastDebugListTasksMs >= 5000)
+  {
+    lastDebugListTasksMs = currentMillis;
+    printTaskStatus();
+  }
+#endif
+#if CFG_ENABLE_WEB_SERVER
+  WSWebServer::loop();
+#endif
+  // It appears that a task labelled CORE0 runs this loop in a task
+  // So if this loop never blocks, no other task on core 0 will run!
+  vTaskDelay(pdMS_TO_TICKS(1));
+}
+
+void initTasks()
+{
   // Setup FreeRTOS tasks
   // Queue consumers need a higher priority than producers to avoid queue
   // overflow
@@ -81,28 +112,6 @@ void setup()
   xTaskCreate(taskMotors, "motors", stackSize, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_0);
 #endif
-
-#if CFG_START_WEB_SERVER_ON_STARTUP
-  WSWebServer::start();
-#endif
-
-}
-
-// Handled by FreeRTOS
-void loop()
-{
-#if CFG_DEBUG_LIST_TASKS
-  const uint32_t currentMillis = millis();
-  if (currentMillis - lastDebugListTasksMs >= 5000)
-  {
-    lastDebugListTasksMs = currentMillis;
-    printTaskStatus();
-  }
-#endif
-  WSWebServer::loop();
-  // It appears that a task labelled CORE0 runs this loop in a task
-  // So if this loop never blocks, no other task on core 0 will run!
-  vTaskDelay(pdMS_TO_TICKS(1));
 }
 
 void printTaskStatus()
