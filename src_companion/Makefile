@@ -31,7 +31,7 @@ SOURCES_C_PICO_SDK = \
 
 SOURCES_FREERTOS = $(FREERTOS_KERNEL_PATH)/portable/MemMang/heap_4.c $(FREERTOS_KERNEL_PATH)/portable/ThirdParty/GCC/RP2040/port.c $(FREERTOS_KERNEL_PATH)/croutine.c $(FREERTOS_KERNEL_PATH)/event_groups.c $(FREERTOS_KERNEL_PATH)/list.c $(FREERTOS_KERNEL_PATH)/queue.c $(FREERTOS_KERNEL_PATH)/stream_buffer.c $(FREERTOS_KERNEL_PATH)/tasks.c $(FREERTOS_KERNEL_PATH)/timers.c
 
-SOURCES = main.c mongoose.c net.c packed_fs.c dhcpserver.c
+SOURCES = main.c mongoose.c net.c packed_fs.c dhcpserver.c task_data_manager.c
 
 OBJECTS = $(SOURCES:%.c=obj/%.o) $(SOURCES_C_PICO_SDK:%.c=obj/%.o) $(SOURCES_CXX_PICO_SDK:%.cpp=obj/%.o) $(SOURCES_FREERTOS:%.c=obj/%.o) $(SOURCES_ASM:%.S=obj/%.o)
 
