@@ -1,4 +1,5 @@
 #include "task_data_manager.h"
+#include "task_web_server.h"
 #include "pico/stdlib.h"
 #include <stdio.h>
 
@@ -24,6 +25,16 @@ void taskDataManager(void *pvParameters)
         if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY))
         {      
             printf("Received message: %s\n", message.Message);
+
+            // Pass the message to the web server
+            if (webServerQueue != NULL)
+            {
+                if (xQueueSend(webServerQueue, &message, 0) != pdPASS)
+                {
+                    printf("Failed to send message to web server\n");
+                }
+            }
+
         }
     }
 

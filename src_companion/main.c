@@ -16,6 +16,7 @@
 
 // Tasks
 #include "task_data_manager.h"
+#include "task_web_server.h"
 
 
 //#define TEST_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
@@ -38,7 +39,7 @@
 
 void send_ack() {
     //static void uardt_write_blocking (uart_inst_t *uart, const uint8_t *src, size_t len)
-    uart_write_blocking(UART_ID, "ACK\n", 4);
+    uart_write_blocking(UART_ID, (const uint8_t *)"ACK\n", 4);
     printf("Companion ACK\n");
 }
 
@@ -80,6 +81,7 @@ void vLaunch( void) {
     TaskHandle_t task;
     xTaskCreate(taskDataManager, "taskDataManager", 2048, NULL, DATA_MANAGER_TASK_PRIORITY, &task);
     xTaskCreate(uart_receive_task, "uart_receive_task", 2048, NULL, PRODUCER_TASK_PRIORITY, &task);
+    xTaskCreate(taskWebServer, "task_web_server", 2048, NULL, CONSUMER_TASK_PRIORITY, &task);
     vTaskStartScheduler();
 }
 
