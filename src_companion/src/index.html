@@ -1,36 +1,163 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Microdot WebSocket Demo</title>
-    <meta charset="UTF-8">
-  </head>
-  <body>
-    <h1>Microdot WebSocket Demo</h1>
-    <div id="log"></div>
-    <br>
-    <form id="form">
-      <label for="text">Input: </label>
-      <input type="text" id="text" autofocus>
-    </form>
-    <script>
-      const log = (text, color) => {
-        document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
-      };
+<!-- File path: /your-project-directory/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+  /* Basic Reset */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-      const socket = new WebSocket('ws://' + location.host + '/echo');
-      socket.addEventListener('message', ev => {
-        log('<<< ' + ev.data, 'blue');
-      });
-      socket.addEventListener('close', ev => {
-        log('<<< closed');
-      });
-      document.getElementById('form').onsubmit = ev => {
-        ev.preventDefault();
-        const textField = document.getElementById('text');
-        log('>>> ' + textField.value, 'red');
-        socket.send(textField.value);
-        textField.value = '';
-      };
-    </script>
-  </body>
+  /* Set up typography */
+  body { font-family: 'Arial', sans-serif; }
+
+  .state { background-color: #f0f0f0; padding: 16px;}
+
+  /* Container for the dashboard */
+  .container { display: flex; flex-wrap: wrap; justify-content: center; margin: 12px; padding: 8px; background-color: rgb(243, 211, 211); }
+
+  /* General styling for each section */
+  .section { margin: 5px; padding: 12px; }
+
+  /* Temperature section */
+  .temperature-section { /* Add styles here */ }
+
+  /* RPM section */
+  .rpm-section { /* Add styles here */ }
+
+  /* Meter section */
+  .meter-section { 
+
+   }
+
+  /* ... Additional sections ... */
+
+  /* Adjust font size responsively based on screen size */
+  @media (max-width: 600px) {
+    html {
+      font-size: 24px; /* Slightly smaller on very small screens */
+    }
+  }
+
+  @media (min-width: 601px) {
+    html {
+      font-size: 42px; /* Base size for most mobile devices */
+    }
+  }
+
+  @media (min-width: 768px) {
+    html {
+      font-size: 18px; /* Larger on tablets */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    html {
+      font-size: 20px; /* Even larger on desktops */
+    }
+  }
+</style>
+<script src="index.js"></script>
+</head>
+<body>
+  <div class="state">
+    <div class="container">
+      <div class="section temperature-section">
+        <div><span id="temp_left"></span>&nbsp;°C</div>
+        <div><span id="temp_right"></span>&nbsp;°C</div>
+      </div>
+      <div class="section rpm-section">
+        <div><span id="rpm_left"></span>&nbsp;RPM</div>
+        <div><span id="rpm_right"></span>&nbsp;RPM</div>
+      </div>
+      <div class="section rotation-section">
+        <div><span id="angle_left"></span>&nbsp;°</div>
+        <div><span id="angle_right"></span>&nbsp;°</div>
+      </div>
+      <!-- ... Additional sections ... -->
+    </div>
+
+    <div class="container">
+      <div class="section numberbat-section">
+        <div><span id="bat_num">Flight Controller</span>&nbsp;bat.</div>
+      </div>
+
+      <div class="section current-section">
+        <div>NOT X</div>
+      </div> 
+    </div>
+
+    <div class="container">
+      <div class="section numberbat-section">
+        <div id="source">Flight Controller</div>
+      </div>
+    </div>
+
+    <!-- Meters -->
+    <div class="container">
+      <div>Fuel:&nbsp</div>
+      <div><span id="fuel">84%</span></div>
+    </div>
+
+    <div class="container">
+      <div>Battery:&nbsp</div>
+      <div><span id="voltage">12.6</span>V</div>
+    </div>
+
+    <div class="container">
+      <div>Current:&nbsp</div>
+      <div><span id="current">0.0</span>A</div>
+    </div>
+
+    <div class="container">
+      <div class="section">
+        <div>RSSI</div>
+        <div><span id="rssi">77</span>dB</div>
+      </div>
+      <div class="section">
+        <div>Link</div>
+        <div><span id="link">64</span>%</div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="section">
+        <div>Offset L</div>
+        <div><span id="offset_left">180</span>&nbsp;deg</div>
+      </div>
+      <div class="section">
+        <div>Offset R</div>
+        <div><span id="offset_right">180</span>&nbsp;deg</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input forms for wheel offset and max speed -->
+  <div class="container" style="justify-content: center;">
+    <div class="section">
+      <form id="form">
+        <label for="text">Wheel Offset L: </label>
+        <input type="text" id="text" autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <form id="form">
+        <label for="text">Wheel Offset R: </label>
+        <input type="text" id="text" autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <form id="form">
+        <label for="text">Max Speed: </label>
+        <input type="text" id="text" autofocus>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+</body>
 </html>

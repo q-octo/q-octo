@@ -19,9 +19,13 @@ password = 'Hello12345'
 message = 'Nothing'
 state = 0
 
-# Connect to the network 
+# Connect to the wifi network 
 def connect():
     wlan = network.WLAN(network.STA_IF)
+
+    # Configure to rover.local
+    wlan.config(hostname='picow')
+
     status = wlan.ifconfig()
     print( 'ip = ' + status[0] )
 
@@ -49,6 +53,15 @@ def connect():
         addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
         print('listening on', addr)
 
+# AP mode instead of station mode
+def ap_mode():
+    #network.hostname('picow')
+    #network.country('GB')
+
+    ap = network.WLAN(network.AP_IF)
+    ap.config(essid='mysterious pico', password='password')
+    ap.ifconfig(("10.10.1.1", "255.255.255.0", "10.10.1.1", "10.10.1.1"))
+    ap.active(True)
 
 # Listen for UART data
 def uart_loop():
@@ -95,5 +108,6 @@ async def echo(request, ws):
 uart_thread = _thread.start_new_thread(uart_loop, ())
 
 ## Web server on another thread
-connect()
+#connect() # wifi mode
+ap_mode() # ap mode
 app.run(port=80, debug=True)
