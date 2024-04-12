@@ -26,6 +26,12 @@ def generate_telemetry_data():
 # The main handler for the WebSocket connection
 async def websocket_handler(websocket, path):
     while True:
+
+        # listen for messages from the client
+        message = await websocket.receive()
+        if message is not None:
+            print(f"Received message: {message}")
+
         data = generate_telemetry_data()
         await websocket.send(json.dumps(data))
         # Wait for 1 second before sending the next set of data

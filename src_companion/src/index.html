@@ -58,18 +58,70 @@
     }
   }
 </style>
-<script src="index.js"></script>
+<script>
+  // Open web socket connection
+  const socket = new WebSocket('ws://' + location.host + '/echo');
+  //const socket = new WebSocket('ws://localhost:8765/echo');
+
+  const updateDisplay = (data) => {
+    // Modify the elements with id's matching the keys in the data object
+    for (let key in data) {
+
+      const element = document.getElementById(key);
+
+      if (element !== null) {
+          document.getElementById(key).textContent = data[key];
+      }
+
+    }
+  };
+
+  socket.addEventListener('message', ev => {
+
+      console.log('Message from server', ev.data);
+
+      updateDisplay(JSON.parse(ev.data));
+    });
+    socket.addEventListener('close', ev => {
+      console.log('Connection closed', ev);
+  });
+
+  // // Form submission
+  // document.getElementById('offset_l').onsubmit = ev => {
+  //       ev.preventDefault();
+  //       const textField = document.getElementById('text');;
+  //       socket.send(`OFFSET_L:${textField.value}`);
+  //       textField.value = '';
+  // };
+  // // Form submission
+  // document.getElementById('offset_r').onsubmit = ev => {
+  //       ev.preventDefault();
+  //       const textField = document.getElementById('text');;
+  //       socket.send(`OFFSET_R:${textField.value}`);
+  //       textField.value = '';
+  // };
+  // // Form submission
+  // document.getElementById('max_speed').onsubmit = ev => {
+  //       ev.preventDefault();
+  //       const textField = document.getElementById('text');;
+  //       socket.send(`MAX_SPEED:${textField.value}`);
+  //       textField.value = '';
+  // };
+
+</script>
+
+
 </head>
 <body>
   <div class="state">
     <div class="container">
       <div class="section temperature-section">
-        <div><span id="temp_left"></span>&nbsp;°C</div>
-        <div><span id="temp_right"></span>&nbsp;°C</div>
+        <div><span id="temp_left">--</span>&nbsp;°C</div>
+        <div><span id="temp_right">--</span>&nbsp;°C</div>
       </div>
       <div class="section rpm-section">
-        <div><span id="rpm_left"></span>&nbsp;RPM</div>
-        <div><span id="rpm_right"></span>&nbsp;RPM</div>
+        <div><span id="rpm_left">--</span>&nbsp;RPM</div>
+        <div><span id="rpm_right">--</span>&nbsp;RPM</div>
       </div>
       <div class="section rotation-section">
         <div><span id="angle_left"></span>&nbsp;°</div>
@@ -80,55 +132,55 @@
 
     <div class="container">
       <div class="section numberbat-section">
-        <div><span id="bat_num">Flight Controller</span>&nbsp;bat.</div>
+        <div><span id="bat_num">--</span>&nbsp;bat.</div>
       </div>
 
       <div class="section current-section">
-        <div>NOT X</div>
+        <div><span id="status">--</span></div>
       </div> 
     </div>
 
     <div class="container">
       <div class="section numberbat-section">
-        <div id="source">Flight Controller</div>
+        <div id="source">--</div>
       </div>
     </div>
 
     <!-- Meters -->
     <div class="container">
       <div>Fuel:&nbsp</div>
-      <div><span id="fuel">84%</span></div>
+      <div><span id="fuel">--</span>%</div>
     </div>
 
     <div class="container">
       <div>Battery:&nbsp</div>
-      <div><span id="voltage">12.6</span>V</div>
+      <div><span id="voltage">--</span>V</div>
     </div>
 
     <div class="container">
       <div>Current:&nbsp</div>
-      <div><span id="current">0.0</span>A</div>
+      <div><span id="current">--</span>A</div>
     </div>
 
     <div class="container">
       <div class="section">
         <div>RSSI</div>
-        <div><span id="rssi">77</span>dB</div>
+        <div><span id="rssi">--</span>dB</div>
       </div>
       <div class="section">
         <div>Link</div>
-        <div><span id="link">64</span>%</div>
+        <div><span id="link">--</span>%</div>
       </div>
     </div>
 
     <div class="container">
       <div class="section">
         <div>Offset L</div>
-        <div><span id="offset_left">180</span>&nbsp;deg</div>
+        <div><span id="offset_left">--</span>&nbsp;°</div>
       </div>
       <div class="section">
         <div>Offset R</div>
-        <div><span id="offset_right">180</span>&nbsp;deg</div>
+        <div><span id="offset_right">--</span>&nbsp;°</div>
       </div>
     </div>
   </div>
@@ -136,7 +188,7 @@
   <!-- Input forms for wheel offset and max speed -->
   <div class="container" style="justify-content: center;">
     <div class="section">
-      <form id="form">
+      <form id="offset_l">
         <label for="text">Wheel Offset L: </label>
         <input type="text" id="text" autofocus>
         <button type="submit">Submit</button>
@@ -144,7 +196,7 @@
     </div>
 
     <div class="section">
-      <form id="form">
+      <form id="offset_r">
         <label for="text">Wheel Offset R: </label>
         <input type="text" id="text" autofocus>
         <button type="submit">Submit</button>
@@ -152,7 +204,7 @@
     </div>
 
     <div class="section">
-      <form id="form">
+      <form id="max_speed">
         <label for="text">Max Speed: </label>
         <input type="text" id="text" autofocus>
         <button type="submit">Submit</button>
