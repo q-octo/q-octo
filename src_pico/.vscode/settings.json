@@ -19,6 +19,7 @@
         "map": "cpp",
         "cmath": "cpp",
         "iosfwd": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "algorithm": "cpp"
     }
 }
