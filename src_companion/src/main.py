@@ -1,9 +1,11 @@
 import time
 import network
 import socket
+import asyncio
 from machine import Pin, UART
 import _thread
-from microdot import Microdot
+from microdot import Microdot, send_file
+from microdot.websocket import with_websocket
 
 # Constants
 UART_TX_PIN = 0
@@ -15,6 +17,7 @@ ssid = 'NPhone'
 password = 'Hello12345'
 
 message = 'Nothing'
+state = 0
 
 # Connect to the network 
 def connect():
@@ -60,13 +63,37 @@ def uart_loop():
 
 # Initialize the web server
 app = Microdot()
+
+@app.route('/hello')
+async def hello(request):
+
+    global state
+
+    state += 1
+
+    return f"Hello World! {state}"
+
 @app.route('/')
-def index(request):
-    return f'<h1>Message: {message}</h1>'
+async def index(request):
+    return send_file('index.html')
+
+@app.route('/echo')
+@with_websocket
+async def echo(request, ws):
+    
+    global message
+    
+    while True:
+
+        # Send update
+        toSend = str(message)
+        await ws.send(toSend)
+        await asyncio.sleep(1)
+    
 
 ## Listen for UART data on one thread
 uart_thread = _thread.start_new_thread(uart_loop, ())
 
 ## Web server on another thread
 connect()
-app.run(port=80)
+app.run(port=80, debug=True)
