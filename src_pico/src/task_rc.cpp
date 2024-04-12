@@ -71,8 +71,8 @@ void taskReceiveFromRC(void *pvParameters)
     // Serial1.setRX(13);
 
     // Serial1 = UART0, Serial2 = UART1.
-    Serial2.setTX(8);
-    Serial2.setRX(9);
+    Serial2.setTX(CFG_RC_UART_TX);
+    Serial2.setRX(CFG_RC_UART_RX);
 #if FULL_CRSF_FEATURES
     crsf = new CRSFforArduino(&Serial2);
 

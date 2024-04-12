@@ -11,6 +11,7 @@
 namespace WSWebServer
 {
 
+    void init();
     void start();
     void stop();
     void loop();
