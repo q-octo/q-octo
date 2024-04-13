@@ -82,7 +82,7 @@ void taskSendToRC(void *pvParameters)
         vTaskDelete(nullptr);
     }
 
-    TaskRC::Message message;
+    static TaskRC::Message message;
 #if !CFG_ENABLE_RC
     Serial.println("RC disabled, blocking indefinitely");
     for (;;)
