@@ -37,11 +37,11 @@ void taskControlMotors(void *pvParameters)
     Serial.println("Failed to create dataManagerQueue");
     vTaskDelete(nullptr);
   }
+  static TaskControlMotors::Message message;
 #if !CFG_ENABLE_MOTORS
   Serial.println("Motors disabled, blocking indefinitely");
   for (;;)
   {
-    TaskControlMotors::Message message;
     xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY);
   }
 #endif
@@ -50,11 +50,9 @@ void taskControlMotors(void *pvParameters)
 
   // for (;;)
   // {
-  //   TaskControlMotors::Message message;
   //   xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY);
   // }
 
-  TaskControlMotors::Message message;
   for (;;)
   {
     if (xQueueReceive(controlMotorsQueue, &message, portMAX_DELAY))
@@ -160,7 +158,6 @@ void initMotors()
   cybergearR.set_limit_current(MOTOR_CURRENT_LIMIT);
   cybergearR.enable_motor();
 }
-
 
 void debugPrintMotorStatus()
 {

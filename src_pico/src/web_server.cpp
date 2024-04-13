@@ -15,11 +15,9 @@ IPAddress apIP(192, 168, 4, 1);
 WebServer *webServer;
 WebSocketsServer *webSocket;
 QueueHandle_t webServerQueue;
-WSWebServer::Message message;
 
 bool webServerIsRunning = false;
 uint32_t lastWebSocketRestart = 0;
-
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
 void handleRoot();
@@ -114,6 +112,7 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
+    static WSWebServer::Message message;
     BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
     const bool messageReceived = xStatus == pdPASS;
     if (messageReceived)

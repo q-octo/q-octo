@@ -21,11 +21,11 @@ void taskWatchdog(void *pvParameters)
         Serial.println("Failed to create watchdogQueue");
         vTaskDelete(nullptr);
     }
+    static Task message;
 #if !CFG_ENABLE_WATCHDOG
     Serial.println("Watchdog disabled, blocking indefinitely");
     for (;;)
     {
-        Task message;
         xQueueReceive(watchdogQueue, &message, portMAX_DELAY);
     }
 #endif
@@ -37,12 +37,11 @@ void taskWatchdog(void *pvParameters)
     // rp2040.wdt_begin(WATCHDOG_TIMEOUT);
     for (;;)
     {
-        Task task;
-        BaseType_t xStatus = xQueueReceive(watchdogQueue, &task, pdMS_TO_TICKS(1));
+        BaseType_t xStatus = xQueueReceive(watchdogQueue, &message, pdMS_TO_TICKS(1));
         const bool messageReceived = xStatus == pdPASS;
         if (messageReceived)
         {
-            tasks[task] += 1;
+            tasks[message] += 1;
         }
         const uint32_t currentMillis = millis();
         // if (currentMillis - lastHealthCheckMs > HEALTH_CHECK_FREQUENCY)

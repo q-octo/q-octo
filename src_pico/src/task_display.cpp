@@ -57,7 +57,6 @@ Button button_y(PicoDisplay::Y);
 // Regardless of whether a message is received or not
 const TickType_t xTicksToWait = pdMS_TO_TICKS(32);
 QueueHandle_t displayQueue;
-TaskDisplay::Message message;
 
 // Internal state
 unsigned long lastBlinkMillis = 0;
@@ -85,6 +84,9 @@ void taskDisplay(void *pvParameters)
     Serial.println("Failed to create displayQueue");
     vTaskDelete(nullptr);
   }
+
+  static TaskDisplay::Message message;
+
 
 #if !CFG_ENABLE_DISPLAY
   Serial.println("Display disabled, blocking indefinitely");

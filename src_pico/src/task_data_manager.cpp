@@ -6,11 +6,6 @@
 
 QueueHandle_t dataManagerQueue;
 
-TaskDisplay::Message displayMessage;
-TaskRC::Message rcMessage;
-TaskControlMotors::Message controlMotorsMessage;
-WSWebServer::Message webServerMessage;
-
 /*
 This task will have a higher priority than the tasks that message it.
 When the sending task sends a message to the queue, this task will preempt the
@@ -32,7 +27,12 @@ void taskDataManager(void *pvParameters)
     vTaskDelete(nullptr);
   }
 
-  TaskMessage::Message message;
+  static TaskMessage::Message message;
+  static TaskDisplay::Message displayMessage;
+  static TaskRC::Message rcMessage;
+  static TaskControlMotors::Message controlMotorsMessage;
+  static WSWebServer::Message webServerMessage;
+
   for (;;)
   {
     if (xQueueReceive(dataManagerQueue, &message, portMAX_DELAY))
