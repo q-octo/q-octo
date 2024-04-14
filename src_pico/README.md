@@ -7,6 +7,9 @@ Speed is in RPM
 https://www.instructables.com/Using-RP2040-PIO-in-Arduino-IDE-on-Windows/
 
 
+`git submodule update --init`
+
+
 ## Windows Footguns
 
 * https://arduino-pico.readthedocs.io/en/latest/platformio.html#current-state-of-development
