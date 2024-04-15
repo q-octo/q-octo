@@ -26,6 +26,7 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
   // Serial.println();
 
   // TODO handle messages from the rotary encoder
+  // TODO forward DroneCAN messages (CAN_MESSAGE_POWER_MONITOR)
 
   TaskMessage::Message message = {
       .as = {.canMessage = {.id = packetId, .data = packetData}}};

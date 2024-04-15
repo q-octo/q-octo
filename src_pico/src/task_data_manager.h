@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <task.h>
@@ -27,6 +27,7 @@ namespace TaskMessage
     CAN_MESSAGE_MOTOR_R,
     CAN_MESSAGE_ROT_ENC_L,
     CAN_MESSAGE_ROT_ENC_R,
+    CAN_MESSAGE_POWER_MONITOR,
   } Type;
 
   typedef struct

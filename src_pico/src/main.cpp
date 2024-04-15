@@ -11,6 +11,7 @@
 #include "task_display.h"
 #include "task_can.h"
 #include "task_watchdog.h"
+#include "task_power_monitor.h"
 #include "web_server.h"
 
 #define CORE_0 (1 << 0)
@@ -24,6 +25,7 @@ TaskHandle_t watchdogHandle = nullptr;
 TaskHandle_t receiveFromRCHandle = nullptr;
 TaskHandle_t sendToRCHandle = nullptr;
 TaskHandle_t displayHandle = nullptr;
+TaskHandle_t powerMonitorHandle = nullptr;
 TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
@@ -95,6 +97,8 @@ void initTasks()
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
   xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 3, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
+  xTaskCreate(taskPowerMonitor, "powerMonitor", stackSize, nullptr, 3, &powerMonitorHandle);
+  vTaskCoreAffinitySet(powerMonitorHandle, CORE_0);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);
