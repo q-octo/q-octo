@@ -37,6 +37,7 @@ void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData
       .as = {.canMessage = {.id = packetId, .data = packetData, .len = packetLength}}};
 
   const uint8_t asMotorId = (packetId & 0xFF00) >> 8;
+  const uint8_t asMotorMasterCanID = (packetId & 0xFF);
   const bool matchesLeftMotor = asMotorId == CYBERGEAR_CAN_ID_L;
   const bool matchesRightMotor = asMotorId == CYBERGEAR_CAN_ID_R;
   
