@@ -7,8 +7,8 @@ static CanardInstance canard;
 static uint8_t memory_pool[1024];
 
 // TODO configure these appropriately
-static const float MOTOR_SHUTDOWN_VOLTAGE = 17.0f;
-static const float SYSTEM_SHUTDOWN_VOLTAGE = 16.5f;
+static const float MOTOR_SHUTDOWN_VOLTAGE = 17.2f;
+static const float SYSTEM_SHUTDOWN_VOLTAGE = 17.0f;
 
 QueueHandle_t powerMonitorQueue;
 
