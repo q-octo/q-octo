@@ -142,6 +142,7 @@ void taskMotors(void *pvParameters)
 
 void setSpeedIndividual(float speedL, float speedR)
 {
+  // TODO this is actually rad/s not RPM
   // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);

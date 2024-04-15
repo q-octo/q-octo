@@ -159,6 +159,8 @@ void taskSendToRC(void *pvParameters)
             switch (message.type)
             {
             case TaskRC::BATTERY:
+                // TODO once pico_crsf PR is merged, update these.
+                // * current and voltage by 10.
                 crsf->telemetryWriteBattery(
                     message.as.battery.voltage,
                     message.as.battery.current,

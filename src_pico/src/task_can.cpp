@@ -14,11 +14,10 @@ void taskCAN(void *pvParameters)
   {
     CanCommunication::checkForPacket();
     vTaskDelay(pdMS_TO_TICKS(1));
-
   }
 }
 
-void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
+void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData,
                         bool extended)
 {
   // Serial.print("Received packet with id 0x");
@@ -29,7 +28,7 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
   // TODO forward DroneCAN messages (CAN_MESSAGE_POWER_MONITOR)
 
   TaskMessage::Message message = {
-      .as = {.canMessage = {.id = packetId, .data = packetData}}};
+      .as = {.canMessage = {.id = packetId, .data = packetData, .len = packetLength}}};
   switch ((packetId & 0xFF00) >> 8)
   {
   case CYBERGEAR_CAN_ID_L:
@@ -41,6 +40,8 @@ void onReceiveCanPacket(int packetSize, uint32_t packetId, uint8_t *packetData,
     xQueueSend(dataManagerQueue, &message, 0);
     break;
   default:
+    message.type = TaskMessage::Type::CAN_MESSAGE_POWER_MONITOR;
+    xQueueSend(dataManagerQueue, &message, 0);
     Serial.print("Received packet from unknown device");
     Serial.print(" with id 0x");
     Serial.print(packetId, HEX);
