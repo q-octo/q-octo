@@ -1,5 +1,6 @@
 #pragma once
 #include "xiaomi_cybergear_defs.h"
+#include <cstdint>
 
 struct XiaomiCyberGearStatus {
     float position;
