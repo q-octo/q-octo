@@ -27,25 +27,53 @@ void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData
   // TODO handle messages from the rotary encoder
   // TODO forward DroneCAN messages (CAN_MESSAGE_POWER_MONITOR)
 
+  if (!extended)
+  {
+    Serial.println("[WARN] Received non-extended packet");
+    return;
+  }
+
   TaskMessage::Message message = {
       .as = {.canMessage = {.id = packetId, .data = packetData, .len = packetLength}}};
-  switch ((packetId & 0xFF00) >> 8)
+
+  const uint8_t asMotorId = (packetId & 0xFF00) >> 8;
+  const bool matchesLeftMotor = asMotorId == CYBERGEAR_CAN_ID_L;
+  const bool matchesRightMotor = asMotorId == CYBERGEAR_CAN_ID_R;
+  
+  // https://dronecan.github.io/Specification/4.1_CAN_bus_transport_layer/#can-frame-format
+  const uint8_t asDroneCanSourceId = (packetId & 0x7F);
+
+  // TODO log the packetId for motor messages.
+  // What are the least significant 8 bits? (0-7)
+  // 8-15 bits are the motor ID
+  // What are 16-28?
+  // They could all be zeros. The motor library ignores the id and just assumes
+  // that the payload consists of position, speed, torque, and temperature.
+  
+  // If they are all zeros, it will be easy to distinguish between a motor
+  // message and a power monitor message.
+  if (matchesLeftMotor)
   {
-  case CYBERGEAR_CAN_ID_L:
     message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_L;
     xQueueSend(dataManagerQueue, &message, 0);
-    break;
-  case CYBERGEAR_CAN_ID_R:
+  }
+
+  if (matchesRightMotor)
+  {
     message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_R;
     xQueueSend(dataManagerQueue, &message, 0);
-    break;
-  default:
+  }
+
+  if (!matchesLeftMotor && !matchesRightMotor)
+  {
     message.type = TaskMessage::Type::CAN_MESSAGE_POWER_MONITOR;
     xQueueSend(dataManagerQueue, &message, 0);
     Serial.print("Received packet from unknown device");
     Serial.print(" with id 0x");
     Serial.print(packetId, HEX);
     Serial.println();
-    break;
+    Serial.print("DroneCAN source id: 0x");
+    Serial.print(asDroneCanSourceId, HEX);
+    Serial.println();
   }
 }
