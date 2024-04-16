@@ -79,10 +79,10 @@ void taskControlMotors(void *pvParameters)
                            message.as.speedIndividual.rpmR);
         break;
       case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
-        cybergearL.process_message(message.as.canMessage.data);
+        cybergearL.process_message(message.as.canMessage.id, message.as.canMessage.data);
         break;
       case TaskControlMotors::CAN_MESSAGE_MOTOR_R:
-        cybergearR.process_message(message.as.canMessage.data);
+        cybergearR.process_message(message.as.canMessage.id, message.as.canMessage.data);
         break;
       }
     }

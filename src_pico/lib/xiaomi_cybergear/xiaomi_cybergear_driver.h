@@ -55,7 +55,7 @@ class XiaomiCyberGearDriver {
         void set_motor_can_id(uint8_t can_id);
 
         void request_status();
-        void process_message(uint8_t* data);
+        void process_message(uint32_t id, uint8_t* data);
         XiaomiCyberGearStatus get_status() const;
         
     private:

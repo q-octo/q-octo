@@ -116,21 +116,41 @@ uint8_t XiaomiCyberGearDriver::get_motor_can_id() const {
     return _cybergear_can_id;
 }
 
-void XiaomiCyberGearDriver::request_status() {
+void XiaomiCyberGearDriver::request_status()
+{
     uint8_t data[8] = {0x00};
-    _send_can_package(_cybergear_can_id, CMD_GET_STATUS, _master_can_id, 8, data);
+    // TODO This whole function may not even be necessary (i think so!)
+    _send_can_package(_cybergear_can_id, CMD_GET_MOTOR_FAIL, _master_can_id, 8, data);
 }
 
-void XiaomiCyberGearDriver::process_message(uint8_t* data){
-    uint16_t raw_position = data[1] | data[0] << 8;
-    uint16_t raw_speed = data[3] | data[2] << 8;
-    uint16_t raw_torque = data[5] | data[4] << 8;
-    uint16_t raw_temperature = data[7] | data[6] << 8;
+void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
+{
+    const uint8_t type = id >> 24;
+    switch (type)
+    {
+    case CMD_RESPONSE:
+    {
+        uint16_t raw_position = data[1] | data[0] << 8;
+        uint16_t raw_speed = data[3] | data[2] << 8;
+        uint16_t raw_torque = data[5] | data[4] << 8;
+        uint16_t raw_temperature = data[7] | data[6] << 8;
 
-    _status.position = _uint_to_float(raw_position, POS_MIN, POS_MAX);
-    _status.speed = _uint_to_float(raw_speed, V_MIN, V_MAX);
-    _status.torque = _uint_to_float(raw_torque, T_MIN, T_MAX);
-    _status.temperature = raw_temperature;
+        _status.position = _uint_to_float(raw_position, POS_MIN, POS_MAX);
+        _status.speed = _uint_to_float(raw_speed, V_MIN, V_MAX);
+        _status.torque = _uint_to_float(raw_torque, T_MIN, T_MAX);
+        _status.temperature = raw_temperature;
+        break;
+    }
+    case CMD_DEVICE_ID:
+        break;
+    case CMD_RAM_READ:
+        break;
+    case CMD_GET_MOTOR_FAIL:
+        // TODO handle this case
+        break;
+    default:
+        break;
+    }
 }
 XiaomiCyberGearStatus XiaomiCyberGearDriver::get_status() const {
     return _status;

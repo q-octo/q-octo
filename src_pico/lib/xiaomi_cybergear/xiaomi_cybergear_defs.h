@@ -1,15 +1,16 @@
 #ifndef XIAOMI_CYBERGEAR_DEFS_H
 #define XIAOMI_CYBERGEAR_DEFS_H
 
+#define CMD_DEVICE_ID                 0x0
 #define CMD_POSITION                  0x1
-#define CMD_REQUEST                   0x2
+#define CMD_RESPONSE                  0x2
 #define CMD_ENABLE                    0x3
 #define CMD_STOP                      0x4
 #define CMD_SET_MECH_POSITION_TO_ZERO 0x6
 #define CMD_SET_CAN_ID                0x7
 #define CMD_RAM_READ                 0x11
 #define CMD_RAM_WRITE                0x12
-#define CMD_GET_STATUS               0x15
+#define CMD_GET_MOTOR_FAIL           0x15
 
 #define ADDR_SPEED_KP              0x2014
 #define ADDR_SPEED_KI              0x2015
@@ -46,11 +47,6 @@
 #define I_MAX                      27.0f
 #define CURRENT_FILTER_GAIN_MIN     0.0f
 #define CURRENT_FILTER_GAIN_MAX     1.0f
-
-#define RET_CYBERGEAR_OK              0x00
-#define RET_CYBERGEAR_MSG_NOT_AVAIL   0x01
-#define RET_CYBERGEAR_INVALID_CAN_ID  0x02
-#define RET_CYBERGEAR_INVALID_PACKET  0x03
 
 
 #endif // !XIAOMI_CYBERGEAR_DEFS_H
