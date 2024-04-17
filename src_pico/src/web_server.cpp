@@ -14,7 +14,7 @@
 IPAddress apIP(192, 168, 4, 1);
 WebServer *webServer;
 WebSocketsServer *webSocket;
-QueueHandle_t webServerQueue;
+// QueueHandle_t webServerQueue;
 
 bool webServerIsRunning = false;
 uint32_t lastWebSocketRestart = 0;
@@ -25,16 +25,16 @@ void restartWebSocket();
 
 void WSWebServer::init()
 {
-    // Initialise the queue
-    if (webServerQueue == nullptr)
-    {
-        webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
-        if (webServerQueue == nullptr)
-        {
-            Serial.println("Failed to create webServerQueue");
-            return;
-        }
-    }
+    // // Initialise the queue
+    // if (webServerQueue == nullptr)
+    // {
+    //     webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+    //     if (webServerQueue == nullptr)
+    //     {
+    //         Serial.println("Failed to create webServerQueue");
+    //         return;
+    //     }
+    // }
 }
 
 void WSWebServer::start()
@@ -52,7 +52,6 @@ void WSWebServer::start()
     Serial.println(WiFi.softAPIP() + " (rover.local)");
 
     webServer = new WebServer(80);
-
     webServer->on("/", handleRoot);
     // webServer.onNotFound(handleRoot);
     webServer->begin();
@@ -112,23 +111,24 @@ void WSWebServer::stop()
 
 void WSWebServer::loop()
 {
-    static WSWebServer::Message message;
-    BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
-    const bool messageReceived = xStatus == pdPASS;
-    if (messageReceived)
-    {
-        switch (message.type)
-        {
-        case WSWebServer::MessageType::ENABLE:
-            Serial.println("Received web server ENABLE message");
-            WSWebServer::start();
-            break;
-        case WSWebServer::MessageType::DISABLE:
-            Serial.println("Received web server DISABLE message");
-            WSWebServer::stop();
-            break;
-        }
-    }
+    // TODO xQueueReceive is NOT allowed here (breaks xSemaphoreTake)
+    // static WSWebServer::Message message;
+    // BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
+    // const bool messageReceived = xStatus == pdPASS;
+    // if (messageReceived)
+    // {
+    //     switch (message.type)
+    //     {
+    //     case WSWebServer::MessageType::ENABLE:
+    //         Serial.println("Received web server ENABLE message");
+    //         WSWebServer::start();
+    //         break;
+    //     case WSWebServer::MessageType::DISABLE:
+    //         Serial.println("Received web server DISABLE message");
+    //         WSWebServer::stop()
+    //         break;
+    //     }
+    // }
 
     if (webServerIsRunning)
     {
