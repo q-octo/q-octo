@@ -62,7 +62,7 @@ void taskReceiveFromRC(void *pvParameters)
     crsf_set_on_link_statistics(onLinkStatisticsUpdate);
     crsf_set_on_rc_channels(onReceiveChannels);
     crsf_set_on_failsafe(onFailsafe);
-    crsf_begin(uart1, CFG_RC_UART_TX, CFG_RC_UART_RX);
+    crsf_begin(uart0, CFG_RC_UART_TX, CFG_RC_UART_RX);
 
     for (;;)
     {

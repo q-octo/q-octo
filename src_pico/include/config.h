@@ -11,5 +11,5 @@
 #define CFG_DEBUG_LIST_TASKS 0
 
 // Pins
-#define CFG_RC_UART_TX 8
-#define CFG_RC_UART_RX 9
+#define CFG_RC_UART_TX 0
+#define CFG_RC_UART_RX 1
