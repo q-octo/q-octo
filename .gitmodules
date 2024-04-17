@@ -1,6 +1,3 @@
 [submodule "src_pico/lib/pico_crsf"]
 	path = src_pico/lib/pico_crsf
 	url = https://github.com/britannio/pico_crsf
-[submodule "flatbuffers"]
-	path = flatbuffers
-	url = git@github.com:google/flatbuffers.git
