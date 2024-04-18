@@ -5,7 +5,10 @@ import Variable from './Components/Variable';
 import DisplayPanel from './Components/DisplayPanel';
 import { useEffect, useState } from 'preact/hooks';
 import { RoverState } from './types';
+import * as flatbuffers from 'flatbuffers';
+import { Robot } from '../generated/qocto/wsschema';
 import './style.css';
+import { RobotToObj } from './util/RobotToObj';
 
 
 export function App() {
@@ -43,7 +46,7 @@ export function App() {
 	// only open once when the component is mounted
 	useEffect(() => {
 		//const ws = new WebSocket('ws://' + location.host + '/echo');
-		const ws = new WebSocket('ws://localhost:8765');
+		const ws = new WebSocket('ws://localhost:8080');
 
 		// On websocket open
 		ws.onopen = () => {
@@ -51,8 +54,21 @@ export function App() {
 		};
 		
 		ws.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-			setRover(data);
+			console.log(event)
+
+			
+			// From blob to array buffer
+			const reader = new FileReader();
+			reader.readAsArrayBuffer(event.data);
+			reader.onload = () => {
+				const buf = new flatbuffers.ByteBuffer(new Uint8Array(reader.result as ArrayBuffer));
+				const robot = Robot.getRootAsRobot(buf);
+
+				console.log(RobotToObj(robot));
+
+			}
+
+	
 		}	
 
 		return () => {
