@@ -43,7 +43,7 @@ export function App() {
 	// only open once when the component is mounted
 	useEffect(() => {
 		//const ws = new WebSocket('ws://' + location.host + '/echo');
-		const ws = new WebSocket('ws://localhost:8765');
+		const ws = new WebSocket('ws://localhost:8080/');
 
 		// On websocket open
 		ws.onopen = () => {
@@ -51,8 +51,11 @@ export function App() {
 		};
 		
 		ws.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-			setRover(data);
+
+			console.log('Message received: ', event.data);
+
+			// const data = JSON.parse(event.data);
+			// setRover(data);
 		}	
 
 		return () => {
