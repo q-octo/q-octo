@@ -12,6 +12,14 @@ static const float SYSTEM_SHUTDOWN_VOLTAGE = 17.0f;
 
 QueueHandle_t powerMonitorQueue;
 
+void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer);
+bool shouldAcceptTransfer(const CanardInstance *ins,
+                          uint64_t *out_data_type_signature,
+                          uint16_t data_type_id,
+                          CanardTransferType transfer_type,
+                          uint8_t source_node_id);
+void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+
 void taskPowerMonitor(void *pvParameters)
 {
     Serial.println("taskPowerMonitor started");
@@ -62,7 +70,7 @@ void taskPowerMonitor(void *pvParameters)
     }
 }
 
-static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
+void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
 {
     // switch on data type ID to pass to the right handler function
     if (transfer->transfer_type == CanardTransferTypeRequest)
@@ -79,22 +87,22 @@ static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer)
             // TODO We should handle status messages from the power monitor
             Serial.print("[WARN] Received unknown droneCAN message");
             Serial.print(" with data type ID ");
-            Serial.println(transfer->data_type_id); 
+            Serial.println(transfer->data_type_id);
             break;
         }
     }
 }
 
-static bool shouldAcceptTransfer(const CanardInstance *ins,
-                                 uint64_t *out_data_type_signature,
-                                 uint16_t data_type_id,
-                                 CanardTransferType transfer_type,
-                                 uint8_t source_node_id)
+bool shouldAcceptTransfer(const CanardInstance *ins,
+                          uint64_t *out_data_type_signature,
+                          uint16_t data_type_id,
+                          CanardTransferType transfer_type,
+                          uint8_t source_node_id)
 {
     return true;
 }
 
-static void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer)
+void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 {
     uavcan_equipment_power_BatteryInfo msg;
     if (uavcan_equipment_power_BatteryInfo_decode(transfer, &msg))

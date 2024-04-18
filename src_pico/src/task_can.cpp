@@ -56,7 +56,7 @@ void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData
   {
     switch (motorCommType)
     {
-    case 0x02:
+    case 0x02: // Motor feedback data
     {
       const uint8_t motorId = (packetId & 0xFF00) >> 8;
 
@@ -72,8 +72,9 @@ void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData
       }
       break;
     }
-    case 0x15:
+    case 0x15: // Fault feedback frame
     {
+      Serial.println("[WARN] Received fault feedback frame");
       // Just send to both motors for now
       message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_L;
       xQueueSend(dataManagerQueue, &message, 0);
