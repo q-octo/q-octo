@@ -27,4 +27,4 @@ $(FBS_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
 	$(FLATC) -o $(FBS_OUT_DIR) -c $<
 
 clean: 
-	rm -f packed_fs/pack include/packed_fs.h $(FBS_OUT_FILES)
+	rm -f $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES)
