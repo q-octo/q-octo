@@ -18,7 +18,7 @@ all: web-dash $(PACKED_FS_FILES) $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FI
 # Rule to build the web dashboard
 # TODO this shouldn't run every time
 web-dash:
-	cd $(DASH_SRC_DIR) && bun run build --emptyOutDir
+	cd $(DASH_SRC_DIR) && bun install && bun run build --emptyOutDir
 
 # Rule to build the mongoose file system packer
 $(MG_PACK): packed_fs/pack.c
@@ -26,7 +26,7 @@ $(MG_PACK): packed_fs/pack.c
 
 # Rule to build the packed_fs.h (read only packed file system)
 $(MG_PACK_OUT): $(MG_PACK) $(PACKED_FS_FILES)
-	cd packed_fs/files && ../pack * > ../../include/packed_fs.h && cd ../..
+	cd packed_fs/files && find . -type f | sed 's|^\./||' | xargs ../pack > ../../include/packed_fs.h
 
 # Rule to build flatc (flatbuffers compiler)
 $(FLATC):
@@ -44,4 +44,4 @@ $(FBS_TS_OUT_FILES): $(FBS_FILES)
 
 
 clean:
-	rm -rf $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES) packed_fs/files/*
+	rm -rf $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES) packed_fs/files/* $(FBS_TS_OUT_FILES) 
