@@ -20,6 +20,8 @@
         "cmath": "cpp",
         "iosfwd": "cpp",
         "cstdlib": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "uavcan.equipment.power.batteryinfo.h": "c",
+        "canard.h": "c"
     }
 }

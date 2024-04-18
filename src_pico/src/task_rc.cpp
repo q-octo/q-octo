@@ -99,8 +99,8 @@ void taskSendToRC(void *pvParameters)
             {
             case TaskRC::BATTERY:
                 crsf_telem_set_battery_data(
-                    message.as.battery.voltage,
-                    message.as.battery.current,
+                    message.as.battery.voltage * 10,
+                    message.as.battery.current * 10,
                     message.as.battery.fuel,
                     42);
                 break;

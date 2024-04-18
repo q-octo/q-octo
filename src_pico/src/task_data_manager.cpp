@@ -3,6 +3,7 @@
 #include "task_rc.h"
 #include "task_motors.h"
 #include "web_server.h"
+#include "task_power_monitor.h"
 
 QueueHandle_t dataManagerQueue;
 
@@ -32,6 +33,7 @@ void taskDataManager(void *pvParameters)
   static TaskRC::Message rcMessage;
   static TaskControlMotors::Message controlMotorsMessage;
   static WSWebServer::Message webServerMessage;
+  static TaskPowerMonitor::Message powerMonitorMessage;
 
   for (;;)
   {
@@ -48,7 +50,7 @@ void taskDataManager(void *pvParameters)
         // Can send the message to other tasks such as the web server
         // task in the future
         break;
-      case TaskMessage::Type::STATE_BATTERY:
+      case TaskMessage::Type::BATT_OK:
         displayMessage = {
             .type = TaskDisplay::MessageType::BATTERY,
             .as = {.battery = message.as.battery},
@@ -59,6 +61,16 @@ void taskDataManager(void *pvParameters)
             .as = {.battery = message.as.battery},
         };
         xQueueSend(rcSendQueue, &rcMessage, 0);
+        break;
+      case TaskMessage::Type::BATT_VOLTAGE_LOW:
+        // Disable motors
+        // TODO Update status on web dashboard & display
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+      case TaskMessage::Type::BATT_VOLTAGE_CRITICAL:
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        exit(1);
         break;
       case TaskMessage::Type::STATE_RC:
         displayMessage = {
@@ -134,6 +146,13 @@ void taskDataManager(void *pvParameters)
         break;
       case TaskMessage::CAN_MESSAGE_ROT_ENC_L:
       case TaskMessage::CAN_MESSAGE_ROT_ENC_R:
+        break;
+      case TaskMessage::CAN_MESSAGE_POWER_MONITOR:
+        powerMonitorMessage = {
+            .type = TaskPowerMonitor::MessageType::CAN_MESSAGE,
+            .as = {.canMessage = message.as.canMessage},
+        };
+        xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
         break;
       default:
         Serial.println("[ERROR] Unknown message type");
