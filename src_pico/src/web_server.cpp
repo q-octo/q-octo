@@ -37,6 +37,47 @@ void WSWebServer::init()
     // }
 }
 
+const char *textToMIMEType(const char *text)
+{
+    // Handle css, js, html, svg
+    if (strcmp(text, "css") == 0)
+    {
+        return "text/css";
+    }
+    else if (strcmp(text, "js") == 0)
+    {
+        return "application/javascript";
+    }
+    else if (strcmp(text, "html") == 0)
+    {
+        return "text/html";
+    }
+    else if (strcmp(text, "svg") == 0)
+    {
+        return "image/svg+xml";
+    }
+    else
+    {
+        return "text/plain";
+    }
+}
+
+void onFileRoute(const packed_file *p)
+{
+    digitalWrite(LED_BUILTIN, 1);
+    // Split name on . to get MIME type
+    char *name = (char *)webServer->uri().c_str();
+    String uri = webServer->uri();
+    int lastDotPos = uri.lastIndexOf('.');
+    String ext = (lastDotPos != -1) ? uri.substring(lastDotPos + 1) : String("");
+    
+    // Serial.println("File extension: " + ext);
+    const char *mimeType = textToMIMEType(ext.c_str());
+    // Serial.println("Serving file: " + webServer->uri() + " with MIME type: " + mimeType);
+    webServer->send(200, mimeType, p->data, p->size);
+    digitalWrite(LED_BUILTIN, 0);
+}
+
 void WSWebServer::start()
 {
     if (webServerIsRunning)
@@ -52,8 +93,14 @@ void WSWebServer::start()
     Serial.println(WiFi.softAPIP() + " (rover.local)");
 
     webServer = new WebServer(80);
+    webServer->enableCORS(true);
     webServer->on("/", handleRoot);
-    // webServer.onNotFound(handleRoot);
+    const struct packed_file *p;
+    for (p = packed_files; p->name != NULL; p++)
+    {
+        webServer->on(p->name, [p]()
+                      { onFileRoute(p); });
+    }
     webServer->begin();
     Serial.println("HTTP server started");
 
