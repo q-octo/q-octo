@@ -1,15 +1,13 @@
 import { render } from 'preact';
-import MotorDisplay from './Components/MotorDisplay';
-import GeneralDisplay from './Components/GeneralDisplay';
-import Variable from './Components/Variable';
-import DisplayPanel from './Components/DisplayPanel';
+import MotorDisplay from './components/MotorDisplay';
+import GeneralDisplay from './components/GeneralDisplay';
+import Variable from './components/Variable';
+import DisplayPanel from './components/DisplayPanel';
 import { useEffect, useState } from 'preact/hooks';
 import { RoverState } from './types';
-import * as flatbuffers from 'flatbuffers';
-import { Robot } from '../generated/qocto/wsschema';
 import './style.css';
-import { RobotToObj } from './util/RobotToObj';
-
+import ws from './util/WebSocket';
+import { updateBatteries } from './util/Updates';
 
 export function App() {
 
@@ -44,39 +42,8 @@ export function App() {
 
 	// Open websocket connection
 	// only open once when the component is mounted
-	useEffect(() => {
-		//const ws = new WebSocket('ws://' + location.host + '/echo');
-		const ws = new WebSocket('ws://localhost:8080');
 
-		// On websocket open
-		ws.onopen = () => {
-			console.log('Connected to server');
-		};
-		
-		ws.onmessage = (event) => {
-			console.log(event)
-
-			
-			// From blob to array buffer
-			const reader = new FileReader();
-			reader.readAsArrayBuffer(event.data);
-			reader.onload = () => {
-				const buf = new flatbuffers.ByteBuffer(new Uint8Array(reader.result as ArrayBuffer));
-				const robot = Robot.getRootAsRobot(buf);
-
-				console.log(RobotToObj(robot));
-
-			}
-
-	
-		}	
-
-		return () => {
-			ws.close();
-		}
-	}
-	, []);
-
+	const wsClient = ws;
 
 	return (
 		<DisplayPanel>
@@ -116,6 +83,8 @@ export function App() {
 				<Variable title="Offset L" value={rover.offset.left} unit="°" />
 				<Variable title="Offset R" value={rover.offset.right} unit="°" />
 			</GeneralDisplay>
+
+			<button onClick={() => {ws.send(updateBatteries(10))}}> Test Update</button>
 		</DisplayPanel>
 	);
 }

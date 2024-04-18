@@ -1,4 +1,4 @@
-import { Robot } from "../../generated/qocto/wsschema";
+import { ControlSource, Robot, Status } from "../../generated/qocto/wsschema";
 
 /** Convert Flatbuffer to Object */
 export const RobotToObj = (robot : Robot) => {
@@ -16,8 +16,8 @@ export const RobotToObj = (robot : Robot) => {
             }
         },
         batteries: robot.batteries(),
-        control_source: robot.controlSource(),
-        status: robot.status(),
+        control_source: ControlSource[robot.controlSource()],
+        status: Status[robot.status()],
         voltage: robot.voltage(),
         current: robot.current(),
         rssi: robot.rssi(),
