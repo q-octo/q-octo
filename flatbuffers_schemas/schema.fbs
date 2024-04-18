@@ -1,0 +1,74 @@
+// Define enums for control sources and status codes
+enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
+enum Status : byte { OK, INIT, NOTX, BAT, TEMP, OFF }
+
+// Define a table for motor information
+table Motor {
+    temperature: float = 0.0;
+    rps: float = 0.0;
+    angle: float = 0.0;
+}
+
+// Define a table for the motors group
+table Motors {
+    motor1: Motor;
+    motor2: Motor;
+}
+
+// Define the main table for your data structure
+table Robot {
+    batteries: int = 4;
+    controlSource: ControlSource = ControlSource.RC;
+    status: Status = Status.OK;
+    motors: Motors;
+    voltage: float = 0.0;
+    current: float = 0.0;
+    fuel: float = 0.0;
+    rssi: float = 0.0;
+    signalStrength: int = 0;
+    maxSpeed: float = 0.0;
+    lowVoltageThreshold: float = 12.0;
+    criticalVoltageThreshold: float = 16.0;
+    referenceWheelAngle: int = 0;
+    motorErrorCode: string = "";
+    wheelsFolded: bool = false;
+    enableRover: bool = false;
+}
+
+// Update tables for individual fields
+table UpdateBatteries {
+    batteries: int;
+}
+
+table UpdateLowVoltageThreshold {
+    lowVoltageThreshold: float;
+}
+
+table UpdateCriticalVoltageThreshold {
+    criticalVoltageThreshold: float;
+}
+
+table UpdateReferenceWheelAngle {
+    referenceWheelAngle: int;
+}
+
+table UpdateWheelsFolded {
+    wheelsFolded: bool;
+}
+
+table UpdateEnableRover {
+    enableRover: bool;
+}
+
+// Define the root type and possible update types
+root_type Robot;
+
+// Optional: Define a union for updates if single endpoint for updates is required
+union Update {
+    UpdateBatteries,
+    UpdateLowVoltageThreshold,
+    UpdateCriticalVoltageThreshold,
+    UpdateReferenceWheelAngle,
+    UpdateWheelsFolded,
+    UpdateEnableRover
+}
