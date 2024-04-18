@@ -26,7 +26,7 @@ void CanCommunication::init(PacketCallback onPacketReceived)
 
 void CanCommunication::checkForPacket()
 {
-    int packetSize = mcp.parsePacket();
+    uint8_t packetSize = mcp.parsePacket();
 
     if (packetSize)
     {

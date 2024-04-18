@@ -1,7 +1,7 @@
 #pragma once
 #include <Adafruit_MCP2515.h>
 
-typedef void (*PacketCallback)(int packetLength, uint32_t packetId, uint8_t *packetData, bool extended);
+typedef void (*PacketCallback)(uint8_t packetLength, uint32_t packetId, uint8_t *packetData, bool extended);
 
 class CanCommunication
 {

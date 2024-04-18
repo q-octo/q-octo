@@ -19,7 +19,7 @@ void taskCAN(void *pvParameters)
   }
 }
 
-void onReceiveCanPacket(int packetLength, uint32_t packetId, uint8_t *packetData,
+void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
                         bool extended)
 {
   // Serial.print("Received packet with id 0x");
