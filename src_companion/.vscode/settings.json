@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "system_error": "c",
-        "task_web_server.h": "c",
-        "stdio.h": "c",
-        "freertosconfig.h": "c",
-        "mongoose.h": "c"
-    }
-}
