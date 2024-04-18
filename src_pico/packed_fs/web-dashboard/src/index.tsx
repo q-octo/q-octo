@@ -1,12 +1,13 @@
 import { render } from 'preact';
-import MotorDisplay from './Components/MotorDisplay';
-import GeneralDisplay from './Components/GeneralDisplay';
-import Variable from './Components/Variable';
-import DisplayPanel from './Components/DisplayPanel';
+import MotorDisplay from './components/MotorDisplay';
+import GeneralDisplay from './components/GeneralDisplay';
+import Variable from './components/Variable';
+import DisplayPanel from './components/DisplayPanel';
 import { useEffect, useState } from 'preact/hooks';
 import { RoverState } from './types';
 import './style.css';
-
+import ws from './util/WebSocket';
+import { updateBatteries } from './util/Updates';
 
 export function App() {
 
@@ -64,6 +65,7 @@ export function App() {
 	}
 	, []);
 
+	const wsClient = ws;
 
 	return (
 		<DisplayPanel>
@@ -103,6 +105,8 @@ export function App() {
 				<Variable title="Offset L" value={rover.offset.left} unit="°" />
 				<Variable title="Offset R" value={rover.offset.right} unit="°" />
 			</GeneralDisplay>
+
+			<button onClick={() => {ws.send(updateBatteries(10))}}> Test Update</button>
 		</DisplayPanel>
 	);
 }

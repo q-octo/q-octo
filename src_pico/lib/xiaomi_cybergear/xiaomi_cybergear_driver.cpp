@@ -207,6 +207,7 @@ float XiaomiCyberGearDriver::_uint_to_float(uint16_t x, float x_min, float x_max
 void XiaomiCyberGearDriver::_send_can_package(uint8_t can_id, uint8_t cmd_id, uint16_t option, uint8_t len, uint8_t *data)
 {
     uint32_t id = cmd_id << 24 | option << 8 | can_id;
+    // [cmd_id:5] [option:16] [can_id:8]
     CanCommunication::sendCANPacket(id, data);
 }
 
