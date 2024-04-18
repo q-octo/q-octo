@@ -5,13 +5,15 @@ FLATC = ../flatbuffers/flatc
 FBS_REPO_DIR = ../flatbuffers
 FBS_SRC_DIR = ../flatbuffers_schemas
 FBS_OUT_DIR = include
+FBS_TS_OUT_DIR = packed_fs/web-dashboard/src/generated
 # Find all .fbs files in the FBS_SRC_DIR
 FBS_FILES = $(wildcard $(FBS_SRC_DIR)/*.fbs)
 FBS_OUT_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_OUT_DIR)/%_generated.h,$(FBS_FILES))
+FBS_TS_OUT_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_TS_OUT_DIR)/%_generated.ts,$(FBS_FILES))
 DASH_SRC_DIR = packed_fs/web-dashboard/
 DASH_SRC_FILES = $(wildcard $(DASH_SRC_DIR)/*)
 
-all: web-dash $(PACKED_FS_FILES) $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES) 
+all: web-dash $(PACKED_FS_FILES) $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES) $(FBS_TS_OUT_FILES)
 
 # Rule to build the web dashboard
 # TODO this shouldn't run every time
@@ -34,5 +36,12 @@ $(FLATC):
 $(FBS_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
 	$(FLATC) -o $(FBS_OUT_DIR) -c $<
 
-clean: 
+# Rule to convert .fbs to .ts (TypeScript)
+ts: $(FBS_TS_OUT_FILES)
+$(FBS_TS_OUT_FILES): $(FBS_FILES)
+	rm -rf $(FBS_TS_OUT_DIR)/*
+	$(FLATC) -o $(FBS_TS_OUT_DIR) --ts $<
+
+
+clean:
 	rm -rf $(MG_PACK) $(MG_PACK_OUT) $(FLATC) $(FBS_OUT_FILES) packed_fs/files/*
