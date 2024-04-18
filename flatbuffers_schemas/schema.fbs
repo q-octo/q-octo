@@ -1,3 +1,5 @@
+namespace QOcto.WSSchema; // Web Server Schema
+
 // Define enums for control sources and status codes
 enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
 enum Status : byte { OK, INIT, NOTX, BAT, TEMP, OFF }
@@ -18,21 +20,21 @@ table Motors {
 // Define the main table for your data structure
 table Robot {
     batteries: int = 4;
-    controlSource: ControlSource = ControlSource.RC;
-    status: Status = Status.OK;
+    control_source: ControlSource = RC;
+    status: Status = OK;
     motors: Motors;
     voltage: float = 0.0;
     current: float = 0.0;
     fuel: float = 0.0;
     rssi: float = 0.0;
-    signalStrength: int = 0;
-    maxSpeed: float = 0.0;
-    lowVoltageThreshold: float = 12.0;
-    criticalVoltageThreshold: float = 16.0;
-    referenceWheelAngle: int = 0;
-    motorErrorCode: string = "";
-    wheelsFolded: bool = false;
-    enableRover: bool = false;
+    signal_strength: int = 0;
+    max_speed: float = 0.0;
+    low_voltage_threshold: float = 12.0;
+    critical_voltage_threshold: float = 16.0;
+    reference_wheel_angle: int = 0;
+    motor_error_code: string; // Defaults not supported in C++
+    wheels_folded: bool = false;
+    enable_rover: bool = false;
 }
 
 // Update tables for individual fields
@@ -41,23 +43,23 @@ table UpdateBatteries {
 }
 
 table UpdateLowVoltageThreshold {
-    lowVoltageThreshold: float;
+    low_voltage_threshold: float;
 }
 
 table UpdateCriticalVoltageThreshold {
-    criticalVoltageThreshold: float;
+    critical_voltage_threshold: float;
 }
 
 table UpdateReferenceWheelAngle {
-    referenceWheelAngle: int;
+    reference_wheel_angle: int;
 }
 
 table UpdateWheelsFolded {
-    wheelsFolded: bool;
+    wheels_folded: bool;
 }
 
 table UpdateEnableRover {
-    enableRover: bool;
+    enable_rover: bool;
 }
 
 // Define the root type and possible update types
