@@ -59,10 +59,10 @@ namespace TaskMessage
 
   typedef struct
   {
-    int16_t rssi;
-    int16_t linkQuality;
-    int16_t signalNoiseRatio;
-    int16_t tx_power;
+    uint8_t rssi;
+    uint8_t linkQuality;
+    int8_t signalNoiseRatio;
+    uint16_t tx_power;
   } RC;
 
   typedef struct

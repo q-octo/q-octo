@@ -2,9 +2,14 @@
 
 How to compile...
 
-Speed is in RPM
+Speed is in rad/s
 
 https://www.instructables.com/Using-RP2040-PIO-in-Arduino-IDE-on-Windows/
+
+
+`git submodule update --init`
+
+`curl -fsSL https://bun.sh/install | bash` (https://bun.sh/docs/installation#installing)
 
 
 ## Windows Footguns

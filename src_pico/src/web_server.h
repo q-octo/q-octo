@@ -4,9 +4,9 @@
 // Otherwise, it can go in the .cpp file.
 #include <WiFi.h>
 #include "Arduino.h"
-#include <FreeRTOS.h>
-#include <queue.h>
-#include <task.h>
+// #include <FreeRTOS.h>
+// #include <queue.h>
+// #include <task.h>
 
 namespace WSWebServer
 {
@@ -27,4 +27,4 @@ typedef struct {
 
 }
 
-extern QueueHandle_t webServerQueue;
+// extern QueueHandle_t webServerQueue;

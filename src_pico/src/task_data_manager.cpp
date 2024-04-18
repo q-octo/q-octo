@@ -92,8 +92,8 @@ void taskDataManager(void *pvParameters)
             .as = {.diagnostics = {.diagnosticsMode = true}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
-        webServerMessage = {.type = WSWebServer::MessageType::ENABLE};
-        xQueueSend(webServerQueue, &webServerMessage, 0);
+        // webServerMessage = {.type = WSWebServer::MessageType::ENABLE};
+        // xQueueSend(webServerQueue, &webServerMessage, 0);
         break;
       case TaskMessage::Type::DISABLE_WEB_SERVER:
         displayMessage = {
@@ -101,8 +101,8 @@ void taskDataManager(void *pvParameters)
             .as = {.diagnostics = {.diagnosticsMode = false}},
         };
         xQueueSend(displayQueue, &displayMessage, 0);
-        webServerMessage = {.type = WSWebServer::MessageType::DISABLE};
-        xQueueSend(webServerQueue, &webServerMessage, 0);
+        // webServerMessage = {.type = WSWebServer::MessageType::DISABLE};
+        // xQueueSend(webServerQueue, &webServerMessage, 0);
       case TaskMessage::Type::ENABLE_MOTORS:
         break;
       case TaskMessage::Type::DISABLE_MOTORS:

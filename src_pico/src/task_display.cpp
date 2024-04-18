@@ -260,7 +260,7 @@ void repaintDisplay()
   graphics.text("CURR 14.5A", Point(batteryRect3.x, batteryRect3.y),
                 batteryRect3.w);
 
-  // Progres bars
+  // Progress bars
 
   SET_PEN_GREEN()
   uint32_t maxWidth = 139; // 240 - 100 - 1(padding);

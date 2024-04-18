@@ -53,9 +53,7 @@ void setup()
   CanCommunication::init(onReceiveCanPacket);
 #endif
   initTasks();
-#if CFG_ENABLE_WEB_SERVER
   WSWebServer::init();
-#endif
 #if CFG_ENABLE_WEB_SERVER && CFG_START_WEB_SERVER_ON_STARTUP
   WSWebServer::start();
 #endif

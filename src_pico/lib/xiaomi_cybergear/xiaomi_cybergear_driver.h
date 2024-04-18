@@ -2,12 +2,27 @@
 #include "xiaomi_cybergear_defs.h"
 #include <cstdint>
 
+enum ResponseModeStatus {
+    RESET = 0,
+    CALIBRATION = 1,
+    RUN = 2,
+};
+
 struct XiaomiCyberGearStatus {
     float position;
     float speed;
     float torque;
     uint16_t temperature;
+    
+    bool notCalibrated;
+    bool hallEncodingFailure;
+    bool magneticEncodingFailure;
+    bool temperatureLimitExceeded;
+    bool currentLimitExceeded;
+    bool voltageLowerLimitExceeded;
+    ResponseModeStatus modeStatus;
 };
+
 
 struct XiaomiCyberGearMotionCommand {
     float position;

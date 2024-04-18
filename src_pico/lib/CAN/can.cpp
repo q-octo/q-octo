@@ -2,7 +2,7 @@
 #include "can.h"
 
 // https://github.com/adafruit/Adafruit_MCP2515/blob/4814941a02d663b82ecdb9548386f20b03ec108a/examples/MCP2515_CAN_ReceiverCallback/MCP2515_CAN_ReceiverCallback.ino#L32-L33
-#define CS_PIN 20 // We may resolder this to another pin
+#define CS_PIN 22 
 #define INT_PIN 21
 
 // Set CAN bus baud rate

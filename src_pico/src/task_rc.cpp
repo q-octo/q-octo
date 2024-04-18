@@ -3,20 +3,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-
-#include "CRSFforArduino.hpp"
 #include "task_rc.h"
-#include <Arduino-CRSF.h>
+#include "crsf.h"
 
-#define FULL_CRSF_FEATURES 1
 #define DEBUG_LOG_RC_CHANNELS 1
 #define DEBUG_LOG_RC_LINK_STATS 1
 #define BROADCAST_FREQUENCY 500 // ms
 
-#define TICKS_TO_US(x) ((x - 992) * 5 / 8 + 1500)
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
-
-CRSFforArduino *crsf = nullptr;
 
 /* A flag to hold the fail-safe status. */
 bool isFailsafeActive = false;
@@ -53,74 +47,26 @@ uint32_t lastRcLinkStatsLogMs = 0;
 uint32_t lastBroadcastMs = 0;
 float lastRPM = 0;
 
-void terminateCrsf();
 /* RC Channels Event Callback. */
-// void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcData);
-void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t);
-void onReceiveChannels(const uint16_t channels[]);
-void onFailsafeActivated();
-void onFailsafeCleared();
-
-CRSF *crsf2 = nullptr;
+void onLinkStatisticsUpdate(const link_statistics_t linkStats);
+void onReceiveChannels(const uint16_t channels[16]);
+void onFailsafe(const bool failsafe);
 
 void taskReceiveFromRC(void *pvParameters)
 {
     (void)pvParameters; //  To avoid warnings
     Serial.println("taskReceiveFromRC started");
-    // Serial1.setTX(12);
-    // Serial1.setRX(13);
 
-    // Serial1 = UART0, Serial2 = UART1.
-    Serial2.setTX(CFG_RC_UART_TX);
-    Serial2.setRX(CFG_RC_UART_RX);
-#if FULL_CRSF_FEATURES
-    crsf = new CRSFforArduino(&Serial2);
+    crsf_set_link_quality_threshold(70);
+    crsf_set_rssi_threshold(105);
+    crsf_set_on_link_statistics(onLinkStatisticsUpdate);
+    crsf_set_on_rc_channels(onReceiveChannels);
+    crsf_set_on_failsafe(onFailsafe);
+    crsf_begin(uart0, CFG_RC_UART_TX, CFG_RC_UART_RX);
 
-    /* Initialise CRSF for Arduino, and clean up
-    any allocated resources if initialisation fails. */
-    if (crsf->begin())
-    {
-        crsf->setLinkStatisticsCallback(onLinkStatisticsUpdate);
-        crsf->setRcChannelsCallback([](serialReceiverLayer::rcChannels_t *rcData)
-                                    {
-            if (rcData->failsafe) { if (!isFailsafeActive) onFailsafeActivated(); }
-            else {
-            /* Set the failsafe status to false. */
-            if (isFailsafeActive) { onFailsafeCleared(); }
-            onReceiveChannels(rcData->value);
-        } });
-        /* Constrain the RC Channels Count to the maximum number
-          of channels that are specified by The Crossfire Protocol.*/
-        rcChannelCount = rcChannelCount > crsfProtocol::RC_CHANNEL_COUNT ? crsfProtocol::RC_CHANNEL_COUNT : rcChannelCount;
-    }
-    else
-    {
-        /* CRSF for Arduino failed to initialise.
-        Clean-up the resources that it previously allocated, and then free up the memory it allocated. */
-        Serial.println("CRSF init failed.");
-        terminateCrsf();
-        return;
-    }
-#else
-    crsf2 = new CRSF();
-    crsf2->begin(&Serial2, 420000);
-    isFailsafeActive = !crsf2->isConnected();
-    crsf2->onDataReceived([](const uint16_t channels[])
-                          {
-        if (isFailsafeActive)
-        {
-            onFailsafeCleared();
-        } 
-        onReceiveChannels(channels); });
-    crsf2->onDisconnected(onFailsafeActivated);
-#endif
     for (;;)
     {
-#if FULL_CRSF_FEATURES
-        crsf->update();
-#else
-        crsf2->readPacket();
-#endif
+        crsf_process_frames();
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
@@ -136,7 +82,7 @@ void taskSendToRC(void *pvParameters)
         vTaskDelete(nullptr);
     }
 
-    TaskRC::Message message;
+    static TaskRC::Message message;
 #if !CFG_ENABLE_RC
     Serial.println("RC disabled, blocking indefinitely");
     for (;;)
@@ -145,13 +91,6 @@ void taskSendToRC(void *pvParameters)
     }
 #endif
 
-#if !FULL_CRSF_FEATURES
-    // Unable to send telemetry data, block indefinitely
-    for (;;)
-    {
-        xQueueReceive(rcSendQueue, &message, portMAX_DELAY);
-    }
-#else
     for (;;)
     {
         if (xQueueReceive(rcSendQueue, &message, portMAX_DELAY))
@@ -159,11 +98,9 @@ void taskSendToRC(void *pvParameters)
             switch (message.type)
             {
             case TaskRC::BATTERY:
-                // TODO once pico_crsf PR is merged, update these.
-                // * current and voltage by 10.
-                crsf->telemetryWriteBattery(
-                    message.as.battery.voltage,
-                    message.as.battery.current,
+                crsf_telem_set_battery_data(
+                    message.as.battery.voltage * 10,
+                    message.as.battery.current * 10,
                     message.as.battery.fuel,
                     42);
                 break;
@@ -173,24 +110,10 @@ void taskSendToRC(void *pvParameters)
             }
         }
     }
-#endif
 }
 
-void terminateCrsf()
+void onLinkStatisticsUpdate(const link_statistics_t linkStatistics)
 {
-#if FULL_CRSF_FEATURES
-    crsf->end();
-    delete crsf;
-    crsf = nullptr;
-#else
-    delete crsf2;
-    crsf2 = nullptr;
-#endif
-}
-
-void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistics)
-{
-
     const uint32_t currentMillis = millis();
 #if DEBUG_LOG_RC_LINK_STATS
     if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY)
@@ -200,7 +123,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
         Serial.print("RSSI: ");
         Serial.print(linkStatistics.rssi);
         Serial.print(", Link Quality: ");
-        Serial.print(linkStatistics.lqi);
+        Serial.print(linkStatistics.link_quality);
         Serial.print(", Signal-to-Noise Ratio: ");
         Serial.print(linkStatistics.snr);
         Serial.print(", Transmitter Power: ");
@@ -216,7 +139,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
             .as = {
                 .rc = {
                     .rssi = linkStatistics.rssi,
-                    .linkQuality = linkStatistics.lqi,
+                    .linkQuality = linkStatistics.link_quality,
                     .signalNoiseRatio = linkStatistics.snr,
                     .tx_power = linkStatistics.tx_power,
                 },
@@ -226,7 +149,7 @@ void onLinkStatisticsUpdate(serialReceiverLayer::link_statistics_t linkStatistic
     }
 }
 
-void onReceiveChannels(const uint16_t channels[])
+void onReceiveChannels(const uint16_t channels[16])
 {
 #if DEBUG_LOG_RC_CHANNELS
     const uint32_t currentMillis = millis();
@@ -284,4 +207,16 @@ void onFailsafeCleared()
     Serial.println("[INFO]: Failsafe cleared.");
     taskMessage = {.type = TaskMessage::Type::TX_RESTORED};
     xQueueSend(dataManagerQueue, &taskMessage, 0);
+}
+
+void onFailsafe(const bool failsafe)
+{
+    if (failsafe)
+    {
+        onFailsafeActivated();
+    }
+    else
+    {
+        onFailsafeCleared();
+    }
 }
