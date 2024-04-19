@@ -9,7 +9,8 @@
   "dependencies": {
     "flatbuffers": "^24.3.25",
     "preact": "^10.20.0",
-    "preact-material-components": "^1.6.1"
+    "preact-material-components": "^1.6.1",
+    "vite-plugin-singlefile": "^2.0.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
