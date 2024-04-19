@@ -1,0 +1,11 @@
+namespace fbs;
+
+file_identifier "PICO2RX";
+
+enum Button : byte { A, B, X, Y }
+
+table Pico2RX {
+    button: Button;
+}
+
+root_type Pico2RX;
