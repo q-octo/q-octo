@@ -44,7 +44,7 @@ export function App() {
 	// only open once when the component is mounted
 	useEffect(() => {
 		//const ws = new WebSocket('ws://' + location.host + '/echo');
-		const ws = new WebSocket('ws://localhost:8080/');
+		const ws = new WebSocket('ws://rover.local:81/');
 
 		// On websocket open
 		ws.onopen = () => {
