@@ -55,7 +55,8 @@ void setup()
   initTasks();
   WSWebServer::init();
 #if CFG_ENABLE_WEB_SERVER && CFG_START_WEB_SERVER_ON_STARTUP
-  WSWebServer::start();
+  webServerEnabled = true;
+  // WSWebServer::start();
 #endif
 }
 

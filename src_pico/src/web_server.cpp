@@ -217,6 +217,7 @@ void broadcastData()
 {
     if (xSemaphoreTake(xWebServerMutex, portMAX_DELAY) == pdTRUE)
     {
+        Serial.println("Broadcasting data");
         fbb.Reset(); // To avoid forever growing buffer
         serialiseFlatbuffer(fbb);
         webSocket->broadcastBIN(fbb.GetBufferPointer(), fbb.GetSize());
@@ -299,7 +300,6 @@ void WSWebServer::loop()
         {
             broadcastData();
         }
-        broadcastData();
 
 #if AUTO_RESTART_WEBSOCKETS
         const uint32_t currentMs = millis();

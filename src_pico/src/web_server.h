@@ -31,6 +31,7 @@ typedef struct {
 }
 
 
-QueueHandle_t webServerQueue;
+extern QueueHandle_t webServerQueue;
+extern bool webServerEnabled;
 
 void webServerConsumerTask(void *pvParameters);
