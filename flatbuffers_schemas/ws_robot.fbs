@@ -1,4 +1,6 @@
-namespace QOcto.WSSchema; // Web Server Schema
+namespace fbs;
+
+file_identifier "ROBO";
 
 // Define enums for control sources and status codes
 enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
@@ -37,40 +39,5 @@ table Robot {
     enable_rover: bool = false;
 }
 
-// Update tables for individual fields
-table UpdateBatteries {
-    batteries: int;
-}
-
-table UpdateLowVoltageThreshold {
-    low_voltage_threshold: float;
-}
-
-table UpdateCriticalVoltageThreshold {
-    critical_voltage_threshold: float;
-}
-
-table UpdateReferenceWheelAngle {
-    reference_wheel_angle: int;
-}
-
-table UpdateWheelsFolded {
-    wheels_folded: bool;
-}
-
-table UpdateEnableRover {
-    enable_rover: bool;
-}
-
 // Define the root type and possible update types
 root_type Robot;
-
-// Optional: Define a union for updates if single endpoint for updates is required
-union Update {
-    UpdateBatteries,
-    UpdateLowVoltageThreshold,
-    UpdateCriticalVoltageThreshold,
-    UpdateReferenceWheelAngle,
-    UpdateWheelsFolded,
-    UpdateEnableRover
-}

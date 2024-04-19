@@ -1,0 +1,41 @@
+namespace fbs;
+
+file_identifier "UPDT";
+
+// Update tables for individual fields
+table UpdateBatteries {
+    batteries: int;
+}
+
+table UpdateLowVoltageThreshold {
+    low_voltage_threshold: float;
+}
+
+table UpdateCriticalVoltageThreshold {
+    critical_voltage_threshold: float;
+}
+
+table UpdateReferenceWheelAngle {
+    reference_wheel_angle: int;
+}
+
+table UpdateFoldWheels {}
+
+table UpdateEnableRover {
+    enable_rover: bool;
+}
+
+union UpdateUnion {
+    UpdateBatteries,
+    UpdateLowVoltageThreshold,
+    UpdateCriticalVoltageThreshold,
+    UpdateReferenceWheelAngle,
+    UpdateFoldWheels,
+    UpdateEnableRover
+}
+
+table Update {
+    update: UpdateUnion;
+}
+
+root_type Update;
