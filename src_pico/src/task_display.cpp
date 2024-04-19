@@ -110,25 +110,9 @@ void taskDisplay(void *pvParameters)
     {
       switch (message.type)
       {
-      case TaskDisplay::MessageType::MOTORS:
-        motorLtemperature = message.as.motors.left.temperature;
-        motorLRPM = message.as.motors.left.RPM;
-        motorLtorque = message.as.motors.left.torque;
-        motorLposition = message.as.motors.left.position;
-        motorRtemperature = message.as.motors.right.temperature;
-        motorRRPM = message.as.motors.right.RPM;
-        motorRtorque = message.as.motors.right.torque;
-        motorRposition = message.as.motors.right.position;
-        break;
-      case TaskDisplay::MessageType::DIAGNOSTICS:
-        break;
-      case TaskDisplay::MessageType::RC:
-        break;
-      case TaskDisplay::MessageType::BATTERY:
-        batteryFuel = message.as.battery.fuel;
-        batteryVoltage = message.as.battery.voltage;
-        batteryCurrent = message.as.battery.current;
-        break;
+      case TaskDisplay::MessageType::STATE_UPDATE:
+        // TODO send flatbuffer over UART to the second Pico
+        break; 
       default:
         Serial.println("[ERROR] Unknown message type");
         break;
