@@ -1,6 +1,6 @@
 namespace fbs;
 
-file_identifier "PICO2RX";
+file_identifier "PCO2";
 
 enum Button : byte { A, B, X, Y }
 

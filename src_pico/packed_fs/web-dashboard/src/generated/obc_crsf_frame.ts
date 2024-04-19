@@ -2,9 +2,4 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-export enum ControlSource {
-  Manual = 0,
-  FlightController = 1,
-  OnboardComputer = 2,
-  RC = 3
-}
+export { Empty } from './empty.js';
