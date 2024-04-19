@@ -6,10 +6,7 @@ namespace TaskDisplay
 {
     typedef enum
     {
-        MOTORS,
-        BATTERY,
-        RC,
-        DIAGNOSTICS,
+        STATE_UPDATE
     } MessageType;
 
     typedef struct
@@ -17,10 +14,7 @@ namespace TaskDisplay
         MessageType type;
         union
         {
-            TaskMessage::Battery battery;
-            TaskMessage::Diagnostics diagnostics;
-            TaskMessage::RC rc;
-            TaskMessage::Motors motors;
+            TaskMessage::State state;
         } as;
     } Message;
 }

@@ -20,6 +20,7 @@ namespace TaskControlMotors
     SET_SPEED_INDIVIDUAL, // Tank mode
     CAN_MESSAGE_MOTOR_L,
     CAN_MESSAGE_MOTOR_R,
+    FOLD_WHEELS,
   } MessageType;
 
   typedef struct

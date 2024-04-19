@@ -30,7 +30,7 @@ TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
-TaskHandle_t webServerHandle = nullptr;
+TaskHandle_t webServerConsumerHandle = nullptr;
 
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
@@ -97,6 +97,8 @@ void initTasks()
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
   xTaskCreate(taskPowerMonitor, "powerMonitor", stackSize, nullptr, 3, &powerMonitorHandle);
   vTaskCoreAffinitySet(powerMonitorHandle, CORE_0);
+  xTaskCreate(webServerConsumerTask, "wsConsumer", stackSize, nullptr, 3, &webServerConsumerHandle);
+  vTaskCoreAffinitySet(webServerConsumerHandle, CORE_0);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);

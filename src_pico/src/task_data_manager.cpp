@@ -7,6 +7,10 @@
 
 QueueHandle_t dataManagerQueue;
 
+static TaskDisplay::Message displayMessage;
+static WSWebServer::Message webServerMessage;
+static TaskMessage::State state;
+
 /*
 This task will have a higher priority than the tasks that message it.
 When the sending task sends a message to the queue, this task will preempt the
@@ -16,6 +20,20 @@ This prevents the queue from overflowing.
 Likewise, tasks that we forward messages to should have a higher priority than
 this task so that their queue does not overflow.
 */
+
+void broadcastStateUpdate()
+{
+  displayMessage = {
+      .type = TaskDisplay::MessageType::STATE_UPDATE,
+      .as = {.state = state},
+  };
+  xQueueSend(displayQueue, &displayMessage, 0);
+  webServerMessage = {
+      .type = WSWebServer::MessageType::STATE_UPDATE,
+      .as = {.state = state},
+  };
+  xQueueSend(webServerQueue, &webServerMessage, 0);
+}
 
 void taskDataManager(void *pvParameters)
 {
@@ -29,10 +47,8 @@ void taskDataManager(void *pvParameters)
   }
 
   static TaskMessage::Message message;
-  static TaskDisplay::Message displayMessage;
   static TaskRC::Message rcMessage;
   static TaskControlMotors::Message controlMotorsMessage;
-  static WSWebServer::Message webServerMessage;
   static TaskPowerMonitor::Message powerMonitorMessage;
 
   for (;;)
@@ -42,71 +58,28 @@ void taskDataManager(void *pvParameters)
       switch (message.type)
       {
       case TaskMessage::Type::STATE_MOTORS:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::MOTORS,
-            .as = {.motors = message.as.motors},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
-        // Can send the message to other tasks such as the web server
-        // task in the future
-        break;
-      case TaskMessage::Type::BATT_OK:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::BATTERY,
-            .as = {.battery = message.as.battery},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
-        rcMessage = {
-            .type = TaskRC::MessageType::BATTERY,
-            .as = {.battery = message.as.battery},
-        };
-        xQueueSend(rcSendQueue, &rcMessage, 0);
-        break;
-      case TaskMessage::Type::BATT_VOLTAGE_LOW:
-        // Disable motors
-        // TODO Update status on web dashboard & display
-        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
-        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
-      case TaskMessage::Type::BATT_VOLTAGE_CRITICAL:
-        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
-        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
-        exit(1);
+        state.motors = message.as.motors;
+        broadcastStateUpdate();
         break;
       case TaskMessage::Type::STATE_RC:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::RC,
-            .as = {.rc = message.as.rc},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
-        break;
-      case TaskMessage::Type::STATE_DIAGNOSTICS:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .as = {.diagnostics = message.as.diagnostics},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
+        state.rc = message.as.rc;
+        broadcastStateUpdate();
         break;
       case TaskMessage::Type::ENABLE_WEB_SERVER:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .as = {.diagnostics = {.diagnosticsMode = true}},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
-        // webServerMessage = {.type = WSWebServer::MessageType::ENABLE};
-        // xQueueSend(webServerQueue, &webServerMessage, 0);
+        state.webServerEnabled = true;
+        webServerMessage = {.type = WSWebServer::MessageType::ENABLE};
+        xQueueSend(webServerQueue, &webServerMessage, 0);
+        broadcastStateUpdate();
         break;
       case TaskMessage::Type::DISABLE_WEB_SERVER:
-        displayMessage = {
-            .type = TaskDisplay::MessageType::DIAGNOSTICS,
-            .as = {.diagnostics = {.diagnosticsMode = false}},
-        };
-        xQueueSend(displayQueue, &displayMessage, 0);
-        // webServerMessage = {.type = WSWebServer::MessageType::DISABLE};
-        // xQueueSend(webServerQueue, &webServerMessage, 0);
+        state.webServerEnabled = false;
+        webServerMessage = {.type = WSWebServer::MessageType::DISABLE};
+        xQueueSend(webServerQueue, &webServerMessage, 0);
       case TaskMessage::Type::ENABLE_MOTORS:
         break;
       case TaskMessage::Type::DISABLE_MOTORS:
         break;
+        broadcastStateUpdate();
       case TaskMessage::Type::SET_MOTOR_SPEED_COMBINED:
         controlMotorsMessage = {
             .type = TaskControlMotors::MessageType::SET_SPEED_COMBINED,
@@ -153,6 +126,54 @@ void taskDataManager(void *pvParameters)
             .as = {.canMessage = message.as.canMessage},
         };
         xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+        break;
+      case TaskMessage::Type::BATT_OK:
+        state.battery = message.as.battery;
+        rcMessage.type = TaskRC::MessageType::BATTERY;
+        rcMessage.as.battery = message.as.battery;
+        xQueueSend(rcSendQueue, &rcMessage, 0);
+        broadcastStateUpdate();
+        break;
+      case TaskMessage::Type::BATT_VOLTAGE_LOW:
+        // Disable motors
+        // TODO Update status on web dashboard & display
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+      case TaskMessage::Type::BATT_VOLTAGE_CRITICAL:
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::DISABLE};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
+        exit(1);
+        break;
+      case TaskMessage::SET_LOW_VOLTAGE_THRESHOLD:
+        state.lowVoltageThreshold = message.as.voltageThreshold;
+        powerMonitorMessage = {
+            .type = TaskPowerMonitor::MessageType::SET_LOW_VOLTAGE_THRESHOLD,
+            .as = {.voltageThreshold = message.as.voltageThreshold},
+        };
+        xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+        broadcastStateUpdate();
+        break;
+      case TaskMessage::SET_CRITICAL_VOLTAGE_THRESHOLD:
+        state.criticalVoltageThreshold = message.as.voltageThreshold;
+        powerMonitorMessage = {
+            .type = TaskPowerMonitor::MessageType::SET_CRITICAL_VOLTAGE_THRESHOLD,
+            .as = {.voltageThreshold = message.as.voltageThreshold},
+        };
+        xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+        broadcastStateUpdate();
+        break;
+      case TaskMessage::SET_BATTERY_COUNT:
+        state.batteryCount = message.as.batteryCount;
+        powerMonitorMessage = {
+            .type = TaskPowerMonitor::MessageType::SET_BATTERY_COUNT,
+            .as = {.batteryCount = message.as.batteryCount},
+        };
+        xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+        broadcastStateUpdate();
+        break;
+      case TaskMessage::FOLD_WHEELS:
+        controlMotorsMessage = {.type = TaskControlMotors::MessageType::FOLD_WHEELS};
+        xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
         break;
       default:
         Serial.println("[ERROR] Unknown message type");

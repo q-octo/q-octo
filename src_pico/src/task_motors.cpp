@@ -83,6 +83,9 @@ void taskControlMotors(void *pvParameters)
       case TaskControlMotors::CAN_MESSAGE_MOTOR_R:
         cybergearR.process_message(message.as.canMessage.id, message.as.canMessage.data);
         break;
+      case TaskControlMotors::FOLD_WHEELS:
+        // TODO implement folding
+        break;
       }
     }
   }

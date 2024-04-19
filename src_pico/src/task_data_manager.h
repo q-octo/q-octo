@@ -11,23 +11,26 @@ namespace TaskMessage
   {
     STATE_MOTORS, // taskMotors
     STATE_RC,     // taskReceiveFromRC
-    STATE_DIAGNOSTICS,
     ENABLE_WEB_SERVER,
     DISABLE_WEB_SERVER,
     ENABLE_MOTORS,
     DISABLE_MOTORS,
-    SET_MOTOR_SPEED_COMBINED,   // taskReceiveFromRC (onboard computer in future)
-    SET_MOTOR_SPEED_INDIVIDUAL, // taskReceiveFromRC
-    TX_LOST,                    // taskReceiveFromRC
-    TX_RESTORED,                // taskReceiveFromRC
-    CAN_MESSAGE_MOTOR_L,        // taskCAN
-    CAN_MESSAGE_MOTOR_R,        // taskCAN
-    CAN_MESSAGE_ROT_ENC_L,      // taskCAN
-    CAN_MESSAGE_ROT_ENC_R,      // taskCAN
-    CAN_MESSAGE_POWER_MONITOR,  // taskCAN
-    BATT_VOLTAGE_LOW,           // taskPowerMonitor
-    BATT_VOLTAGE_CRITICAL,      // taskPowerMonitor
-    BATT_OK,                    // taskPowerMonitor
+    SET_MOTOR_SPEED_COMBINED,       // taskReceiveFromRC (onboard computer in future)
+    SET_MOTOR_SPEED_INDIVIDUAL,     // taskReceiveFromRC
+    TX_LOST,                        // taskReceiveFromRC
+    TX_RESTORED,                    // taskReceiveFromRC
+    CAN_MESSAGE_MOTOR_L,            // taskCAN
+    CAN_MESSAGE_MOTOR_R,            // taskCAN
+    CAN_MESSAGE_ROT_ENC_L,          // taskCAN
+    CAN_MESSAGE_ROT_ENC_R,          // taskCAN
+    CAN_MESSAGE_POWER_MONITOR,      // taskCAN
+    BATT_OK,                        // taskPowerMonitor
+    BATT_VOLTAGE_LOW,               // taskPowerMonitor
+    BATT_VOLTAGE_CRITICAL,          // taskPowerMonitor
+    SET_LOW_VOLTAGE_THRESHOLD,      // web server
+    SET_CRITICAL_VOLTAGE_THRESHOLD, // web server
+    SET_BATTERY_COUNT,              // web server
+    FOLD_WHEELS,                    // web server, taskReceiveFromRC
   } Type;
 
   typedef struct
@@ -101,8 +104,22 @@ namespace TaskMessage
       SetMotorSpeedIndividual motorSpeedIndividual;
       SetMotorSpeedCombined motorSpeedCombined;
       CanMessage canMessage;
+      float voltageThreshold;
+      int batteryCount;
     } as;
   } Message;
+
+  typedef struct
+  {
+    Motors motors;
+    Battery battery;
+    RC rc;
+    float lowVoltageThreshold;
+    float criticalVoltageThreshold;
+    bool webServerEnabled;
+    int batteryCount;
+    bool wheelsFolded;
+  } State;
 
 }
 

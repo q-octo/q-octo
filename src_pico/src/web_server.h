@@ -4,9 +4,9 @@
 // Otherwise, it can go in the .cpp file.
 #include <WiFi.h>
 #include "Arduino.h"
-// #include <FreeRTOS.h>
-// #include <queue.h>
-// #include <task.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include "task_data_manager.h"
 
 namespace WSWebServer
 {
@@ -18,13 +18,19 @@ namespace WSWebServer
 typedef enum {
     ENABLE,
     DISABLE,
+    STATE_UPDATE,
 } MessageType;
 
 typedef struct {
     MessageType type;
-    union {} as;
+    union {
+        TaskMessage::State state;
+    } as;
 } Message;
 
 }
 
-// extern QueueHandle_t webServerQueue;
+
+QueueHandle_t webServerQueue;
+
+void webServerConsumerTask(void *pvParameters);
