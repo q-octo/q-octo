@@ -91,6 +91,13 @@ void webServerConsumerTask(void *pvParameters)
     }
 #endif
 
+    webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+    if (webServerQueue == nullptr)
+    {
+        Serial.println("Failed to create webServerQueue");
+        vTaskDelete(nullptr);
+    }
+
     for (;;)
     {
         if (xQueueReceive(webServerQueue, &message, portMAX_DELAY))
