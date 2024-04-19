@@ -14502,10 +14502,10 @@ static const struct packed_file {
   size_t size;
   time_t mtime;
 } packed_files[] = {
-  {"/index.html", v1, sizeof(v1), 1713523275},
-  {"/vite.svg", v2, sizeof(v2), 1713523275},
-  {"/assets/index-KgXiHnW3.js", v3, sizeof(v3), 1713523275},
-  {"/assets/index-DjKk2bl8.css", v4, sizeof(v4), 1713523275},
+  {"/index.html", v1, sizeof(v1), 1713525151},
+  {"/vite.svg", v2, sizeof(v2), 1713525151},
+  {"/assets/index-KgXiHnW3.js", v3, sizeof(v3), 1713525151},
+  {"/assets/index-DjKk2bl8.css", v4, sizeof(v4), 1713525151},
   {NULL, NULL, 0, 0}
 };
 
