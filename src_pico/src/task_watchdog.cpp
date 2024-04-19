@@ -2,7 +2,7 @@
 #include "task_watchdog.h"
 
 #define WATCHDOG_TIMEOUT 5000
-#define LOG_MEMORY_FREQUENCY 10000
+#define LOG_MEMORY_FREQUENCY 500
 #define HEALTH_CHECK_FREQUENCY 100
 
 uint32_t lastMemoryLog = 0;
@@ -26,7 +26,14 @@ void taskWatchdog(void *pvParameters)
     Serial.println("Watchdog disabled, blocking indefinitely");
     for (;;)
     {
-        xQueueReceive(watchdogQueue, &message, portMAX_DELAY);
+        xQueueReceive(watchdogQueue, &message, pdMS_TO_TICKS(1));
+        const uint32_t currentMillis = millis();
+
+        if (currentMillis - lastMemoryLog > LOG_MEMORY_FREQUENCY)
+        {
+            lastMemoryLog = currentMillis;
+            Serial.printf("free heap: %d\n", rp2040.getFreeHeap());
+        }
     }
 #endif
 
@@ -63,11 +70,11 @@ void taskWatchdog(void *pvParameters)
         //         tasks[i] = 0;
         //     }
         // }
-        if (currentMillis - lastMemoryLog > LOG_MEMORY_FREQUENCY)
-        {
-            lastMemoryLog = currentMillis;
-            Serial.printf("free heap: %d\n", rp2040.getFreeHeap());
-        }
+        // if (currentMillis - lastMemoryLog > LOG_MEMORY_FREQUENCY)
+        // {
+        //     lastMemoryLog = currentMillis;
+        //     Serial.printf("free heap: %d\n", rp2040.getFreeHeap());
+        // }
         
     }
 }
