@@ -10,6 +10,7 @@ FBS_TS_OUT_DIR = packed_fs/web-dashboard/src/generated
 FBS_FILES = $(wildcard $(FBS_SRC_DIR)/*.fbs)
 FBS_OUT_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_OUT_DIR)/%_generated.h,$(FBS_FILES))
 FBS_TS_OUT_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_TS_OUT_DIR)/%_generated.ts,$(FBS_FILES))
+FBS_DART_OUT_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_OUT_DIR)/%_generated.dart,$(FBS_FILES))
 DASH_SRC_DIR = packed_fs/web-dashboard/
 DASH_SRC_FILES = $(wildcard $(DASH_SRC_DIR)/*)
 
@@ -41,6 +42,11 @@ ts: $(FBS_TS_OUT_FILES)
 $(FBS_TS_OUT_FILES): $(FBS_FILES)
 	rm -rf $(FBS_TS_OUT_DIR)/*
 	$(FLATC) -o $(FBS_TS_OUT_DIR) --ts $<
+
+# Rule to convert .fbs to .dart
+dart: $(FBS_DART_OUT_FILES)
+$(FBS_DART_OUT_FILES): $(FBS_FILES)
+	$(FLATC) -o $(FBS_OUT_DIR) --dart $<
 
 
 clean:
