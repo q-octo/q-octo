@@ -71,7 +71,7 @@ rssi():number {
   return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 0.0;
 }
 
-signalStrength():number {
+linkQuality():number {
   const offset = this.bb!.__offset(this.bb_pos, 20);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
@@ -91,30 +91,40 @@ criticalVoltageThreshold():number {
   return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 16.0;
 }
 
-referenceWheelAngle():number {
+rssiThreshold():number {
   const offset = this.bb!.__offset(this.bb_pos, 28);
+  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+}
+
+linkQualityThreshold():number {
+  const offset = this.bb!.__offset(this.bb_pos, 30);
+  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+}
+
+referenceWheelAngle():number {
+  const offset = this.bb!.__offset(this.bb_pos, 32);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 motorErrorCode():string|null
 motorErrorCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 motorErrorCode(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 30);
+  const offset = this.bb!.__offset(this.bb_pos, 34);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 wheelsFolded():boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 32);
+  const offset = this.bb!.__offset(this.bb_pos, 36);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
 enableRover():boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 34);
+  const offset = this.bb!.__offset(this.bb_pos, 38);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
 static startRobot(builder:flatbuffers.Builder) {
-  builder.startObject(16);
+  builder.startObject(18);
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
@@ -149,8 +159,8 @@ static addRssi(builder:flatbuffers.Builder, rssi:number) {
   builder.addFieldFloat32(7, rssi, 0.0);
 }
 
-static addSignalStrength(builder:flatbuffers.Builder, signalStrength:number) {
-  builder.addFieldInt32(8, signalStrength, 0);
+static addLinkQuality(builder:flatbuffers.Builder, linkQuality:number) {
+  builder.addFieldInt32(8, linkQuality, 0);
 }
 
 static addMaxSpeed(builder:flatbuffers.Builder, maxSpeed:number) {
@@ -165,20 +175,28 @@ static addCriticalVoltageThreshold(builder:flatbuffers.Builder, criticalVoltageT
   builder.addFieldFloat32(11, criticalVoltageThreshold, 16.0);
 }
 
+static addRssiThreshold(builder:flatbuffers.Builder, rssiThreshold:number) {
+  builder.addFieldInt32(12, rssiThreshold, 0);
+}
+
+static addLinkQualityThreshold(builder:flatbuffers.Builder, linkQualityThreshold:number) {
+  builder.addFieldInt32(13, linkQualityThreshold, 0);
+}
+
 static addReferenceWheelAngle(builder:flatbuffers.Builder, referenceWheelAngle:number) {
-  builder.addFieldInt32(12, referenceWheelAngle, 0);
+  builder.addFieldInt32(14, referenceWheelAngle, 0);
 }
 
 static addMotorErrorCode(builder:flatbuffers.Builder, motorErrorCodeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(13, motorErrorCodeOffset, 0);
+  builder.addFieldOffset(15, motorErrorCodeOffset, 0);
 }
 
 static addWheelsFolded(builder:flatbuffers.Builder, wheelsFolded:boolean) {
-  builder.addFieldInt8(14, +wheelsFolded, +false);
+  builder.addFieldInt8(16, +wheelsFolded, +false);
 }
 
 static addEnableRover(builder:flatbuffers.Builder, enableRover:boolean) {
-  builder.addFieldInt8(15, +enableRover, +false);
+  builder.addFieldInt8(17, +enableRover, +false);
 }
 
 static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {

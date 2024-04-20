@@ -9,4 +9,6 @@ export { UpdateEnableRover } from './fbs/update-enable-rover.js';
 export { UpdateFoldWheels } from './fbs/update-fold-wheels.js';
 export { UpdateLowVoltageThreshold } from './fbs/update-low-voltage-threshold.js';
 export { UpdateReferenceWheelAngle } from './fbs/update-reference-wheel-angle.js';
+export { UpdateLinkQualityThreshold } from './fbs/update-link-quality-threshold.js';
+export { UpdateRssiThreshold } from './fbs/update-rssi-threshold.js';
 export { UpdateUnion } from './fbs/update-union.js';

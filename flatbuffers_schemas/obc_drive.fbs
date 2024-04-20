@@ -1,5 +1,18 @@
+namespace fbs;
 
+file_identifier "OCDV";
 
-table Empty {}
+enum DriveMode : byte { Tank, Mixed }
 
-root_type Empty;
+table TankDriveConfig { left_rad_s: float; right_rad_s: float; }
+
+table MixedDriveConfig { rad_s: float; direction: float; }
+
+union DriveConfig { TankDriveConfig, MixedDriveConfig }
+
+// Wrapping the union in a table for use as the root type
+table RobotDriveConfig {
+    config: DriveConfig;
+}
+
+root_type RobotDriveConfig;

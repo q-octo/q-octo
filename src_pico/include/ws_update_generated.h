@@ -33,6 +33,12 @@ struct UpdateFoldWheelsBuilder;
 struct UpdateEnableRover;
 struct UpdateEnableRoverBuilder;
 
+struct UpdateLinkQualityThreshold;
+struct UpdateLinkQualityThresholdBuilder;
+
+struct UpdateRssiThreshold;
+struct UpdateRssiThresholdBuilder;
+
 struct Update;
 struct UpdateBuilder;
 
@@ -44,11 +50,13 @@ enum UpdateUnion : uint8_t {
   UpdateUnion_UpdateReferenceWheelAngle = 4,
   UpdateUnion_UpdateFoldWheels = 5,
   UpdateUnion_UpdateEnableRover = 6,
+  UpdateUnion_UpdateLinkQualityThreshold = 7,
+  UpdateUnion_UpdateRssiThreshold = 8,
   UpdateUnion_MIN = UpdateUnion_NONE,
-  UpdateUnion_MAX = UpdateUnion_UpdateEnableRover
+  UpdateUnion_MAX = UpdateUnion_UpdateRssiThreshold
 };
 
-inline const UpdateUnion (&EnumValuesUpdateUnion())[7] {
+inline const UpdateUnion (&EnumValuesUpdateUnion())[9] {
   static const UpdateUnion values[] = {
     UpdateUnion_NONE,
     UpdateUnion_UpdateBatteries,
@@ -56,13 +64,15 @@ inline const UpdateUnion (&EnumValuesUpdateUnion())[7] {
     UpdateUnion_UpdateCriticalVoltageThreshold,
     UpdateUnion_UpdateReferenceWheelAngle,
     UpdateUnion_UpdateFoldWheels,
-    UpdateUnion_UpdateEnableRover
+    UpdateUnion_UpdateEnableRover,
+    UpdateUnion_UpdateLinkQualityThreshold,
+    UpdateUnion_UpdateRssiThreshold
   };
   return values;
 }
 
 inline const char * const *EnumNamesUpdateUnion() {
-  static const char * const names[8] = {
+  static const char * const names[10] = {
     "NONE",
     "UpdateBatteries",
     "UpdateLowVoltageThreshold",
@@ -70,13 +80,15 @@ inline const char * const *EnumNamesUpdateUnion() {
     "UpdateReferenceWheelAngle",
     "UpdateFoldWheels",
     "UpdateEnableRover",
+    "UpdateLinkQualityThreshold",
+    "UpdateRssiThreshold",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUpdateUnion(UpdateUnion e) {
-  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateEnableRover)) return "";
+  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateRssiThreshold)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUpdateUnion()[index];
 }
@@ -107,6 +119,14 @@ template<> struct UpdateUnionTraits<fbs::UpdateFoldWheels> {
 
 template<> struct UpdateUnionTraits<fbs::UpdateEnableRover> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateEnableRover;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateLinkQualityThreshold> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateLinkQualityThreshold;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateRssiThreshold> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
 };
 
 bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj, UpdateUnion type);
@@ -346,6 +366,88 @@ inline ::flatbuffers::Offset<UpdateEnableRover> CreateUpdateEnableRover(
   return builder_.Finish();
 }
 
+struct UpdateLinkQualityThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateLinkQualityThresholdBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LINK_QUALITY_THRESHOLD = 4
+  };
+  int32_t link_quality_threshold() const {
+    return GetField<int32_t>(VT_LINK_QUALITY_THRESHOLD, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct UpdateLinkQualityThresholdBuilder {
+  typedef UpdateLinkQualityThreshold Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_link_quality_threshold(int32_t link_quality_threshold) {
+    fbb_.AddElement<int32_t>(UpdateLinkQualityThreshold::VT_LINK_QUALITY_THRESHOLD, link_quality_threshold, 0);
+  }
+  explicit UpdateLinkQualityThresholdBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateLinkQualityThreshold> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateLinkQualityThreshold>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateLinkQualityThreshold> CreateUpdateLinkQualityThreshold(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t link_quality_threshold = 0) {
+  UpdateLinkQualityThresholdBuilder builder_(_fbb);
+  builder_.add_link_quality_threshold(link_quality_threshold);
+  return builder_.Finish();
+}
+
+struct UpdateRssiThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateRssiThresholdBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_RSSI_THRESHOLD = 4
+  };
+  int32_t rssi_threshold() const {
+    return GetField<int32_t>(VT_RSSI_THRESHOLD, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct UpdateRssiThresholdBuilder {
+  typedef UpdateRssiThreshold Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_rssi_threshold(int32_t rssi_threshold) {
+    fbb_.AddElement<int32_t>(UpdateRssiThreshold::VT_RSSI_THRESHOLD, rssi_threshold, 0);
+  }
+  explicit UpdateRssiThresholdBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateRssiThreshold> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateRssiThreshold>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t rssi_threshold = 0) {
+  UpdateRssiThresholdBuilder builder_(_fbb);
+  builder_.add_rssi_threshold(rssi_threshold);
+  return builder_.Finish();
+}
+
 struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef UpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -376,6 +478,12 @@ struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const fbs::UpdateEnableRover *update_as_UpdateEnableRover() const {
     return update_type() == fbs::UpdateUnion_UpdateEnableRover ? static_cast<const fbs::UpdateEnableRover *>(update()) : nullptr;
+  }
+  const fbs::UpdateLinkQualityThreshold *update_as_UpdateLinkQualityThreshold() const {
+    return update_type() == fbs::UpdateUnion_UpdateLinkQualityThreshold ? static_cast<const fbs::UpdateLinkQualityThreshold *>(update()) : nullptr;
+  }
+  const fbs::UpdateRssiThreshold *update_as_UpdateRssiThreshold() const {
+    return update_type() == fbs::UpdateUnion_UpdateRssiThreshold ? static_cast<const fbs::UpdateRssiThreshold *>(update()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -408,6 +516,14 @@ template<> inline const fbs::UpdateFoldWheels *Update::update_as<fbs::UpdateFold
 
 template<> inline const fbs::UpdateEnableRover *Update::update_as<fbs::UpdateEnableRover>() const {
   return update_as_UpdateEnableRover();
+}
+
+template<> inline const fbs::UpdateLinkQualityThreshold *Update::update_as<fbs::UpdateLinkQualityThreshold>() const {
+  return update_as_UpdateLinkQualityThreshold();
+}
+
+template<> inline const fbs::UpdateRssiThreshold *Update::update_as<fbs::UpdateRssiThreshold>() const {
+  return update_as_UpdateRssiThreshold();
 }
 
 struct UpdateBuilder {
@@ -468,6 +584,14 @@ inline bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj
     }
     case UpdateUnion_UpdateEnableRover: {
       auto ptr = reinterpret_cast<const fbs::UpdateEnableRover *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateLinkQualityThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateLinkQualityThreshold *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateRssiThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
