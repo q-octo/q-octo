@@ -37,8 +37,13 @@ angle():number {
   return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 0.0;
 }
 
+torque():number {
+  const offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 0.0;
+}
+
 static startMotor(builder:flatbuffers.Builder) {
-  builder.startObject(3);
+  builder.startObject(4);
 }
 
 static addTemperature(builder:flatbuffers.Builder, temperature:number) {
@@ -53,16 +58,21 @@ static addAngle(builder:flatbuffers.Builder, angle:number) {
   builder.addFieldFloat32(2, angle, 0.0);
 }
 
+static addTorque(builder:flatbuffers.Builder, torque:number) {
+  builder.addFieldFloat32(3, torque, 0.0);
+}
+
 static endMotor(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }
 
-static createMotor(builder:flatbuffers.Builder, temperature:number, rps:number, angle:number):flatbuffers.Offset {
+static createMotor(builder:flatbuffers.Builder, temperature:number, rps:number, angle:number, torque:number):flatbuffers.Offset {
   Motor.startMotor(builder);
   Motor.addTemperature(builder, temperature);
   Motor.addRps(builder, rps);
   Motor.addAngle(builder, angle);
+  Motor.addTorque(builder, torque);
   return Motor.endMotor(builder);
 }
 }

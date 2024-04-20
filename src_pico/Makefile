@@ -41,7 +41,7 @@ $(FBS_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
 ts: $(FBS_TS_OUT_FILES)
 $(FBS_TS_OUT_FILES): $(FBS_FILES)
 	rm -rf $(FBS_TS_OUT_DIR)/*
-	$(FLATC) -o $(FBS_TS_OUT_DIR) --ts $<
+	$(FLATC) -o $(FBS_TS_OUT_DIR) --ts $(FBS_FILES)
 
 # Rule to convert .fbs to .dart
 dart: $(FBS_DART_OUT_FILES)
