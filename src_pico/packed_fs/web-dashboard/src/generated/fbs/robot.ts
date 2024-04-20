@@ -4,9 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { ControlSource } from '../../qocto/wsschema/control-source.js';
-import { Motors } from '../../qocto/wsschema/motors.js';
-import { Status } from '../../qocto/wsschema/status.js';
+import { ControlSource } from '../fbs/control-source.js';
+import { Motors } from '../fbs/motors.js';
+import { Status } from '../fbs/status.js';
 
 
 export class Robot {
@@ -25,6 +25,10 @@ static getRootAsRobot(bb:flatbuffers.ByteBuffer, obj?:Robot):Robot {
 static getSizePrefixedRootAsRobot(bb:flatbuffers.ByteBuffer, obj?:Robot):Robot {
   bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
   return (obj || new Robot()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+}
+
+static bufferHasIdentifier(bb:flatbuffers.ByteBuffer):boolean {
+  return bb.__has_identifier('ROBO');
 }
 
 batteries():number {
@@ -183,11 +187,11 @@ static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
 }
 
 static finishRobotBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset);
+  builder.finish(offset, 'ROBO');
 }
 
 static finishSizePrefixedRobotBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset, undefined, true);
+  builder.finish(offset, 'ROBO', true);
 }
 
 }

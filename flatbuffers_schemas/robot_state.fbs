@@ -11,6 +11,7 @@ table Motor {
     temperature: float = 0.0;
     rps: float = 0.0;
     angle: float = 0.0;
+    torque: float = 0.0;
 }
 
 // Define a table for the motors group

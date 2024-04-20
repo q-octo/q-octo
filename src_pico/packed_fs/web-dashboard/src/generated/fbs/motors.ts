@@ -4,7 +4,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { Motor } from '../../qocto/wsschema/motor.js';
+import { Motor } from '../fbs/motor.js';
 
 
 export class Motors {

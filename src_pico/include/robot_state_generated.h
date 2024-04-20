@@ -107,7 +107,8 @@ struct Motor FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_TEMPERATURE = 4,
     VT_RPS = 6,
-    VT_ANGLE = 8
+    VT_ANGLE = 8,
+    VT_TORQUE = 10
   };
   float temperature() const {
     return GetField<float>(VT_TEMPERATURE, 0.0f);
@@ -118,11 +119,15 @@ struct Motor FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float angle() const {
     return GetField<float>(VT_ANGLE, 0.0f);
   }
+  float torque() const {
+    return GetField<float>(VT_TORQUE, 0.0f);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<float>(verifier, VT_TEMPERATURE, 4) &&
            VerifyField<float>(verifier, VT_RPS, 4) &&
            VerifyField<float>(verifier, VT_ANGLE, 4) &&
+           VerifyField<float>(verifier, VT_TORQUE, 4) &&
            verifier.EndTable();
   }
 };
@@ -140,6 +145,9 @@ struct MotorBuilder {
   void add_angle(float angle) {
     fbb_.AddElement<float>(Motor::VT_ANGLE, angle, 0.0f);
   }
+  void add_torque(float torque) {
+    fbb_.AddElement<float>(Motor::VT_TORQUE, torque, 0.0f);
+  }
   explicit MotorBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -155,8 +163,10 @@ inline ::flatbuffers::Offset<Motor> CreateMotor(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float temperature = 0.0f,
     float rps = 0.0f,
-    float angle = 0.0f) {
+    float angle = 0.0f,
+    float torque = 0.0f) {
   MotorBuilder builder_(_fbb);
+  builder_.add_torque(torque);
   builder_.add_angle(angle);
   builder_.add_rps(rps);
   builder_.add_temperature(temperature);

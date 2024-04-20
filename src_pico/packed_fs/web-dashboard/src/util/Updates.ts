@@ -1,5 +1,5 @@
 import * as flatbuffers from 'flatbuffers';
-import { UpdateBatteries, UpdateLowVoltageThreshold, UpdateCriticalVoltageThreshold, UpdateEnableRover, UpdateReferenceWheelAngle, UpdateWheelsFolded } from '../../generated/qocto/wsschema';
+import { UpdateBatteries, UpdateLowVoltageThreshold, UpdateCriticalVoltageThreshold, UpdateEnableRover, UpdateReferenceWheelAngle, UpdateFoldWheels } from '../generated/fbs';
 
 export const updateBatteries = (batteries: number) => {
     const builder = new flatbuffers.Builder(1);
@@ -40,12 +40,11 @@ export const updateReferenceWheelAngle = (referenceWheelAngle: number) => {
     return builder.asUint8Array();
 }
 
-export const updateWheelsFolded = (wheelsFolded: boolean) => {
+export const updateFoldWheels = () => {
     const builder = new flatbuffers.Builder(0);
-    UpdateWheelsFolded.startUpdateWheelsFolded(builder);
-    UpdateWheelsFolded.addWheelsFolded(builder, wheelsFolded);
-    const updateWheelsFolded = UpdateWheelsFolded.endUpdateWheelsFolded(builder);
-    builder.finish(updateWheelsFolded);
+    UpdateFoldWheels.startUpdateFoldWheels(builder);
+    const updateFoldWheels = UpdateFoldWheels.endUpdateFoldWheels(builder);
+    builder.finish(updateFoldWheels);
     return builder.asUint8Array();
 }
 

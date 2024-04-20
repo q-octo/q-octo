@@ -1,0 +1,12 @@
+namespace fbs;
+
+file_identifier "OCTX";
+
+table TxMessage {
+    crsf_frame_type: uint8;
+    /// excludes CRC byte
+    payload_length: uint8;
+    payload_data: [uint8];
+}
+
+root_type TxMessage;
