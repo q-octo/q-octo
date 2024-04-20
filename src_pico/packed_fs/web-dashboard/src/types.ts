@@ -6,13 +6,15 @@ export type RoverState = {
     motors: {
         motor1: {
             temperature: number,
-            rpm: number,
-            angle: number
+            rps: number,
+            angle: number,
+            torque: number
         },
         motor2: {
             temperature: number,
-            rpm: number,
-            angle: number
+            rps: number,
+            angle: number,
+            torque: number
         }
     },
     batteries: {

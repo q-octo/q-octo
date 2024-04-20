@@ -8,6 +8,7 @@ export const RobotToObj = (robot : Robot) => {
                 temperature: robot.motors().motor1().temperature(),
                 rps: robot.motors().motor1().rps(),
                 angle: robot.motors().motor1().angle()
+                torque: robot.motors().motor1().
             },
             motor2: {
                 temperature: robot.motors().motor2().temperature(),
