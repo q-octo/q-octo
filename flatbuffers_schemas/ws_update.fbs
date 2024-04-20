@@ -25,13 +25,23 @@ table UpdateEnableRover {
     enable_rover: bool;
 }
 
+table UpdateLinkQualityThreshold {
+    link_quality_threshold: int;
+}
+
+table UpdateRssiThreshold {
+    rssi_threshold: int;
+}
+
 union UpdateUnion {
     UpdateBatteries,
     UpdateLowVoltageThreshold,
     UpdateCriticalVoltageThreshold,
     UpdateReferenceWheelAngle,
     UpdateFoldWheels,
-    UpdateEnableRover
+    UpdateEnableRover,
+    UpdateLinkQualityThreshold,
+    UpdateRssiThreshold
 }
 
 table Update {

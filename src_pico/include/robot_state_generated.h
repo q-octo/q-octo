@@ -237,14 +237,16 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CURRENT = 14,
     VT_FUEL = 16,
     VT_RSSI = 18,
-    VT_SIGNAL_STRENGTH = 20,
+    VT_LINK_QUALITY = 20,
     VT_MAX_SPEED = 22,
     VT_LOW_VOLTAGE_THRESHOLD = 24,
     VT_CRITICAL_VOLTAGE_THRESHOLD = 26,
-    VT_REFERENCE_WHEEL_ANGLE = 28,
-    VT_MOTOR_ERROR_CODE = 30,
-    VT_WHEELS_FOLDED = 32,
-    VT_ENABLE_ROVER = 34
+    VT_RSSI_THRESHOLD = 28,
+    VT_LINK_QUALITY_THRESHOLD = 30,
+    VT_REFERENCE_WHEEL_ANGLE = 32,
+    VT_MOTOR_ERROR_CODE = 34,
+    VT_WHEELS_FOLDED = 36,
+    VT_ENABLE_ROVER = 38
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -270,8 +272,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float rssi() const {
     return GetField<float>(VT_RSSI, 0.0f);
   }
-  int32_t signal_strength() const {
-    return GetField<int32_t>(VT_SIGNAL_STRENGTH, 0);
+  int32_t link_quality() const {
+    return GetField<int32_t>(VT_LINK_QUALITY, 0);
   }
   float max_speed() const {
     return GetField<float>(VT_MAX_SPEED, 0.0f);
@@ -281,6 +283,12 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   float critical_voltage_threshold() const {
     return GetField<float>(VT_CRITICAL_VOLTAGE_THRESHOLD, 16.0f);
+  }
+  int32_t rssi_threshold() const {
+    return GetField<int32_t>(VT_RSSI_THRESHOLD, 0);
+  }
+  int32_t link_quality_threshold() const {
+    return GetField<int32_t>(VT_LINK_QUALITY_THRESHOLD, 0);
   }
   int32_t reference_wheel_angle() const {
     return GetField<int32_t>(VT_REFERENCE_WHEEL_ANGLE, 0);
@@ -305,10 +313,12 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_CURRENT, 4) &&
            VerifyField<float>(verifier, VT_FUEL, 4) &&
            VerifyField<float>(verifier, VT_RSSI, 4) &&
-           VerifyField<int32_t>(verifier, VT_SIGNAL_STRENGTH, 4) &&
+           VerifyField<int32_t>(verifier, VT_LINK_QUALITY, 4) &&
            VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
            VerifyField<float>(verifier, VT_LOW_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
+           VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
+           VerifyField<int32_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 4) &&
            VerifyField<int32_t>(verifier, VT_REFERENCE_WHEEL_ANGLE, 4) &&
            VerifyOffset(verifier, VT_MOTOR_ERROR_CODE) &&
            verifier.VerifyString(motor_error_code()) &&
@@ -346,8 +356,8 @@ struct RobotBuilder {
   void add_rssi(float rssi) {
     fbb_.AddElement<float>(Robot::VT_RSSI, rssi, 0.0f);
   }
-  void add_signal_strength(int32_t signal_strength) {
-    fbb_.AddElement<int32_t>(Robot::VT_SIGNAL_STRENGTH, signal_strength, 0);
+  void add_link_quality(int32_t link_quality) {
+    fbb_.AddElement<int32_t>(Robot::VT_LINK_QUALITY, link_quality, 0);
   }
   void add_max_speed(float max_speed) {
     fbb_.AddElement<float>(Robot::VT_MAX_SPEED, max_speed, 0.0f);
@@ -357,6 +367,12 @@ struct RobotBuilder {
   }
   void add_critical_voltage_threshold(float critical_voltage_threshold) {
     fbb_.AddElement<float>(Robot::VT_CRITICAL_VOLTAGE_THRESHOLD, critical_voltage_threshold, 16.0f);
+  }
+  void add_rssi_threshold(int32_t rssi_threshold) {
+    fbb_.AddElement<int32_t>(Robot::VT_RSSI_THRESHOLD, rssi_threshold, 0);
+  }
+  void add_link_quality_threshold(int32_t link_quality_threshold) {
+    fbb_.AddElement<int32_t>(Robot::VT_LINK_QUALITY_THRESHOLD, link_quality_threshold, 0);
   }
   void add_reference_wheel_angle(int32_t reference_wheel_angle) {
     fbb_.AddElement<int32_t>(Robot::VT_REFERENCE_WHEEL_ANGLE, reference_wheel_angle, 0);
@@ -391,10 +407,12 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     float current = 0.0f,
     float fuel = 0.0f,
     float rssi = 0.0f,
-    int32_t signal_strength = 0,
+    int32_t link_quality = 0,
     float max_speed = 0.0f,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
+    int32_t rssi_threshold = 0,
+    int32_t link_quality_threshold = 0,
     int32_t reference_wheel_angle = 0,
     ::flatbuffers::Offset<::flatbuffers::String> motor_error_code = 0,
     bool wheels_folded = false,
@@ -402,10 +420,12 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   RobotBuilder builder_(_fbb);
   builder_.add_motor_error_code(motor_error_code);
   builder_.add_reference_wheel_angle(reference_wheel_angle);
+  builder_.add_link_quality_threshold(link_quality_threshold);
+  builder_.add_rssi_threshold(rssi_threshold);
   builder_.add_critical_voltage_threshold(critical_voltage_threshold);
   builder_.add_low_voltage_threshold(low_voltage_threshold);
   builder_.add_max_speed(max_speed);
-  builder_.add_signal_strength(signal_strength);
+  builder_.add_link_quality(link_quality);
   builder_.add_rssi(rssi);
   builder_.add_fuel(fuel);
   builder_.add_current(current);
@@ -429,10 +449,12 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     float current = 0.0f,
     float fuel = 0.0f,
     float rssi = 0.0f,
-    int32_t signal_strength = 0,
+    int32_t link_quality = 0,
     float max_speed = 0.0f,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
+    int32_t rssi_threshold = 0,
+    int32_t link_quality_threshold = 0,
     int32_t reference_wheel_angle = 0,
     const char *motor_error_code = nullptr,
     bool wheels_folded = false,
@@ -448,10 +470,12 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       current,
       fuel,
       rssi,
-      signal_strength,
+      link_quality,
       max_speed,
       low_voltage_threshold,
       critical_voltage_threshold,
+      rssi_threshold,
+      link_quality_threshold,
       reference_wheel_angle,
       motor_error_code__,
       wheels_folded,

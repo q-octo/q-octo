@@ -30,10 +30,12 @@ table Robot {
     current: float = 0.0;
     fuel: float = 0.0;
     rssi: float = 0.0;
-    signal_strength: int = 0;
+    link_quality: int = 0;
     max_speed: float = 0.0;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;
+    rssi_threshold: int = 0;
+    link_quality_threshold: int = 0;
     reference_wheel_angle: int = 0;
     motor_error_code: string; // Defaults not supported in C++
     wheels_folded: bool = false;

@@ -6,8 +6,10 @@ import { UpdateBatteries } from '../fbs/update-batteries.js';
 import { UpdateCriticalVoltageThreshold } from '../fbs/update-critical-voltage-threshold.js';
 import { UpdateEnableRover } from '../fbs/update-enable-rover.js';
 import { UpdateFoldWheels } from '../fbs/update-fold-wheels.js';
+import { UpdateLinkQualityThreshold } from '../fbs/update-link-quality-threshold.js';
 import { UpdateLowVoltageThreshold } from '../fbs/update-low-voltage-threshold.js';
 import { UpdateReferenceWheelAngle } from '../fbs/update-reference-wheel-angle.js';
+import { UpdateRssiThreshold } from '../fbs/update-rssi-threshold.js';
 
 
 export enum UpdateUnion {
@@ -17,13 +19,15 @@ export enum UpdateUnion {
   UpdateCriticalVoltageThreshold = 3,
   UpdateReferenceWheelAngle = 4,
   UpdateFoldWheels = 5,
-  UpdateEnableRover = 6
+  UpdateEnableRover = 6,
+  UpdateLinkQualityThreshold = 7,
+  UpdateRssiThreshold = 8
 }
 
 export function unionToUpdateUnion(
   type: UpdateUnion,
-  accessor: (obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|null
-): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|null {
+  accessor: (obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold|null
+): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold|null {
   switch(UpdateUnion[type]) {
     case 'NONE': return null; 
     case 'UpdateBatteries': return accessor(new UpdateBatteries())! as UpdateBatteries;
@@ -32,15 +36,17 @@ export function unionToUpdateUnion(
     case 'UpdateReferenceWheelAngle': return accessor(new UpdateReferenceWheelAngle())! as UpdateReferenceWheelAngle;
     case 'UpdateFoldWheels': return accessor(new UpdateFoldWheels())! as UpdateFoldWheels;
     case 'UpdateEnableRover': return accessor(new UpdateEnableRover())! as UpdateEnableRover;
+    case 'UpdateLinkQualityThreshold': return accessor(new UpdateLinkQualityThreshold())! as UpdateLinkQualityThreshold;
+    case 'UpdateRssiThreshold': return accessor(new UpdateRssiThreshold())! as UpdateRssiThreshold;
     default: return null;
   }
 }
 
 export function unionListToUpdateUnion(
   type: UpdateUnion, 
-  accessor: (index: number, obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|null, 
+  accessor: (index: number, obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold|null, 
   index: number
-): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|null {
+): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateReferenceWheelAngle|UpdateRssiThreshold|null {
   switch(UpdateUnion[type]) {
     case 'NONE': return null; 
     case 'UpdateBatteries': return accessor(index, new UpdateBatteries())! as UpdateBatteries;
@@ -49,6 +55,8 @@ export function unionListToUpdateUnion(
     case 'UpdateReferenceWheelAngle': return accessor(index, new UpdateReferenceWheelAngle())! as UpdateReferenceWheelAngle;
     case 'UpdateFoldWheels': return accessor(index, new UpdateFoldWheels())! as UpdateFoldWheels;
     case 'UpdateEnableRover': return accessor(index, new UpdateEnableRover())! as UpdateEnableRover;
+    case 'UpdateLinkQualityThreshold': return accessor(index, new UpdateLinkQualityThreshold())! as UpdateLinkQualityThreshold;
+    case 'UpdateRssiThreshold': return accessor(index, new UpdateRssiThreshold())! as UpdateRssiThreshold;
     default: return null;
   }
 }
