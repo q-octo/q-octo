@@ -1,8 +1,4 @@
 import { render } from 'preact';
-import MotorDisplay from './components/MotorDisplay';
-import GeneralDisplay from './components/GeneralDisplay';
-import Variable from './components/Variable';
-import DisplayPanel from './components/DisplayPanel';
 import { useEffect, useState } from 'preact/hooks';
 import { RoverState } from './types';
 import './style.css';
@@ -38,8 +34,8 @@ const Dashboard = ({rover} : {rover: RoverState}) => {
 			</div>
 
 
-			<div className="mt-4 p-6">
-				<p class="text-base sm:text-sm">No. Bats 🔋 : <span class="font-medium">{rover.batteries.number}</span></p>
+			<div className="mt-4 p-6 space-y-2">
+				<p class="text-base sm:text-sm">Number of Batteries 🔋 : <span class="font-medium">{rover.batteries.number}</span></p>
 				<p class="text-base sm:text-sm">Status ❓ : <span class="font-medium">{rover.batteries.status}</span></p>
 				<p class="text-base sm:text-sm">Control Source 🎮 : <span class="font-medium">{rover.controlSource}</span></p>
 				<p class="text-base sm:text-sm">Fuel ⛽ : <span class="font-medium">{rover.fuel}%</span></p>
@@ -52,7 +48,7 @@ const Dashboard = ({rover} : {rover: RoverState}) => {
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
 					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{rover.rssi} dBm</span></p>
-					<p class="text-base sm:text-sm">Signal 📻: <span class="font-medium">{rover.signalStrength} dBm</span></p>
+					<p class="text-base sm:text-sm">Signal 📻: <span class="font-medium">{rover.linkQualityThreshold} dBm</span></p>
 				</div>
 
 
@@ -78,7 +74,7 @@ const EditValuesForm = () => {
 	};
   
 	return (
-	  <div className="bg-white p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md">
+	  <div className="bg-slate-200 p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md">
 		<h2 className="text-xl sm:text-2xl font-bold mb-4">Edit Values</h2>
 		
 		{/* Number of batteries */}
@@ -126,7 +122,7 @@ const EditValuesForm = () => {
 			Reference Wheel Angle
 		  </label>
 		  <div className="mt-1 flex rounded-md shadow-sm">
-			<input type="number" step="0.1" id="referenceWheelAngle" name="referenceWheelAngle" className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
+			<input type="number" step="0.2" id="referenceWheelAngle" name="referenceWheelAngle" className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
 			<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
 			  Save
 			</button>
@@ -164,7 +160,7 @@ export function App() {
 		voltage: 12,
 		current: 2,
 		rssi: -50,
-		signalStrength: -50,
+		linkQualityThreshold: -50,
 		offset: {
 			left: 0,
 			right: 0

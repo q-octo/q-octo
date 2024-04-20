@@ -10,13 +10,8 @@ export const RobotToObj = (robot : Robot) => {
             motor1: {
                 temperature: robot.motors().motor1().temperature(),
                 rps: robot.motors().motor1().rps(),
-<<<<<<< HEAD
-                angle: robot.motors().motor1().angle()
-                torque: robot.motors().motor1().
-=======
                 angle: robot.motors().motor1().angle(),
                 torque: robot.motors().motor1().torque()
->>>>>>> 7a7fbf954edd0d82b69d16f5664d1ed1857751ea
             },
             motor2: {
                 temperature: robot.motors().motor2().temperature(),
@@ -31,7 +26,7 @@ export const RobotToObj = (robot : Robot) => {
         voltage: robot.voltage(),
         current: robot.current(),
         rssi: robot.rssi(),
-        signalStrength: robot.signalStrength(),
+        linkQualityThreshold: robot.linkQualityThreshold(),
         max_speed: robot.maxSpeed(),
         low_voltage_threshold: robot.lowVoltageThreshold(),
         critical_voltage_threshold: robot.criticalVoltageThreshold(),

@@ -26,7 +26,7 @@ export type RoverState = {
     voltage: number,
     current: number,
     rssi: number,
-    signalStrength: number,
+    linkQualityThreshold: number,
     offset: {
         left: number,
         right: number
