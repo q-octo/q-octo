@@ -135,13 +135,30 @@ void setSpeedIndividual(float speedL, float speedR)
 
 void initMotors()
 {
-  cybergearL.init_motor(MODE_SPEED);
+  // Command + 3 x ram write + command (for each motor)
+  // Seems like we only get two responses back though, so are we sending
+  // the messages too fast? The motor needs 500us between messages
+  // TODO check if we now receive 5 responses
+  // If so, we can halve the wait time by sending messages across both motors
+  // before waiting.
+  cybergearL.stop_motor();
+  delayMicroseconds(500);
+  cybergearL.set_run_mode(MODE_SPEED);
+  delayMicroseconds(500);
   cybergearL.set_limit_speed(MOTOR_SPEED_LIMIT);
+  delayMicroseconds(500);
   cybergearL.set_limit_current(MOTOR_CURRENT_LIMIT);
+  delayMicroseconds(500);
   cybergearL.enable_motor();
-  cybergearR.init_motor(MODE_SPEED);
+
+  cybergearR.stop_motor();
+  delayMicroseconds(500);
+  cybergearR.set_run_mode(MODE_SPEED);
+  delayMicroseconds(500);
   cybergearR.set_limit_speed(MOTOR_SPEED_LIMIT);
+  delayMicroseconds(500);
   cybergearR.set_limit_current(MOTOR_CURRENT_LIMIT);
+  delayMicroseconds(500);
   cybergearR.enable_motor();
 }
 
