@@ -1,4 +1,7 @@
-import { ControlSource, Robot, Status } from "../../generated/qocto/wsschema";
+import { Robot } from "../generated/fbs/robot"
+import { Motor } from "../generated/fbs/motor"
+import { ControlSource } from "../generated/fbs/control-source"
+import { Status } from "../generated/fbs/status"
 
 /** Convert Flatbuffer to Object */
 export const RobotToObj = (robot : Robot) => {
@@ -7,13 +10,19 @@ export const RobotToObj = (robot : Robot) => {
             motor1: {
                 temperature: robot.motors().motor1().temperature(),
                 rps: robot.motors().motor1().rps(),
+<<<<<<< HEAD
                 angle: robot.motors().motor1().angle()
                 torque: robot.motors().motor1().
+=======
+                angle: robot.motors().motor1().angle(),
+                torque: robot.motors().motor1().torque()
+>>>>>>> 7a7fbf954edd0d82b69d16f5664d1ed1857751ea
             },
             motor2: {
                 temperature: robot.motors().motor2().temperature(),
                 rps: robot.motors().motor2().rps(),
-                angle: robot.motors().motor2().angle()
+                angle: robot.motors().motor2().angle(),
+                torque: robot.motors().motor2().torque(),
             }
         },
         batteries: robot.batteries(),

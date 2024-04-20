@@ -2,4 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-export * as fbs from './fbs.js';
+export enum DriveMode {
+  Tank = 0,
+  Mixed = 1
+}

@@ -1,4 +1,4 @@
-import { Robot } from "../../generated/qocto/wsschema";
+import { Robot } from '../generated/fbs/robot';
 import { RobotToObj } from "./RobotToObj";
 import * as flatbuffers from 'flatbuffers';
 

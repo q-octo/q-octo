@@ -187,7 +187,6 @@ void WSWebServer::start()
     Serial.println(WiFi.softAPIP() + " (rover.local)");
 
     webServer = new WebServer(80);
-    webServer->enableCORS(true);
     webServer->on("/", handleRoot);
     const struct packed_file *p;
     for (p = packed_files; p->name != NULL; p++)

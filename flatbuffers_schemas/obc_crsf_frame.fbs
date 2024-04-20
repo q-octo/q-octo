@@ -1,5 +1,28 @@
+namespace fbs;
 
+file_identifier "OCDT";
 
-table Empty {}
+table Telemetry {
+  /// Signal strength indicator
+  rssi: ubyte;         
+  /// Link quality
+  link_quality: ubyte; 
+  /// Signal to noise ratio
+  snr: byte;           
+  /// Transmission power
+  tx_power: ushort;
+}
 
-root_type Empty;
+struct Channels {
+  data: [ushort:16];
+}
+
+table TxData {
+  channels: Channels;
+  /// Telemetry data associated with the RC frame
+  telemetry: Telemetry;
+  /// Failsafe flag with a default value of true
+  failsafe:bool = true;
+}
+
+root_type TxData;
