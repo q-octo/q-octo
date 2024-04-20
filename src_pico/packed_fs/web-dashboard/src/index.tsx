@@ -48,7 +48,7 @@ const Dashboard = ({rover} : {rover: RoverState}) => {
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
 					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{rover.rssi} dBm</span></p>
-					<p class="text-base sm:text-sm">Signal 📻: <span class="font-medium">{rover.linkQualityThreshold} dBm</span></p>
+					<p class="text-base sm:text-sm">Link 📻: <span class="font-medium">{rover.linkQualityThreshold} %</span></p>
 				</div>
 
 
