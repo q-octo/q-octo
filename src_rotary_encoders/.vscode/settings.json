@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "cstdio": "c",
+        "uavcan.equipment.power.batteryinfo.h": "c",
+        "cstring": "c",
+        "unistd.h": "c"
+    }
+}
