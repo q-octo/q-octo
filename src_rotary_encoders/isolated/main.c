@@ -26,6 +26,17 @@ bool shouldAcceptTransfer(const CanardInstance *ins,
 
 void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
 
+void transmitFrame(const CanardCANFrame* txf)
+{
+  printf("Transmitting frame with ID: %08X\n", txf->id);
+  printf("Data: ");
+  for (int i = 0; i < txf->data_len; i++)
+  {
+    printf("%02X ", txf->data[i]);
+  }
+  printf("\n");
+}
+
 int main()
 {
   canardInit(&canard,
@@ -47,6 +58,14 @@ int main()
     // DATA: 01 43 00 29 00 08 50 C0
     uint8_t data[8] = {0x01, 0x43, 0x00, 0x29, 0x00, 0x08, 0x50, 0xC0};
     receiveCanPacket(8, id, data);
+
+    for (const CanardCANFrame *txf = NULL; (txf = canardPeekTxQueue(&canard)) != NULL;)
+    {
+      // Transmit the frame
+      printf("Transmitting frame\n");
+      transmitFrame(txf);
+      canardPopTxQueue(&canard);
+    }
     sleep(1);
   }
 }
@@ -141,6 +160,8 @@ void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
 void handleDynamicNodeIdAllocation(CanardInstance *ins, CanardRxTransfer *transfer)
 {
+  static uint8_t node_id_allocation_transfer_id = 0;
+
   struct uavcan_protocol_dynamic_node_id_Allocation msg;
   if (uavcan_protocol_dynamic_node_id_Allocation_decode(transfer, &msg))
   {
@@ -181,13 +202,13 @@ void handleDynamicNodeIdAllocation(CanardInstance *ins, CanardRxTransfer *transf
   memcpy(response.unique_id.data, cached_node_id, cached_node_id_offset);
   response.unique_id.len = cached_node_id_offset;
 
-  uint8_t buffer[UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_MAX_SIZE];
+  uint8_t buffer[7];
   uint32_t len = uavcan_protocol_dynamic_node_id_Allocation_encode(&response, buffer);
 
   canardBroadcast(&canard,
                   UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_SIGNATURE,
                   UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID,
-                  0, // transfer ID
+                  &node_id_allocation_transfer_id, // transfer ID
                   CANARD_TRANSFER_PRIORITY_LOW,
                   buffer,
                   len);
