@@ -2,6 +2,7 @@ import { Robot } from "../generated/fbs/robot"
 import { Motor } from "../generated/fbs/motor"
 import { ControlSource } from "../generated/fbs/control-source"
 import { Status } from "../generated/fbs/status"
+import { RoverState } from "../types"
 
 /** Convert Flatbuffer to Object */
 export const RobotToObj = (robot : Robot) => {
@@ -34,5 +35,6 @@ export const RobotToObj = (robot : Robot) => {
         motor_error_code: robot.motorErrorCode(),
         wheels_folded: robot.wheelsFolded(),
         enable_rover: robot.enableRover(),
-    }
+        fuel: robot.fuel(),
+    } as RoverState;
 }

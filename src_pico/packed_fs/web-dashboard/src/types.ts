@@ -17,18 +17,18 @@ export type RoverState = {
             torque: number
         }
     },
-    batteries: {
-        number: number,
-        status: string
-    },
-    controlSource: string,
-    fuel: number,
+    batteries: number
+    control_source: string,
+    status: string
     voltage: number,
     current: number,
     rssi: number,
     linkQualityThreshold: number,
-    offset: {
-        left: number,
-        right: number
-    }
+    max_speed: number,
+    low_voltage_threshold: number,
+    critical_voltage_threshold: number,
+    reference_wheel_angle: number,
+    motor_error_code: string,
+    wheels_folded: boolean,
+    fuel: number,
 }
