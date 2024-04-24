@@ -83,6 +83,13 @@ void webServerConsumerTask(void *pvParameters)
     static WSWebServer::Message message;
     Serial.println("Web server consumer task started");
 
+    webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
+    if (webServerQueue == nullptr)
+    {
+        Serial.println("Failed to create webServerQueue");
+        vTaskDelete(nullptr);
+    }
+
 #if !CFG_ENABLE_WEB_SERVER
     Serial.println("Web server is disabled, blocking indefinitely");
     for (;;)
@@ -91,12 +98,6 @@ void webServerConsumerTask(void *pvParameters)
     }
 #endif
 
-    webServerQueue = xQueueCreate(10, sizeof(WSWebServer::Message));
-    if (webServerQueue == nullptr)
-    {
-        Serial.println("Failed to create webServerQueue");
-        vTaskDelete(nullptr);
-    }
 
     for (;;)
     {
