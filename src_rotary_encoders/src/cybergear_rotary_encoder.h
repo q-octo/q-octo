@@ -30,7 +30,7 @@ public:
     void speedTorqueControlMode();
     void positionSpeedTorqueTripleClosedLoopMode();
     void setMotorPositionToZero();
-    void move(uint16_t position, uint16_t speed, uint16_t positionGain, uint16_t positionDamping, uint16_t torque);
+    void move(int16_t positionDegrees, int16_t speed, uint16_t positionGain, uint16_t positionDamping, uint16_t torque);
     void processMessage(RotaryEncoderResponse* response, uint8_t packetLength, uint32_t packetId, const uint8_t *packetData);
 
 

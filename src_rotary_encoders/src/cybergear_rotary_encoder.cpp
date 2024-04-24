@@ -44,12 +44,38 @@ void CybergearRotaryEncoder::setMotorPositionToZero()
     _sendCanPacket(_motorId, data);
 }
 
-void CybergearRotaryEncoder::move(uint16_t position, uint16_t speed, uint16_t positionGain, uint16_t positionDamping, uint16_t torque)
+// Speed is between -200 and 200
+void CybergearRotaryEncoder::move(int16_t positionDegrees, int16_t speed, uint16_t positionGain, uint16_t positionDamping, uint16_t torque)
 {
+    uint16_t position = (positionDegrees / 360) * 0x8000 + 0x8000;
+    uint16_t _speed = (speed / 200) * 2048 + 2048;
+    // uint8_t data[8] = {0xC0, 0x00, 0xC0, 0x01, 0x00, 0x02, 0x0C, 0x00};
+    // _sendCanPacket(_motorId, data);
+    // return;
     // TODO implement this (rn it is just a sample payload)
-    uint8_t data[8] = {0xC0, 0x00, 0xC0, 0x01, 0x00, 0x02, 0x0C, 0x00};
+    // auto _speed = (0x864 << 4) & 0x01;
+    // uint8_t data[8] = {0xC0, 0x00, (_speed >> 8) && 0xFF, _speed && 0xFF, 0x00, 0x02, 0x0C, 0x00};
+    uint8_t data[8] = {
+        // Position (top 8)
+        position >> 8,
+        // Position (bottom 8)
+        position & 0xFF,
+        // Speed (top 4)
+        _speed >> 4,
+        // Speed (bottom 4), position gain (top 4)
+        ((_speed & 0x0F) << 4) & ((positionGain >> 8) & 0x0F),
+        // position gain (bottom 8)
+        0x00, //positionGain & 0xFF,
+        // position damping (top 8)
+        0x02, // positionDamping >> 8,
+        // position damping (bottom 4), torque (top 4)
+        0x0C,// ((positionDamping & 0x0F) << 4) & ((torque >> 8) & 0x0F),
+        // torque (bottom 8)
+        0x00, //torque & 0xFF,
+    };
     _sendCanPacket(_motorId, data);
 }
+
 void CybergearRotaryEncoder::processMessage(RotaryEncoderResponse *response, uint8_t packetLength, uint32_t packetId, const uint8_t *packetData)
 {
     if (response == nullptr)

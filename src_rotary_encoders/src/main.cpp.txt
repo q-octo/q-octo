@@ -1,0 +1,101 @@
+#include <Arduino.h>
+#include <can.h>
+#include <canard.h>
+#include <uavcan.equipment.power.BatteryInfo.h>
+#include "uavcan.protocol.dynamic_node_id.Allocation.h"
+#include "uavcan.protocol.NodeStatus.h"
+#include <xiaomi_cybergear_driver.h>
+#include "cybergear_rotary_encoder.h"
+
+const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
+const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
+
+const uint8_t TEST_MOTOR_CAN_ID = CYBERGEAR_CAN_ID_L;
+
+static CanardInstance canard;
+static uint8_t memory_pool[1024];
+uint8_t cached_node_id[16];
+uint8_t cached_node_id_offset = 0;
+
+XiaomiCyberGearDriver cybergearL = XiaomiCyberGearDriver(0x01, 0x00);
+CybergearRotaryEncoder rotaryEncoderL = CybergearRotaryEncoder([](uint32_t packetId, uint8_t *packetData)
+                                                               { CanCommunication::sendCANPacket(packetId, packetData); },
+                                                               0x01);
+
+void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
+                        bool extended);
+
+void setup()
+{
+    Serial.begin(115200);
+    // Wait for serial connection to be established
+    while (!Serial)
+        ;
+    delay(1000); // Wait for a second
+    Serial.println("Live on core 0 ofc");
+    CanCommunication::init(onReceiveCanPacket);
+    // Serial.println("Sending start motor message");
+    // startMotor();
+    //
+
+    rotaryEncoderL.startMotor();
+    rotaryEncoderL.positionSpeedTorqueTripleClosedLoopMode();
+    rotaryEncoderL.move(180, 10, 0, 0, 0);
+    // rotaryEncoderL.setMotorPositionToZero();
+    
+    
+    // cybergearL.init_motor(MODE_POSITION);
+    // cybergearL.set_limit_speed(4);
+    // cybergearL.set_limit_current(1);
+    // cybergearL.enable_motor();
+
+    // cybergearL.set_position_ref(0);
+
+    // move(0, 0, 0, 0, 0);
+}
+
+void loop()
+{
+    // cybergearL.set_speed_ref(0.5);
+    // Serial.println("Motor enabled");
+    // CanCommunication::checkForPacket();
+    // delay(1000);
+    // cybergearL.set_speed_ref(0.0);
+    
+    // Serial.println("Motor stopped");
+    CanCommunication::checkForPacket();
+    delay(1000);
+}
+
+void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
+                        bool extended)
+{
+    // Serial.print("Received packet with id 0x");
+    // Serial.print(packetId, HEX);
+    // Serial.println();
+
+    // received a packet
+    Serial.print("Received ");
+
+    if (extended)
+    {
+        Serial.print("extended ");
+    }
+    else
+    {
+        Serial.print("standard ");
+    }
+
+    Serial.print("packet with id 0x");
+    Serial.print(packetId, HEX);
+
+    Serial.print(" and length ");
+    Serial.println(packetLength);
+
+    Serial.print("0x");
+    for (size_t i = 0; i < packetLength; i++)
+    {
+        Serial.printf("%02X", packetData[i]);
+    }
+    Serial.println();
+}

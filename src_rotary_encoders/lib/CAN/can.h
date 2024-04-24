@@ -8,5 +8,5 @@ class CanCommunication
 public:
     static void init(PacketCallback callback);
     static void checkForPacket();
-    static void sendCANPacket(uint32_t id, uint8_t *data);
+    static void sendCANPacket(uint32_t id, const uint8_t *data, uint8_t length = 8, bool extended = true);
 };
