@@ -1,78 +1,13 @@
-#include <Arduino.h>
 #include "web_server.h"
-#include <WebSocketsServer.h>
-#include <ESP8266WiFi.h>
-#include <WebServer.h>
-#include <DNSServer.h>
-#include <LEAmDNS.h>
+
+// Putting this in the header file breaks the build
 #include "packed_fs.h"
-#include "ws_robot_generated.h"
-#include "ws_update_generated.h"
-#include <flatbuffers/flatbuffer_builder.h>
-using namespace fbs;
 
 #define AUTO_RESTART_WEBSOCKETS 0
 #define RESTART_WEBSOCKETS_FREQUENCY 1000 * 15 // 15 seconds
-static const int WEBSOCKET_BROADCAST_FREQ = 500;
-long lastWebSocketBroadcast = 0;
+#define WEBSOCKET_BROADCAST_FREQ 500
 
-IPAddress apIP(192, 168, 4, 1);
-WebServer *webServer;
-WebSocketsServer *webSocket;
-flatbuffers::FlatBufferBuilder fbb;
-// Requested state
-bool webServerEnabled = false;
-// Actual state
-bool webServerIsRunning = false;
-uint32_t lastWebSocketRestart = 0;
-
-// Visible to other tasks
-bool pendingBroadcast = false;
-// TaskMessage::State state;
-
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
-void handleRoot();
-void restartWebSocket();
-
-void serialiseFlatbuffer(flatbuffers::FlatBufferBuilder &builder)
-{
-
-    // TODO move these varaibles into TaskMessage::State
-    ControlSource control_source = ControlSource_RC;
-    Status status = Status_OK;
-    float max_speed = 0.0f;
-    int reference_wheel_angle = 0;
-    std::string motor_error_code;
-    bool wheels_folded = false;
-    bool enable_rover = false;
-
-    auto motor1 = CreateMotor(builder, state.motors.left.temperature, state.motors.left.RPM, state.motors.left.position);
-    auto motor2 = CreateMotor(builder, state.motors.right.temperature, state.motors.right.RPM, state.motors.right.position);
-    auto motors = CreateMotors(builder, motor1, motor2);
-
-    auto robot = CreateRobot(
-        builder,
-        state.batteryCount,
-        control_source,
-        status,
-        motors,
-        state.battery.voltage,
-        state.battery.current,
-        state.battery.fuel,
-        0, // TODO fix schema (rssi = signal strength)
-        0,
-        max_speed,
-        state.lowVoltageThreshold,
-        state.criticalVoltageThreshold,
-        reference_wheel_angle,
-        builder.CreateString(motor_error_code),
-        wheels_folded,
-        enable_rover);
-
-    builder.Finish(robot);
-}
-
-const char *textToMIMEType(const char *text)
+const char *QOctoWebServer::textToMIMEType(const char *text)
 {
     // Handle css, js, html, svg
     if (strcmp(text, "css") == 0)
@@ -97,7 +32,7 @@ const char *textToMIMEType(const char *text)
     }
 }
 
-void onFileRoute(const packed_file *p)
+void QOctoWebServer::onFileRoute(const packed_file *p)
 {
     digitalWrite(LED_BUILTIN, 1);
     // Split name on . to get MIME type
@@ -109,7 +44,7 @@ void onFileRoute(const packed_file *p)
     digitalWrite(LED_BUILTIN, 0);
 }
 
-void WSWebServer::start()
+void QOctoWebServer::start()
 {
     if (webServerIsRunning)
     {
@@ -124,19 +59,20 @@ void WSWebServer::start()
     Serial.println(WiFi.softAPIP() + " (rover.local)");
 
     webServer = new WebServer(80);
-    webServer->on("/", handleRoot);
+    webServer->on("/", [this]()
+                  { handleRoot(); });
     const struct packed_file *p;
     for (p = packed_files; p->name != NULL; p++)
     {
-        webServer->on(p->name, [p]()
+        webServer->on(p->name, [p, this]()
                       { onFileRoute(p); });
     }
     webServer->begin();
     Serial.println("HTTP server started");
 
     webSocket = new WebSocketsServer(81);
-    webSocket->begin();
-    webSocket->onEvent(webSocketEvent);
+    webSocket->onEvent([this](uint8_t num, WStype_t type, uint8_t *payload, size_t length)
+                       { webSocketEvent(num, type, payload, length); });
     Serial.println("Web socket server started");
 
     // Setup MDNS responder (creates rover.local domain within the AP)
@@ -153,27 +89,32 @@ void WSWebServer::start()
     }
 
     webServerIsRunning = true;
-    webServerEnabled = true;
 }
 
-void broadcastData()
+void QOctoWebServer::broadcastData()
 {
+    auto r = GetRobot(nullptr);
     Serial.println("Broadcasting data");
-    fbb.Reset(); // To avoid forever growing buffer
-    serialiseFlatbuffer(fbb);
-    webSocket->broadcastBIN(fbb.GetBufferPointer(), fbb.GetSize());
-    pendingBroadcast = false;
+    if (stateBufferLength == 0)
+    {
+        Serial.println("No data to broadcast");
+        return;
+    }
+    webSocket->broadcastBIN(stateBuffer, stateBufferLength);
     lastWebSocketBroadcast = millis();
 }
 
-void sendDataToClient(uint8_t num)
+void QOctoWebServer::sendDataToClient(uint8_t num)
 {
-    fbb.Reset(); // To avoid forever growing buffer
-    serialiseFlatbuffer(fbb);
-    webSocket->sendBIN(num, fbb.GetBufferPointer(), fbb.GetSize());
+    if (stateBufferLength == 0)
+    {
+        Serial.println("No data to send to client");
+        return;
+    }
+    webSocket->sendBIN(num, stateBuffer, stateBufferLength);
 }
 
-void WSWebServer::stop()
+void QOctoWebServer::stop()
 {
     Serial.println("Stopping web server");
     MDNS.close();
@@ -202,66 +143,39 @@ void WSWebServer::stop()
     }
 
     webServerIsRunning = false;
-    webServerEnabled = false;
 }
 
-void WSWebServer::loop()
+void QOctoWebServer::loop()
 {
-    // TODO xQueueReceive is NOT allowed here (breaks xSemaphoreTake)
-    // static WSWebServer::Message message;
-    // BaseType_t xStatus = xQueueReceive(webServerQueue, &message, pdMS_TO_TICKS(1));
-    // const bool messageReceived = xStatus == pdPASS;
-    // if (messageReceived)
-    // {
-    //     switch (message.type)
-    //     {
-    //     case WSWebServer::MessageType::ENABLE:
-    //         Serial.println("Received web server ENABLE message");
-    //         WSWebServer::start();
-    //         break;
-    //     case WSWebServer::MessageType::DISABLE:
-    //         Serial.println("Received web server DISABLE message");
-    //         WSWebServer::stop()
-    //         break;
-    //     }
-    // }
 
-    if (webServerIsRunning)
+    if (!webServerIsRunning)
     {
-        webServer->handleClient();
-        webSocket->loop();
-        MDNS.update();
-        if (pendingBroadcast && millis() - lastWebSocketBroadcast > WEBSOCKET_BROADCAST_FREQ)
-        {
-            broadcastData();
-        }
+        return;
+    }
+    webServer->handleClient();
+    webSocket->loop();
+    MDNS.update();
+    if (pendingBroadcast && millis() - lastWebSocketBroadcast > WEBSOCKET_BROADCAST_FREQ)
+    {
+        broadcastData();
+    }
 
 #if AUTO_RESTART_WEBSOCKETS
-        const uint32_t currentMs = millis();
-        if (lastWebSocketRestart == 0)
-        {
-            // First run
-            lastWebSocketRestart = currentMs;
-        }
-        if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
-        {
-            restartWebSocket();
-            lastWebSocketRestart = currentMs;
-        }
+    const uint32_t currentMs = millis();
+    if (lastWebSocketRestart == 0)
+    {
+        // First run
+        lastWebSocketRestart = currentMs;
+    }
+    if (currentMs - lastWebSocketRestart > RESTART_WEBSOCKETS_FREQUENCY)
+    {
+        restartWebSocket();
+        lastWebSocketRestart = currentMs;
+    }
 #endif
-    }
-
-    if (webServerEnabled && !webServerIsRunning)
-    {
-        start();
-    }
-    else if (!webServerEnabled && webServerIsRunning)
-    {
-        stop();
-    }
 }
 
-void handleRoot()
+void QOctoWebServer::handleRoot()
 {
     digitalWrite(LED_BUILTIN, 1);
     size_t htmlSize;
@@ -270,73 +184,12 @@ void handleRoot()
     digitalWrite(LED_BUILTIN, 0);
 }
 
-
-void processRemoteBinaryUpdate(uint8_t *payload, size_t length)
+void QOctoWebServer::processRemoteBinaryUpdate(uint8_t *payload, size_t length)
 {
-    auto update = GetUpdate(payload);
-    // TODO forward this message to the main pico.
-    // static TaskMessage::Message taskMessage;
-    // switch (update->update_type())
-    // {
-    // case UpdateUnion::UpdateUnion_UpdateBatteries:
-    // {
-    //     auto updateBatteries = update->update_as_UpdateBatteries();
-    //     taskMessage = {
-    //         .type = TaskMessage::Type::SET_BATTERY_COUNT,
-    //         .as = {.batteryCount = updateBatteries->batteries()},
-    //     };
-    //     sendTaskMessage(&taskMessage);
-    //     break;
-    // }
-    // case UpdateUnion::UpdateUnion_UpdateLowVoltageThreshold:
-    // {
-    //     auto updateLowVoltageThreshold = update->update_as_UpdateLowVoltageThreshold();
-    //     taskMessage = {
-    //         .type = TaskMessage::Type::SET_LOW_VOLTAGE_THRESHOLD,
-    //         .as = {
-    //             .voltageThreshold = updateLowVoltageThreshold->low_voltage_threshold(),
-    //         },
-    //     };
-    //     sendTaskMessage(&taskMessage);
-    //     break;
-    // }
-    // case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold:
-    // {
-    //     auto updateCriticalVoltageThreshold = update->update_as_UpdateCriticalVoltageThreshold();
-    //     taskMessage = {
-    //         .type = TaskMessage::Type::SET_CRITICAL_VOLTAGE_THRESHOLD,
-    //         .as = {
-    //             .voltageThreshold = updateCriticalVoltageThreshold->critical_voltage_threshold(),
-    //         },
-    //     };
-    //     sendTaskMessage(&taskMessage);
-    //     break;
-    // }
-    // case UpdateUnion::UpdateUnion_UpdateReferenceWheelAngle:
-    // {
-    //     auto updateReferenceWheelAngle = update->update_as_UpdateReferenceWheelAngle();
-    //     // TODO implement
-    //     // robot.reference_wheel_angle = updateReferenceWheelAngle->reference_wheel_angle();
-    //     break;
-    // }
-    // case UpdateUnion::UpdateUnion_UpdateFoldWheels:
-    // {
-    //     // robot.wheels_folded = true;
-    //     taskMessage = {.type = TaskMessage::Type::FOLD_WHEELS};
-    //     sendTaskMessage(&taskMessage);
-    //     break;
-    // }
-    // case UpdateUnion::UpdateUnion_UpdateEnableRover:
-    // {
-    //     auto updateEnableRover = update->update_as_UpdateEnableRover();
-    //     // TODO implement
-    //     // robot.enable_rover = updateEnableRover->enable_rover();
-    //     break;
-    // }
-    // }
+    // TODO(niall) forward this byte array to the main pico
 }
 
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
+void QOctoWebServer::webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 {
     switch (type)
     {
@@ -368,7 +221,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     }
 }
 
-void restartWebSocket()
+void QOctoWebServer::restartWebSocket()
 {
     Serial.println("Restarting web socket server");
     webSocket->close();

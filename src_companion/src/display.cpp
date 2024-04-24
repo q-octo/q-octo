@@ -1,45 +1,5 @@
-#include <Arduino.h>
 
-// Pico Display libraries
-#include "button.hpp"
-#include "pico_display.hpp"
-#include "pico_graphics.hpp"
-#include "rgbled.hpp"
-#include "st7789.hpp"
-#include <sstream>
 #include "display.h"
-
-// Explicitly include necessary classes from the pimoroni namespace
-using pimoroni::BG_SPI_FRONT;
-using pimoroni::Button;
-using pimoroni::get_spi_pins;
-using pimoroni::PicoDisplay;
-using pimoroni::PicoGraphics_PenRGB332;
-using pimoroni::Point;
-using pimoroni::Rect;
-using pimoroni::RGBLED;
-using pimoroni::ROTATE_0;
-using pimoroni::ST7789;
-
-void repaintDisplay();
-void blinkLED();
-
-// Display driver
-ST7789 st7789(PicoDisplay::WIDTH, PicoDisplay::HEIGHT, ROTATE_0, false,
-              get_spi_pins(BG_SPI_FRONT));
-
-// Graphics library - in RGB332 mode you get 256 colours and optional dithering
-// for ~32K RAM.
-PicoGraphics_PenRGB332 graphics(st7789.width, st7789.height, nullptr);
-
-// RGB LED
-RGBLED led(PicoDisplay::LED_R, PicoDisplay::LED_G, PicoDisplay::LED_B);
-
-// And each button
-Button button_a(PicoDisplay::A);
-Button button_b(PicoDisplay::B);
-Button button_x(PicoDisplay::X);
-Button button_y(PicoDisplay::Y);
 
 #define SET_PEN_RED() graphics.set_pen(244, 67, 54);
 #define SET_PEN_GREEN() graphics.set_pen(76, 176, 80);
@@ -47,39 +7,32 @@ Button button_y(PicoDisplay::Y);
 #define SET_PEN_BLACK() graphics.set_pen(0, 0, 0);
 #define SET_PEN_WHITE() graphics.set_pen(255, 255, 255);
 
-// Internal state
-
-bool ledState = false;
-float batteryFuel = 0.0; // 0.0 to 1.0
-float batteryVoltage = 0.0;
-float batteryCurrent = 0.0;
-uint16_t motorLtemperature = 0;
-float motorLRPM = 0.0;
-float motorLtorque = 0.0;
-float motorLposition = 0.0;
-uint16_t motorRtemperature = 0;
-float motorRRPM = 0.0;
-float motorRtorque = 0.0;
-float motorRposition = 0.0;
-
-void loopDisplay()
+void Display::loop()
 {
   static unsigned long lastBlinkMillis = 0;
   static unsigned long lastRepaintMillis = 0;
 
   st7789.set_backlight(255);
   led.set_brightness(0); // Turn LED off.
-  repaintDisplay();
 
   // Display is 240x135 pixels
 
   // Blink the LED every second to show that the data is live
+  // TODO blink this red if the status is not OK.
   const uint32_t currentMillis = millis();
   if (currentMillis - lastBlinkMillis >= 1000)
   {
     lastBlinkMillis = currentMillis;
     blinkLED();
   }
+
+  if (state == nullptr)
+  {
+    // Skip display update because we do not have anything to show yet.
+    return;
+  }
+
+
   // Repaint the screen every 32ms (30fps)
   if (currentMillis - lastRepaintMillis >= 32)
   {
@@ -88,15 +41,19 @@ void loopDisplay()
   }
 }
 
-void blinkLED()
+void Display::blinkLED()
 {
   led.set_rgb(76, 176, 80); // Green
   led.set_brightness(ledState ? 0 : 100);
   ledState = !ledState;
 }
 
-void repaintDisplay()
+void Display::repaintDisplay()
 {
+
+  // An example of how to access state.
+  state->batteries();
+  
   // bitmap6, bitmap8, bitmap14_outline
   graphics.set_font("bitmap8");
 
@@ -140,7 +97,7 @@ void repaintDisplay()
   Rect wifiRect(motorBoxWidth + 2, 0, 240 - motorBoxWidth, 36);
   // graphics.rectangle(wifiRect);
   wifiRect.deflate(2);
-  if (button_x.raw())
+  if (button_x.read())
   {
     SET_PEN_RED()
     graphics.text("WiFi  ON", Point(wifiRect.x, wifiRect.y), wifiRect.w);

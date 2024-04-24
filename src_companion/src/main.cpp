@@ -1,33 +1,59 @@
 #include <Arduino.h>
-#include <WiFi.h>
 
 #include "display.h"
+#include "web_server.h"
+#include "serial.h"
 
-#define PIN_UART_TX 0
-#define PIN_UART_RX 1
+#define WAIT_FOR_USB_SERIAL 1
 
-void loopWebServer();
-void loopSerial();
+void toggleAButton();
+void toggleBButton();
+void toggleXButton();
+
+// Callbacks can be added to these constructors if necessary.
+Display display(toggleAButton, toggleBButton, toggleXButton);
+QOctoWebServer webServer;
+QOctoSerial serial;
 
 void setup()
 {
   Serial.begin(115200);
-  // Wait for serial connection to be established
+#if WAIT_FOR_USB_SERIAL
   while (!Serial)
-    ;
+  {
+  }
+#endif
 
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
 
-  WSWebServer::init();
+  // Initialise the display & web server with the initial state.
+  auto fbb = flatbuffers::FlatBufferBuilder();
+  auto robot = CreateRobot(fbb);
+  fbb.Finish(robot);
+  display.updateState(fbb.GetBufferPointer(), fbb.GetSize());
+  webServer.updateState(fbb.GetBufferPointer(), fbb.GetSize());
+  
 }
 
 void loop()
 {
-  loopWebServer();
-  loopDisplay();
-  loopSerial();
+  display.loop();
+  webServer.loop();
+  serial.loop();
 }
 
-void loopWebServer() {}
-void loopSerial() {}
+void toggleAButton()
+{
+  Serial.println("A button pressed");
+}
+
+void toggleBButton()
+{
+  Serial.println("B button pressed");
+}
+
+void toggleXButton()
+{
+  Serial.println("X button pressed");
+}
