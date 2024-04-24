@@ -7,4 +7,5 @@ public:
     void loop();
 
 private:
+    uint8_t serialBuffer[255];
 };
