@@ -22,17 +22,26 @@ static getSizePrefixedRootAsUpdateReferenceWheelAngle(bb:flatbuffers.ByteBuffer,
   return (obj || new UpdateReferenceWheelAngle()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-referenceWheelAngle():number {
+leftMotorFoldAngle():number {
   const offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
-static startUpdateReferenceWheelAngle(builder:flatbuffers.Builder) {
-  builder.startObject(1);
+rightMotorFoldAngle():number {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
-static addReferenceWheelAngle(builder:flatbuffers.Builder, referenceWheelAngle:number) {
-  builder.addFieldInt32(0, referenceWheelAngle, 0);
+static startUpdateReferenceWheelAngle(builder:flatbuffers.Builder) {
+  builder.startObject(2);
+}
+
+static addLeftMotorFoldAngle(builder:flatbuffers.Builder, leftMotorFoldAngle:number) {
+  builder.addFieldInt32(0, leftMotorFoldAngle, 0);
+}
+
+static addRightMotorFoldAngle(builder:flatbuffers.Builder, rightMotorFoldAngle:number) {
+  builder.addFieldInt32(1, rightMotorFoldAngle, 0);
 }
 
 static endUpdateReferenceWheelAngle(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -40,9 +49,10 @@ static endUpdateReferenceWheelAngle(builder:flatbuffers.Builder):flatbuffers.Off
   return offset;
 }
 
-static createUpdateReferenceWheelAngle(builder:flatbuffers.Builder, referenceWheelAngle:number):flatbuffers.Offset {
+static createUpdateReferenceWheelAngle(builder:flatbuffers.Builder, leftMotorFoldAngle:number, rightMotorFoldAngle:number):flatbuffers.Offset {
   UpdateReferenceWheelAngle.startUpdateReferenceWheelAngle(builder);
-  UpdateReferenceWheelAngle.addReferenceWheelAngle(builder, referenceWheelAngle);
+  UpdateReferenceWheelAngle.addLeftMotorFoldAngle(builder, leftMotorFoldAngle);
+  UpdateReferenceWheelAngle.addRightMotorFoldAngle(builder, rightMotorFoldAngle);
   return UpdateReferenceWheelAngle.endUpdateReferenceWheelAngle(builder);
 }
 }

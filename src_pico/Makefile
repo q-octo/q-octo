@@ -3,7 +3,7 @@ FBS_REPO_DIR = ../flatbuffers
 FBS_SRC_DIR = ../flatbuffers_schemas
 FBS_PICO1_OUT_DIR = include
 FBS_PICO2_OUT_DIR = ../src_companion/include
-FBS_TS_OUT_DIR = packed_fs/web-dashboard/src/generated
+FBS_TS_OUT_DIR = ../src_companion/packed_fs/web-dashboard/src/generated
 # Find all .fbs files in the FBS_SRC_DIR
 FBS_FILES = $(wildcard $(FBS_SRC_DIR)/*.fbs)
 FBS_PICO1_FILES = $(patsubst $(FBS_SRC_DIR)/%.fbs,$(FBS_PICO1_OUT_DIR)/%_generated.h,$(FBS_FILES))

@@ -25,10 +25,6 @@ static getSizePrefixedRootAsRobotDriveConfig(bb:flatbuffers.ByteBuffer, obj?:Rob
   return (obj || new RobotDriveConfig()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-static bufferHasIdentifier(bb:flatbuffers.ByteBuffer):boolean {
-  return bb.__has_identifier('OCDV');
-}
-
 configType():DriveConfig {
   const offset = this.bb!.__offset(this.bb_pos, 4);
   return offset ? this.bb!.readUint8(this.bb_pos + offset) : DriveConfig.NONE;
@@ -54,14 +50,6 @@ static addConfig(builder:flatbuffers.Builder, configOffset:flatbuffers.Offset) {
 static endRobotDriveConfig(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
-}
-
-static finishRobotDriveConfigBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset, 'OCDV');
-}
-
-static finishSizePrefixedRobotDriveConfigBuffer(builder:flatbuffers.Builder, offset:flatbuffers.Offset) {
-  builder.finish(offset, 'OCDV', true);
 }
 
 static createRobotDriveConfig(builder:flatbuffers.Builder, configType:DriveConfig, configOffset:flatbuffers.Offset):flatbuffers.Offset {
