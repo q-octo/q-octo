@@ -1,0 +1,37 @@
+namespace fbs;
+
+// Source: Onboard Computer
+// Destination: Main Pico
+
+file_identifier "OCTX";
+
+table CrsfFrame {
+    crsf_frame_type: uint8;
+    /// excludes CRC byte
+    payload_length: uint8;
+    payload_data: [uint8];
+}
+
+enum DriveMode : byte { Tank, Mixed }
+
+table TankDriveConfig { left_rad_s: float; right_rad_s: float; }
+
+table MixedDriveConfig { rad_s: float; direction: float; }
+
+union DriveConfig { TankDriveConfig, MixedDriveConfig }
+
+table RobotDriveConfig {
+    config: DriveConfig;
+}
+
+union OnboardComputerTxUnion {
+    CrsfFrame,
+    RobotDriveConfig,
+}
+
+table OnboardComputerTx {
+    message: OnboardComputerTxUnion
+}
+
+root_type OnboardComputerTx;
+

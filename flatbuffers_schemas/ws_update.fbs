@@ -1,5 +1,8 @@
 namespace fbs;
 
+// Source: Web Dashboard
+// Destination: Companion Pico
+
 file_identifier "UPDT";
 
 // Update tables for individual fields
@@ -16,7 +19,8 @@ table UpdateCriticalVoltageThreshold {
 }
 
 table UpdateReferenceWheelAngle {
-    reference_wheel_angle: int;
+    left_motor_fold_angle: int;
+    right_motor_fold_angle: int;
 }
 
 table UpdateFoldWheels {}

@@ -1,0 +1,20 @@
+namespace fbs;
+
+// Source: Main Pico
+// Destination: Companion Pico
+
+file_identifier "CNRX";
+
+table SetWebServerEnabled {
+    enabled: bool;
+}
+
+union CompanionRxUnion {
+    SetWebServerEnabled,
+}
+
+table CompanionRx {
+    message: CompanionRxUnion; 
+}
+
+root_type CompanionRx;

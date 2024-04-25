@@ -1,5 +1,8 @@
 namespace fbs;
 
+// Source: Main Pico
+// Destination: Web Dashboard, Display
+
 file_identifier "ROBO";
 
 // Define enums for control sources and status codes
@@ -20,6 +23,16 @@ table Motors {
     motor2: Motor;
 }
 
+table DisplayMessages {
+    message1: string;
+    message2: string;
+    message3: string;
+    message4: string;
+    message5: string;
+    message6: string;
+    message7: string;
+}
+
 // Define the main table for your data structure
 table Robot {
     batteries: int = 4;
@@ -37,9 +50,10 @@ table Robot {
     rssi_threshold: int = 0;
     link_quality_threshold: int = 0;
     reference_wheel_angle: int = 0;
-    motor_error_code: string; // Defaults not supported in C++
+    motor_error_code: string; // Defaults not supported for strings
     wheels_folded: bool = false;
     enable_rover: bool = false;
+    display_messages: DisplayMessages;
 }
 
 // Define the root type and possible update types

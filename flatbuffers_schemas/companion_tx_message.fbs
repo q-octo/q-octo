@@ -1,0 +1,22 @@
+namespace fbs;
+
+// Source: Companion Pico
+// Destination: Main Pico
+
+file_identifier "CNTX";
+
+enum Button : byte { A, B, X }
+
+table ButtonPressed {
+    button: Button;
+}
+
+union CompanionTxUnion {
+    ButtonPressed,
+}
+
+table CompanionTx {
+    message: CompanionTxUnion; 
+}
+
+root_type CompanionRx;

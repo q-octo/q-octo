@@ -1,8 +1,11 @@
 namespace fbs;
 
-file_identifier "OCDT";
+// Source: Main Pico
+// Destination: Onboard Computer
 
-table Telemetry {
+file_identifier "OCRX";
+
+table CrsfTelemetry {
   /// Signal strength indicator
   rssi: ubyte;         
   /// Link quality
@@ -13,16 +16,27 @@ table Telemetry {
   tx_power: ushort;
 }
 
-struct Channels {
+struct CrsfChannels {
   data: [ushort:16];
 }
 
-table TxData {
-  channels: Channels;
+table CrsfData {
+  channels: CrsfChannels;
   /// Telemetry data associated with the RC frame
-  telemetry: Telemetry;
+  telemetry: CrsfTelemetry;
   /// Failsafe flag with a default value of true
   failsafe:bool = true;
 }
 
-root_type TxData;
+union OnboardComputerRxUnion {
+    CrsfData,
+}
+
+table OnboardComputerRx {
+    message: OnboardComputerRxUnion
+}
+
+root_type OnboardComputerRx;
+
+
+
