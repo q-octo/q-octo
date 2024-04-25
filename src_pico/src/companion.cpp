@@ -1,11 +1,11 @@
+#include <Arduino.h>
 #include "companion.h"
 #include "companion_rx_generated.h"
 #include "companion_tx_generated.h"
 #include "config.h"
-#include <Arduino.h>
 using namespace fbs;
 
-void Companion::accept(Message &message) {
+void Companion::accept(const Message &message) {
   switch (message.type) {
   case ENABLE_WEB_SERVER:
     Serial.println("Enable web server");
@@ -122,6 +122,12 @@ void Companion::companionProducerTask(void *pvParameters) {
 
 void Companion::companionConsumerTask(void *pvParameters) {
   (void)pvParameters; //  To avoid warnings
+  Serial.println("Companion consumer task started");
+  companionQueue = xQueueCreate(10, sizeof(Message));
+  if (companionQueue == nullptr) {
+    Serial.println("Failed to create companionQueue");
+    vTaskDelete(nullptr);
+  }
   static Message message;
 
 #if !CFG_ENABLE_COMPANION
