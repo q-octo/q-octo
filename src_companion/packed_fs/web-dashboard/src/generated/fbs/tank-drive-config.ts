@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class TankDriveConfig {
+
+
+export class TankDriveConfig implements flatbuffers.IUnpackableObject<TankDriveConfigT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):TankDriveConfig {
@@ -54,5 +56,33 @@ static createTankDriveConfig(builder:flatbuffers.Builder, leftRadS:number, right
   TankDriveConfig.addLeftRadS(builder, leftRadS);
   TankDriveConfig.addRightRadS(builder, rightRadS);
   return TankDriveConfig.endTankDriveConfig(builder);
+}
+
+unpack(): TankDriveConfigT {
+  return new TankDriveConfigT(
+    this.leftRadS(),
+    this.rightRadS()
+  );
+}
+
+
+unpackTo(_o: TankDriveConfigT): void {
+  _o.leftRadS = this.leftRadS();
+  _o.rightRadS = this.rightRadS();
+}
+}
+
+export class TankDriveConfigT implements flatbuffers.IGeneratedObject {
+constructor(
+  public leftRadS: number = 0.0,
+  public rightRadS: number = 0.0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return TankDriveConfig.createTankDriveConfig(builder,
+    this.leftRadS,
+    this.rightRadS
+  );
 }
 }

@@ -2,8 +2,8 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-import { MixedDriveConfig } from '../fbs/mixed-drive-config.js';
-import { TankDriveConfig } from '../fbs/tank-drive-config.js';
+import { MixedDriveConfig, MixedDriveConfigT } from '../fbs/mixed-drive-config.js';
+import { TankDriveConfig, TankDriveConfigT } from '../fbs/tank-drive-config.js';
 
 
 export enum DriveConfig {

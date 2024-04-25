@@ -2,14 +2,14 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-import { UpdateBatteries } from '../fbs/update-batteries.js';
-import { UpdateCriticalVoltageThreshold } from '../fbs/update-critical-voltage-threshold.js';
-import { UpdateEnableRover } from '../fbs/update-enable-rover.js';
-import { UpdateFoldWheels } from '../fbs/update-fold-wheels.js';
-import { UpdateLinkQualityThreshold } from '../fbs/update-link-quality-threshold.js';
-import { UpdateLowVoltageThreshold } from '../fbs/update-low-voltage-threshold.js';
-import { UpdateReferenceWheelAngle } from '../fbs/update-reference-wheel-angle.js';
-import { UpdateRssiThreshold } from '../fbs/update-rssi-threshold.js';
+import { UpdateBatteries, UpdateBatteriesT } from '../fbs/update-batteries.js';
+import { UpdateCriticalVoltageThreshold, UpdateCriticalVoltageThresholdT } from '../fbs/update-critical-voltage-threshold.js';
+import { UpdateEnableRover, UpdateEnableRoverT } from '../fbs/update-enable-rover.js';
+import { UpdateFoldWheels, UpdateFoldWheelsT } from '../fbs/update-fold-wheels.js';
+import { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from '../fbs/update-link-quality-threshold.js';
+import { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from '../fbs/update-low-voltage-threshold.js';
+import { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from '../fbs/update-reference-wheel-angle.js';
+import { UpdateRssiThreshold, UpdateRssiThresholdT } from '../fbs/update-rssi-threshold.js';
 
 
 export enum UpdateUnion {

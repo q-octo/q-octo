@@ -4,10 +4,12 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { CrsfData, CrsfDataT } from '../fbs/crsf-data.js';
 import { OnboardComputerRxUnion, unionToOnboardComputerRxUnion, unionListToOnboardComputerRxUnion } from '../fbs/onboard-computer-rx-union.js';
+import { Robot, RobotT } from '../fbs/robot.js';
 
 
-export class OnboardComputerRx {
+export class OnboardComputerRx implements flatbuffers.IUnpackableObject<OnboardComputerRxT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):OnboardComputerRx {
@@ -69,5 +71,43 @@ static createOnboardComputerRx(builder:flatbuffers.Builder, messageType:OnboardC
   OnboardComputerRx.addMessageType(builder, messageType);
   OnboardComputerRx.addMessage(builder, messageOffset);
   return OnboardComputerRx.endOnboardComputerRx(builder);
+}
+
+unpack(): OnboardComputerRxT {
+  return new OnboardComputerRxT(
+    this.messageType(),
+    (() => {
+      const temp = unionToOnboardComputerRxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
+  );
+}
+
+
+unpackTo(_o: OnboardComputerRxT): void {
+  _o.messageType = this.messageType();
+  _o.message = (() => {
+      const temp = unionToOnboardComputerRxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
+}
+}
+
+export class OnboardComputerRxT implements flatbuffers.IGeneratedObject {
+constructor(
+  public messageType: OnboardComputerRxUnion = OnboardComputerRxUnion.NONE,
+  public message: CrsfDataT|RobotT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const message = builder.createObjectOffset(this.message);
+
+  return OnboardComputerRx.createOnboardComputerRx(builder,
+    this.messageType,
+    message
+  );
 }
 }

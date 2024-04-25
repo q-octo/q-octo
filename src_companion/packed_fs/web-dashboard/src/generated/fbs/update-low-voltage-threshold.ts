@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateLowVoltageThreshold {
+
+
+export class UpdateLowVoltageThreshold implements flatbuffers.IUnpackableObject<UpdateLowVoltageThresholdT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateLowVoltageThreshold {
@@ -44,5 +46,29 @@ static createUpdateLowVoltageThreshold(builder:flatbuffers.Builder, lowVoltageTh
   UpdateLowVoltageThreshold.startUpdateLowVoltageThreshold(builder);
   UpdateLowVoltageThreshold.addLowVoltageThreshold(builder, lowVoltageThreshold);
   return UpdateLowVoltageThreshold.endUpdateLowVoltageThreshold(builder);
+}
+
+unpack(): UpdateLowVoltageThresholdT {
+  return new UpdateLowVoltageThresholdT(
+    this.lowVoltageThreshold()
+  );
+}
+
+
+unpackTo(_o: UpdateLowVoltageThresholdT): void {
+  _o.lowVoltageThreshold = this.lowVoltageThreshold();
+}
+}
+
+export class UpdateLowVoltageThresholdT implements flatbuffers.IGeneratedObject {
+constructor(
+  public lowVoltageThreshold: number = 0.0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateLowVoltageThreshold.createUpdateLowVoltageThreshold(builder,
+    this.lowVoltageThreshold
+  );
 }
 }

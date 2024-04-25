@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateBatteries {
+
+
+export class UpdateBatteries implements flatbuffers.IUnpackableObject<UpdateBatteriesT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateBatteries {
@@ -44,5 +46,29 @@ static createUpdateBatteries(builder:flatbuffers.Builder, batteries:number):flat
   UpdateBatteries.startUpdateBatteries(builder);
   UpdateBatteries.addBatteries(builder, batteries);
   return UpdateBatteries.endUpdateBatteries(builder);
+}
+
+unpack(): UpdateBatteriesT {
+  return new UpdateBatteriesT(
+    this.batteries()
+  );
+}
+
+
+unpackTo(_o: UpdateBatteriesT): void {
+  _o.batteries = this.batteries();
+}
+}
+
+export class UpdateBatteriesT implements flatbuffers.IGeneratedObject {
+constructor(
+  public batteries: number = 0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateBatteries.createUpdateBatteries(builder,
+    this.batteries
+  );
 }
 }

@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateFoldWheels {
+
+
+export class UpdateFoldWheels implements flatbuffers.IUnpackableObject<UpdateFoldWheelsT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateFoldWheels {
@@ -34,5 +36,21 @@ static endUpdateFoldWheels(builder:flatbuffers.Builder):flatbuffers.Offset {
 static createUpdateFoldWheels(builder:flatbuffers.Builder):flatbuffers.Offset {
   UpdateFoldWheels.startUpdateFoldWheels(builder);
   return UpdateFoldWheels.endUpdateFoldWheels(builder);
+}
+
+unpack(): UpdateFoldWheelsT {
+  return new UpdateFoldWheelsT();
+}
+
+
+unpackTo(_o: UpdateFoldWheelsT): void {}
+}
+
+export class UpdateFoldWheelsT implements flatbuffers.IGeneratedObject {
+constructor(){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateFoldWheels.createUpdateFoldWheels(builder);
 }
 }

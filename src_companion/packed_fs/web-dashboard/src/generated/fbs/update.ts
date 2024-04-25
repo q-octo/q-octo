@@ -4,10 +4,18 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { UpdateBatteries, UpdateBatteriesT } from '../fbs/update-batteries.js';
+import { UpdateCriticalVoltageThreshold, UpdateCriticalVoltageThresholdT } from '../fbs/update-critical-voltage-threshold.js';
+import { UpdateEnableRover, UpdateEnableRoverT } from '../fbs/update-enable-rover.js';
+import { UpdateFoldWheels, UpdateFoldWheelsT } from '../fbs/update-fold-wheels.js';
+import { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from '../fbs/update-link-quality-threshold.js';
+import { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from '../fbs/update-low-voltage-threshold.js';
+import { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from '../fbs/update-reference-wheel-angle.js';
+import { UpdateRssiThreshold, UpdateRssiThresholdT } from '../fbs/update-rssi-threshold.js';
 import { UpdateUnion, unionToUpdateUnion, unionListToUpdateUnion } from '../fbs/update-union.js';
 
 
-export class Update {
+export class Update implements flatbuffers.IUnpackableObject<UpdateT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):Update {
@@ -69,5 +77,43 @@ static createUpdate(builder:flatbuffers.Builder, updateType:UpdateUnion, updateO
   Update.addUpdateType(builder, updateType);
   Update.addUpdate(builder, updateOffset);
   return Update.endUpdate(builder);
+}
+
+unpack(): UpdateT {
+  return new UpdateT(
+    this.updateType(),
+    (() => {
+      const temp = unionToUpdateUnion(this.updateType(), this.update.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
+  );
+}
+
+
+unpackTo(_o: UpdateT): void {
+  _o.updateType = this.updateType();
+  _o.update = (() => {
+      const temp = unionToUpdateUnion(this.updateType(), this.update.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
+}
+}
+
+export class UpdateT implements flatbuffers.IGeneratedObject {
+constructor(
+  public updateType: UpdateUnion = UpdateUnion.NONE,
+  public update: UpdateBatteriesT|UpdateCriticalVoltageThresholdT|UpdateEnableRoverT|UpdateFoldWheelsT|UpdateLinkQualityThresholdT|UpdateLowVoltageThresholdT|UpdateReferenceWheelAngleT|UpdateRssiThresholdT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const update = builder.createObjectOffset(this.update);
+
+  return Update.createUpdate(builder,
+    this.updateType,
+    update
+  );
 }
 }

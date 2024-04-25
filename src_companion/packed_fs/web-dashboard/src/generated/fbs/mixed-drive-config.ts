@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class MixedDriveConfig {
+
+
+export class MixedDriveConfig implements flatbuffers.IUnpackableObject<MixedDriveConfigT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):MixedDriveConfig {
@@ -54,5 +56,33 @@ static createMixedDriveConfig(builder:flatbuffers.Builder, radS:number, directio
   MixedDriveConfig.addRadS(builder, radS);
   MixedDriveConfig.addDirection(builder, direction);
   return MixedDriveConfig.endMixedDriveConfig(builder);
+}
+
+unpack(): MixedDriveConfigT {
+  return new MixedDriveConfigT(
+    this.radS(),
+    this.direction()
+  );
+}
+
+
+unpackTo(_o: MixedDriveConfigT): void {
+  _o.radS = this.radS();
+  _o.direction = this.direction();
+}
+}
+
+export class MixedDriveConfigT implements flatbuffers.IGeneratedObject {
+constructor(
+  public radS: number = 0.0,
+  public direction: number = 0.0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return MixedDriveConfig.createMixedDriveConfig(builder,
+    this.radS,
+    this.direction
+  );
 }
 }

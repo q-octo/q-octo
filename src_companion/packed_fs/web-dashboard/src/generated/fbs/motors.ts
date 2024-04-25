@@ -4,10 +4,10 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { Motor } from '../fbs/motor.js';
+import { Motor, MotorT } from '../fbs/motor.js';
 
 
-export class Motors {
+export class Motors implements flatbuffers.IUnpackableObject<MotorsT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):Motors {
@@ -52,4 +52,36 @@ static endMotors(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
+
+unpack(): MotorsT {
+  return new MotorsT(
+    (this.motor1() !== null ? this.motor1()!.unpack() : null),
+    (this.motor2() !== null ? this.motor2()!.unpack() : null)
+  );
+}
+
+
+unpackTo(_o: MotorsT): void {
+  _o.motor1 = (this.motor1() !== null ? this.motor1()!.unpack() : null);
+  _o.motor2 = (this.motor2() !== null ? this.motor2()!.unpack() : null);
+}
+}
+
+export class MotorsT implements flatbuffers.IGeneratedObject {
+constructor(
+  public motor1: MotorT|null = null,
+  public motor2: MotorT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const motor1 = (this.motor1 !== null ? this.motor1!.pack(builder) : 0);
+  const motor2 = (this.motor2 !== null ? this.motor2!.pack(builder) : 0);
+
+  Motors.startMotors(builder);
+  Motors.addMotor1(builder, motor1);
+  Motors.addMotor2(builder, motor2);
+
+  return Motors.endMotors(builder);
+}
 }

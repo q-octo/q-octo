@@ -2,8 +2,8 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-import { CrsfFrame } from '../fbs/crsf-frame.js';
-import { RobotDriveConfig } from '../fbs/robot-drive-config.js';
+import { CrsfFrame, CrsfFrameT } from '../fbs/crsf-frame.js';
+import { RobotDriveConfig, RobotDriveConfigT } from '../fbs/robot-drive-config.js';
 
 
 export enum OnboardComputerTxUnion {

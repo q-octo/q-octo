@@ -5,12 +5,12 @@
 import * as flatbuffers from 'flatbuffers';
 
 import { ControlSource } from '../fbs/control-source.js';
-import { DisplayMessages } from '../fbs/display-messages.js';
-import { Motors } from '../fbs/motors.js';
+import { DisplayMessages, DisplayMessagesT } from '../fbs/display-messages.js';
+import { Motors, MotorsT } from '../fbs/motors.js';
 import { Status } from '../fbs/status.js';
 
 
-export class Robot {
+export class Robot implements flatbuffers.IUnpackableObject<RobotT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):Robot {
@@ -222,4 +222,105 @@ static finishSizePrefixedRobotBuffer(builder:flatbuffers.Builder, offset:flatbuf
   builder.finish(offset, 'ROBO', true);
 }
 
+
+unpack(): RobotT {
+  return new RobotT(
+    this.batteries(),
+    this.controlSource(),
+    this.status(),
+    (this.motors() !== null ? this.motors()!.unpack() : null),
+    this.voltage(),
+    this.current(),
+    this.fuel(),
+    this.rssi(),
+    this.linkQuality(),
+    this.maxSpeed(),
+    this.lowVoltageThreshold(),
+    this.criticalVoltageThreshold(),
+    this.rssiThreshold(),
+    this.linkQualityThreshold(),
+    this.leftMotorFoldAngle(),
+    this.rightMotorFoldAngle(),
+    this.motorErrorCode(),
+    this.enableRover(),
+    (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null)
+  );
+}
+
+
+unpackTo(_o: RobotT): void {
+  _o.batteries = this.batteries();
+  _o.controlSource = this.controlSource();
+  _o.status = this.status();
+  _o.motors = (this.motors() !== null ? this.motors()!.unpack() : null);
+  _o.voltage = this.voltage();
+  _o.current = this.current();
+  _o.fuel = this.fuel();
+  _o.rssi = this.rssi();
+  _o.linkQuality = this.linkQuality();
+  _o.maxSpeed = this.maxSpeed();
+  _o.lowVoltageThreshold = this.lowVoltageThreshold();
+  _o.criticalVoltageThreshold = this.criticalVoltageThreshold();
+  _o.rssiThreshold = this.rssiThreshold();
+  _o.linkQualityThreshold = this.linkQualityThreshold();
+  _o.leftMotorFoldAngle = this.leftMotorFoldAngle();
+  _o.rightMotorFoldAngle = this.rightMotorFoldAngle();
+  _o.motorErrorCode = this.motorErrorCode();
+  _o.enableRover = this.enableRover();
+  _o.displayMessages = (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null);
+}
+}
+
+export class RobotT implements flatbuffers.IGeneratedObject {
+constructor(
+  public batteries: number = 4,
+  public controlSource: ControlSource = ControlSource.RC,
+  public status: Status = Status.OK,
+  public motors: MotorsT|null = null,
+  public voltage: number = 0.0,
+  public current: number = 0.0,
+  public fuel: number = 0.0,
+  public rssi: number = 0.0,
+  public linkQuality: number = 0,
+  public maxSpeed: number = 0.0,
+  public lowVoltageThreshold: number = 12.0,
+  public criticalVoltageThreshold: number = 16.0,
+  public rssiThreshold: number = 0,
+  public linkQualityThreshold: number = 0,
+  public leftMotorFoldAngle: number = 0,
+  public rightMotorFoldAngle: number = 0,
+  public motorErrorCode: string|Uint8Array|null = null,
+  public enableRover: boolean = false,
+  public displayMessages: DisplayMessagesT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const motors = (this.motors !== null ? this.motors!.pack(builder) : 0);
+  const motorErrorCode = (this.motorErrorCode !== null ? builder.createString(this.motorErrorCode!) : 0);
+  const displayMessages = (this.displayMessages !== null ? this.displayMessages!.pack(builder) : 0);
+
+  Robot.startRobot(builder);
+  Robot.addBatteries(builder, this.batteries);
+  Robot.addControlSource(builder, this.controlSource);
+  Robot.addStatus(builder, this.status);
+  Robot.addMotors(builder, motors);
+  Robot.addVoltage(builder, this.voltage);
+  Robot.addCurrent(builder, this.current);
+  Robot.addFuel(builder, this.fuel);
+  Robot.addRssi(builder, this.rssi);
+  Robot.addLinkQuality(builder, this.linkQuality);
+  Robot.addMaxSpeed(builder, this.maxSpeed);
+  Robot.addLowVoltageThreshold(builder, this.lowVoltageThreshold);
+  Robot.addCriticalVoltageThreshold(builder, this.criticalVoltageThreshold);
+  Robot.addRssiThreshold(builder, this.rssiThreshold);
+  Robot.addLinkQualityThreshold(builder, this.linkQualityThreshold);
+  Robot.addLeftMotorFoldAngle(builder, this.leftMotorFoldAngle);
+  Robot.addRightMotorFoldAngle(builder, this.rightMotorFoldAngle);
+  Robot.addMotorErrorCode(builder, motorErrorCode);
+  Robot.addEnableRover(builder, this.enableRover);
+  Robot.addDisplayMessages(builder, displayMessages);
+
+  return Robot.endRobot(builder);
+}
 }

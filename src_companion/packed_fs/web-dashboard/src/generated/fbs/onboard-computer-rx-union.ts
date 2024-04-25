@@ -2,8 +2,8 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-import { CrsfData } from '../fbs/crsf-data.js';
-import { Robot } from '../fbs/robot.js';
+import { CrsfData, CrsfDataT } from '../fbs/crsf-data.js';
+import { Robot, RobotT } from '../fbs/robot.js';
 
 
 export enum OnboardComputerRxUnion {

@@ -4,11 +4,11 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { CrsfChannels } from '../fbs/crsf-channels.js';
-import { CrsfTelemetry } from '../fbs/crsf-telemetry.js';
+import { CrsfChannels, CrsfChannelsT } from '../fbs/crsf-channels.js';
+import { CrsfTelemetry, CrsfTelemetryT } from '../fbs/crsf-telemetry.js';
 
 
-export class CrsfData {
+export class CrsfData implements flatbuffers.IUnpackableObject<CrsfDataT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CrsfData {
@@ -68,4 +68,39 @@ static endCrsfData(builder:flatbuffers.Builder):flatbuffers.Offset {
   return offset;
 }
 
+
+unpack(): CrsfDataT {
+  return new CrsfDataT(
+    (this.channels() !== null ? this.channels()!.unpack() : null),
+    (this.telemetry() !== null ? this.telemetry()!.unpack() : null),
+    this.failsafe()
+  );
+}
+
+
+unpackTo(_o: CrsfDataT): void {
+  _o.channels = (this.channels() !== null ? this.channels()!.unpack() : null);
+  _o.telemetry = (this.telemetry() !== null ? this.telemetry()!.unpack() : null);
+  _o.failsafe = this.failsafe();
+}
+}
+
+export class CrsfDataT implements flatbuffers.IGeneratedObject {
+constructor(
+  public channels: CrsfChannelsT|null = null,
+  public telemetry: CrsfTelemetryT|null = null,
+  public failsafe: boolean = true
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const telemetry = (this.telemetry !== null ? this.telemetry!.pack(builder) : 0);
+
+  CrsfData.startCrsfData(builder);
+  CrsfData.addChannels(builder, (this.channels !== null ? this.channels!.pack(builder) : 0));
+  CrsfData.addTelemetry(builder, telemetry);
+  CrsfData.addFailsafe(builder, this.failsafe);
+
+  return CrsfData.endCrsfData(builder);
+}
 }

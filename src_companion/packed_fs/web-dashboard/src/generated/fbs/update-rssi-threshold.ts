@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateRssiThreshold {
+
+
+export class UpdateRssiThreshold implements flatbuffers.IUnpackableObject<UpdateRssiThresholdT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateRssiThreshold {
@@ -44,5 +46,29 @@ static createUpdateRssiThreshold(builder:flatbuffers.Builder, rssiThreshold:numb
   UpdateRssiThreshold.startUpdateRssiThreshold(builder);
   UpdateRssiThreshold.addRssiThreshold(builder, rssiThreshold);
   return UpdateRssiThreshold.endUpdateRssiThreshold(builder);
+}
+
+unpack(): UpdateRssiThresholdT {
+  return new UpdateRssiThresholdT(
+    this.rssiThreshold()
+  );
+}
+
+
+unpackTo(_o: UpdateRssiThresholdT): void {
+  _o.rssiThreshold = this.rssiThreshold();
+}
+}
+
+export class UpdateRssiThresholdT implements flatbuffers.IGeneratedObject {
+constructor(
+  public rssiThreshold: number = 0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateRssiThreshold.createUpdateRssiThreshold(builder,
+    this.rssiThreshold
+  );
 }
 }

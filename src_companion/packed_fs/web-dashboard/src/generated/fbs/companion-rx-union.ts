@@ -2,8 +2,8 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-import { Robot } from '../fbs/robot.js';
-import { SetWebServerEnabled } from '../fbs/set-web-server-enabled.js';
+import { Robot, RobotT } from '../fbs/robot.js';
+import { SetWebServerEnabled, SetWebServerEnabledT } from '../fbs/set-web-server-enabled.js';
 
 
 export enum CompanionRxUnion {

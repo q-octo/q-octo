@@ -31,12 +31,12 @@ $(FBS_PICO2_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
 ts: $(FBS_TS_OUT_FILES)
 $(FBS_TS_OUT_FILES): $(FBS_FILES)
 	rm -rf $(FBS_TS_OUT_DIR)/*
-	$(FLATC) -o $(FBS_TS_OUT_DIR) --ts $(FBS_FILES)
+	$(FLATC) --gen-object-api -o $(FBS_TS_OUT_DIR) --ts $(FBS_FILES)
 
 # Rule to convert .fbs to .dart
 dart: $(FBS_DART_OUT_FILES)
 $(FBS_DART_OUT_FILES): $(FBS_FILES)
-	$(FLATC) -o $(FBS_PICO1_OUT_DIR) --dart $<
+	$(FLATC) --gen-object-api -o $(FBS_PICO1_OUT_DIR) --dart $<
 
 clean:
 	rm -rf $(FLATC) $(FBS_PICO1_OUT_DIR)/*_generated.h $(FBS_PICO2_OUT_DIR)/*_generated.h $(FBS_TS_OUT_DIR)/**

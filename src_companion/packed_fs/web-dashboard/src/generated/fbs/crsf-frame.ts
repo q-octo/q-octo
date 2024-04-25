@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class CrsfFrame {
+
+
+export class CrsfFrame implements flatbuffers.IUnpackableObject<CrsfFrameT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CrsfFrame {
@@ -89,5 +91,39 @@ static createCrsfFrame(builder:flatbuffers.Builder, crsfFrameType:number, payloa
   CrsfFrame.addPayloadLength(builder, payloadLength);
   CrsfFrame.addPayloadData(builder, payloadDataOffset);
   return CrsfFrame.endCrsfFrame(builder);
+}
+
+unpack(): CrsfFrameT {
+  return new CrsfFrameT(
+    this.crsfFrameType(),
+    this.payloadLength(),
+    this.bb!.createScalarList<number>(this.payloadData.bind(this), this.payloadDataLength())
+  );
+}
+
+
+unpackTo(_o: CrsfFrameT): void {
+  _o.crsfFrameType = this.crsfFrameType();
+  _o.payloadLength = this.payloadLength();
+  _o.payloadData = this.bb!.createScalarList<number>(this.payloadData.bind(this), this.payloadDataLength());
+}
+}
+
+export class CrsfFrameT implements flatbuffers.IGeneratedObject {
+constructor(
+  public crsfFrameType: number = 0,
+  public payloadLength: number = 0,
+  public payloadData: (number)[] = []
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const payloadData = CrsfFrame.createPayloadDataVector(builder, this.payloadData);
+
+  return CrsfFrame.createCrsfFrame(builder,
+    this.crsfFrameType,
+    this.payloadLength,
+    payloadData
+  );
 }
 }

@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class SetWebServerEnabled {
+
+
+export class SetWebServerEnabled implements flatbuffers.IUnpackableObject<SetWebServerEnabledT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):SetWebServerEnabled {
@@ -44,5 +46,29 @@ static createSetWebServerEnabled(builder:flatbuffers.Builder, enabled:boolean):f
   SetWebServerEnabled.startSetWebServerEnabled(builder);
   SetWebServerEnabled.addEnabled(builder, enabled);
   return SetWebServerEnabled.endSetWebServerEnabled(builder);
+}
+
+unpack(): SetWebServerEnabledT {
+  return new SetWebServerEnabledT(
+    this.enabled()
+  );
+}
+
+
+unpackTo(_o: SetWebServerEnabledT): void {
+  _o.enabled = this.enabled();
+}
+}
+
+export class SetWebServerEnabledT implements flatbuffers.IGeneratedObject {
+constructor(
+  public enabled: boolean = false
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return SetWebServerEnabled.createSetWebServerEnabled(builder,
+    this.enabled
+  );
 }
 }

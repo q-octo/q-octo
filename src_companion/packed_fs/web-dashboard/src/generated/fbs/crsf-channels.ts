@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class CrsfChannels {
+
+
+export class CrsfChannels implements flatbuffers.IUnpackableObject<CrsfChannelsT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CrsfChannels {
@@ -32,4 +34,28 @@ static createCrsfChannels(builder:flatbuffers.Builder, data: number[]|null):flat
   return builder.offset();
 }
 
+
+unpack(): CrsfChannelsT {
+  return new CrsfChannelsT(
+    this.bb!.createScalarList<number>(this.data.bind(this), 16)
+  );
+}
+
+
+unpackTo(_o: CrsfChannelsT): void {
+  _o.data = this.bb!.createScalarList<number>(this.data.bind(this), 16);
+}
+}
+
+export class CrsfChannelsT implements flatbuffers.IGeneratedObject {
+constructor(
+  public data: (number)[] = []
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return CrsfChannels.createCrsfChannels(builder,
+    this.data
+  );
+}
 }

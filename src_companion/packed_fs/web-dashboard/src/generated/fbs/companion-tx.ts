@@ -4,10 +4,11 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { ButtonPressed, ButtonPressedT } from '../fbs/button-pressed.js';
 import { CompanionTxUnion, unionToCompanionTxUnion, unionListToCompanionTxUnion } from '../fbs/companion-tx-union.js';
 
 
-export class CompanionTx {
+export class CompanionTx implements flatbuffers.IUnpackableObject<CompanionTxT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CompanionTx {
@@ -69,5 +70,43 @@ static createCompanionTx(builder:flatbuffers.Builder, messageType:CompanionTxUni
   CompanionTx.addMessageType(builder, messageType);
   CompanionTx.addMessage(builder, messageOffset);
   return CompanionTx.endCompanionTx(builder);
+}
+
+unpack(): CompanionTxT {
+  return new CompanionTxT(
+    this.messageType(),
+    (() => {
+      const temp = unionToCompanionTxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
+  );
+}
+
+
+unpackTo(_o: CompanionTxT): void {
+  _o.messageType = this.messageType();
+  _o.message = (() => {
+      const temp = unionToCompanionTxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
+}
+}
+
+export class CompanionTxT implements flatbuffers.IGeneratedObject {
+constructor(
+  public messageType: CompanionTxUnion = CompanionTxUnion.NONE,
+  public message: ButtonPressedT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const message = builder.createObjectOffset(this.message);
+
+  return CompanionTx.createCompanionTx(builder,
+    this.messageType,
+    message
+  );
 }
 }

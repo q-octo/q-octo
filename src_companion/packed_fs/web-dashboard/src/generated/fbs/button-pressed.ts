@@ -7,7 +7,7 @@ import * as flatbuffers from 'flatbuffers';
 import { Button } from '../fbs/button.js';
 
 
-export class ButtonPressed {
+export class ButtonPressed implements flatbuffers.IUnpackableObject<ButtonPressedT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):ButtonPressed {
@@ -47,5 +47,29 @@ static createButtonPressed(builder:flatbuffers.Builder, button:Button):flatbuffe
   ButtonPressed.startButtonPressed(builder);
   ButtonPressed.addButton(builder, button);
   return ButtonPressed.endButtonPressed(builder);
+}
+
+unpack(): ButtonPressedT {
+  return new ButtonPressedT(
+    this.button()
+  );
+}
+
+
+unpackTo(_o: ButtonPressedT): void {
+  _o.button = this.button();
+}
+}
+
+export class ButtonPressedT implements flatbuffers.IGeneratedObject {
+constructor(
+  public button: Button = Button.A
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return ButtonPressed.createButtonPressed(builder,
+    this.button
+  );
 }
 }

@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class CrsfTelemetry {
+
+
+export class CrsfTelemetry implements flatbuffers.IUnpackableObject<CrsfTelemetryT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CrsfTelemetry {
@@ -86,5 +88,41 @@ static createCrsfTelemetry(builder:flatbuffers.Builder, rssi:number, linkQuality
   CrsfTelemetry.addSnr(builder, snr);
   CrsfTelemetry.addTxPower(builder, txPower);
   return CrsfTelemetry.endCrsfTelemetry(builder);
+}
+
+unpack(): CrsfTelemetryT {
+  return new CrsfTelemetryT(
+    this.rssi(),
+    this.linkQuality(),
+    this.snr(),
+    this.txPower()
+  );
+}
+
+
+unpackTo(_o: CrsfTelemetryT): void {
+  _o.rssi = this.rssi();
+  _o.linkQuality = this.linkQuality();
+  _o.snr = this.snr();
+  _o.txPower = this.txPower();
+}
+}
+
+export class CrsfTelemetryT implements flatbuffers.IGeneratedObject {
+constructor(
+  public rssi: number = 0,
+  public linkQuality: number = 0,
+  public snr: number = 0,
+  public txPower: number = 0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return CrsfTelemetry.createCrsfTelemetry(builder,
+    this.rssi,
+    this.linkQuality,
+    this.snr,
+    this.txPower
+  );
 }
 }

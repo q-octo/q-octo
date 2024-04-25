@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class DisplayMessages {
+
+
+export class DisplayMessages implements flatbuffers.IUnpackableObject<DisplayMessagesT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):DisplayMessages {
@@ -118,5 +120,61 @@ static createDisplayMessages(builder:flatbuffers.Builder, message1Offset:flatbuf
   DisplayMessages.addMessage6(builder, message6Offset);
   DisplayMessages.addMessage7(builder, message7Offset);
   return DisplayMessages.endDisplayMessages(builder);
+}
+
+unpack(): DisplayMessagesT {
+  return new DisplayMessagesT(
+    this.message1(),
+    this.message2(),
+    this.message3(),
+    this.message4(),
+    this.message5(),
+    this.message6(),
+    this.message7()
+  );
+}
+
+
+unpackTo(_o: DisplayMessagesT): void {
+  _o.message1 = this.message1();
+  _o.message2 = this.message2();
+  _o.message3 = this.message3();
+  _o.message4 = this.message4();
+  _o.message5 = this.message5();
+  _o.message6 = this.message6();
+  _o.message7 = this.message7();
+}
+}
+
+export class DisplayMessagesT implements flatbuffers.IGeneratedObject {
+constructor(
+  public message1: string|Uint8Array|null = null,
+  public message2: string|Uint8Array|null = null,
+  public message3: string|Uint8Array|null = null,
+  public message4: string|Uint8Array|null = null,
+  public message5: string|Uint8Array|null = null,
+  public message6: string|Uint8Array|null = null,
+  public message7: string|Uint8Array|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const message1 = (this.message1 !== null ? builder.createString(this.message1!) : 0);
+  const message2 = (this.message2 !== null ? builder.createString(this.message2!) : 0);
+  const message3 = (this.message3 !== null ? builder.createString(this.message3!) : 0);
+  const message4 = (this.message4 !== null ? builder.createString(this.message4!) : 0);
+  const message5 = (this.message5 !== null ? builder.createString(this.message5!) : 0);
+  const message6 = (this.message6 !== null ? builder.createString(this.message6!) : 0);
+  const message7 = (this.message7 !== null ? builder.createString(this.message7!) : 0);
+
+  return DisplayMessages.createDisplayMessages(builder,
+    message1,
+    message2,
+    message3,
+    message4,
+    message5,
+    message6,
+    message7
+  );
 }
 }

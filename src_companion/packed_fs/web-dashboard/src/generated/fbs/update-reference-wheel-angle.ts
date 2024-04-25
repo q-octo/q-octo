@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateReferenceWheelAngle {
+
+
+export class UpdateReferenceWheelAngle implements flatbuffers.IUnpackableObject<UpdateReferenceWheelAngleT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateReferenceWheelAngle {
@@ -54,5 +56,33 @@ static createUpdateReferenceWheelAngle(builder:flatbuffers.Builder, leftMotorFol
   UpdateReferenceWheelAngle.addLeftMotorFoldAngle(builder, leftMotorFoldAngle);
   UpdateReferenceWheelAngle.addRightMotorFoldAngle(builder, rightMotorFoldAngle);
   return UpdateReferenceWheelAngle.endUpdateReferenceWheelAngle(builder);
+}
+
+unpack(): UpdateReferenceWheelAngleT {
+  return new UpdateReferenceWheelAngleT(
+    this.leftMotorFoldAngle(),
+    this.rightMotorFoldAngle()
+  );
+}
+
+
+unpackTo(_o: UpdateReferenceWheelAngleT): void {
+  _o.leftMotorFoldAngle = this.leftMotorFoldAngle();
+  _o.rightMotorFoldAngle = this.rightMotorFoldAngle();
+}
+}
+
+export class UpdateReferenceWheelAngleT implements flatbuffers.IGeneratedObject {
+constructor(
+  public leftMotorFoldAngle: number = 0,
+  public rightMotorFoldAngle: number = 0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateReferenceWheelAngle.createUpdateReferenceWheelAngle(builder,
+    this.leftMotorFoldAngle,
+    this.rightMotorFoldAngle
+  );
 }
 }

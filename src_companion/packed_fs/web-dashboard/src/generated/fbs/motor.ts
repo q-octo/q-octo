@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class Motor {
+
+
+export class Motor implements flatbuffers.IUnpackableObject<MotorT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):Motor {
@@ -74,5 +76,41 @@ static createMotor(builder:flatbuffers.Builder, temperature:number, rps:number, 
   Motor.addAngle(builder, angle);
   Motor.addTorque(builder, torque);
   return Motor.endMotor(builder);
+}
+
+unpack(): MotorT {
+  return new MotorT(
+    this.temperature(),
+    this.rps(),
+    this.angle(),
+    this.torque()
+  );
+}
+
+
+unpackTo(_o: MotorT): void {
+  _o.temperature = this.temperature();
+  _o.rps = this.rps();
+  _o.angle = this.angle();
+  _o.torque = this.torque();
+}
+}
+
+export class MotorT implements flatbuffers.IGeneratedObject {
+constructor(
+  public temperature: number = 0.0,
+  public rps: number = 0.0,
+  public angle: number = 0.0,
+  public torque: number = 0.0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return Motor.createMotor(builder,
+    this.temperature,
+    this.rps,
+    this.angle,
+    this.torque
+  );
 }
 }

@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateEnableRover {
+
+
+export class UpdateEnableRover implements flatbuffers.IUnpackableObject<UpdateEnableRoverT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateEnableRover {
@@ -44,5 +46,29 @@ static createUpdateEnableRover(builder:flatbuffers.Builder, enableRover:boolean)
   UpdateEnableRover.startUpdateEnableRover(builder);
   UpdateEnableRover.addEnableRover(builder, enableRover);
   return UpdateEnableRover.endUpdateEnableRover(builder);
+}
+
+unpack(): UpdateEnableRoverT {
+  return new UpdateEnableRoverT(
+    this.enableRover()
+  );
+}
+
+
+unpackTo(_o: UpdateEnableRoverT): void {
+  _o.enableRover = this.enableRover();
+}
+}
+
+export class UpdateEnableRoverT implements flatbuffers.IGeneratedObject {
+constructor(
+  public enableRover: boolean = false
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateEnableRover.createUpdateEnableRover(builder,
+    this.enableRover
+  );
 }
 }

@@ -5,9 +5,11 @@
 import * as flatbuffers from 'flatbuffers';
 
 import { CompanionRxUnion, unionToCompanionRxUnion, unionListToCompanionRxUnion } from '../fbs/companion-rx-union.js';
+import { Robot, RobotT } from '../fbs/robot.js';
+import { SetWebServerEnabled, SetWebServerEnabledT } from '../fbs/set-web-server-enabled.js';
 
 
-export class CompanionRx {
+export class CompanionRx implements flatbuffers.IUnpackableObject<CompanionRxT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):CompanionRx {
@@ -69,5 +71,43 @@ static createCompanionRx(builder:flatbuffers.Builder, messageType:CompanionRxUni
   CompanionRx.addMessageType(builder, messageType);
   CompanionRx.addMessage(builder, messageOffset);
   return CompanionRx.endCompanionRx(builder);
+}
+
+unpack(): CompanionRxT {
+  return new CompanionRxT(
+    this.messageType(),
+    (() => {
+      const temp = unionToCompanionRxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })()
+  );
+}
+
+
+unpackTo(_o: CompanionRxT): void {
+  _o.messageType = this.messageType();
+  _o.message = (() => {
+      const temp = unionToCompanionRxUnion(this.messageType(), this.message.bind(this));
+      if(temp === null) { return null; }
+      return temp.unpack()
+  })();
+}
+}
+
+export class CompanionRxT implements flatbuffers.IGeneratedObject {
+constructor(
+  public messageType: CompanionRxUnion = CompanionRxUnion.NONE,
+  public message: RobotT|SetWebServerEnabledT|null = null
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const message = builder.createObjectOffset(this.message);
+
+  return CompanionRx.createCompanionRx(builder,
+    this.messageType,
+    message
+  );
 }
 }

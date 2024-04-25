@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateLinkQualityThreshold {
+
+
+export class UpdateLinkQualityThreshold implements flatbuffers.IUnpackableObject<UpdateLinkQualityThresholdT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateLinkQualityThreshold {
@@ -44,5 +46,29 @@ static createUpdateLinkQualityThreshold(builder:flatbuffers.Builder, linkQuality
   UpdateLinkQualityThreshold.startUpdateLinkQualityThreshold(builder);
   UpdateLinkQualityThreshold.addLinkQualityThreshold(builder, linkQualityThreshold);
   return UpdateLinkQualityThreshold.endUpdateLinkQualityThreshold(builder);
+}
+
+unpack(): UpdateLinkQualityThresholdT {
+  return new UpdateLinkQualityThresholdT(
+    this.linkQualityThreshold()
+  );
+}
+
+
+unpackTo(_o: UpdateLinkQualityThresholdT): void {
+  _o.linkQualityThreshold = this.linkQualityThreshold();
+}
+}
+
+export class UpdateLinkQualityThresholdT implements flatbuffers.IGeneratedObject {
+constructor(
+  public linkQualityThreshold: number = 0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateLinkQualityThreshold.createUpdateLinkQualityThreshold(builder,
+    this.linkQualityThreshold
+  );
 }
 }

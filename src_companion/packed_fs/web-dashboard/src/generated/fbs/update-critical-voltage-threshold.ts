@@ -4,7 +4,9 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-export class UpdateCriticalVoltageThreshold {
+
+
+export class UpdateCriticalVoltageThreshold implements flatbuffers.IUnpackableObject<UpdateCriticalVoltageThresholdT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
   __init(i:number, bb:flatbuffers.ByteBuffer):UpdateCriticalVoltageThreshold {
@@ -44,5 +46,29 @@ static createUpdateCriticalVoltageThreshold(builder:flatbuffers.Builder, critica
   UpdateCriticalVoltageThreshold.startUpdateCriticalVoltageThreshold(builder);
   UpdateCriticalVoltageThreshold.addCriticalVoltageThreshold(builder, criticalVoltageThreshold);
   return UpdateCriticalVoltageThreshold.endUpdateCriticalVoltageThreshold(builder);
+}
+
+unpack(): UpdateCriticalVoltageThresholdT {
+  return new UpdateCriticalVoltageThresholdT(
+    this.criticalVoltageThreshold()
+  );
+}
+
+
+unpackTo(_o: UpdateCriticalVoltageThresholdT): void {
+  _o.criticalVoltageThreshold = this.criticalVoltageThreshold();
+}
+}
+
+export class UpdateCriticalVoltageThresholdT implements flatbuffers.IGeneratedObject {
+constructor(
+  public criticalVoltageThreshold: number = 0.0
+){}
+
+
+pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  return UpdateCriticalVoltageThreshold.createUpdateCriticalVoltageThreshold(builder,
+    this.criticalVoltageThreshold
+  );
 }
 }
