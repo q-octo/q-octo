@@ -4,15 +4,13 @@
 #include <FreeRTOS.h> // Enables FreeRTOS and multicore support
 #include <task.h>     // Enables FreeRTOS tasks
 
-#include <WiFi.h>
 #include "can.h"
 #include "task_motors.h"
 #include "task_rc.h"
-#include "task_display.h"
 #include "task_can.h"
 #include "task_watchdog.h"
 #include "task_power_monitor.h"
-#include "web_server.h"
+#include "companion.h"
 
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -30,7 +28,8 @@ TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
-TaskHandle_t webServerConsumerHandle = nullptr;
+TaskHandle_t companionConsumerHandle = nullptr;
+TaskHandle_t companionProducerHandle = nullptr;
 
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
@@ -53,11 +52,6 @@ void setup()
   CanCommunication::init(onReceiveCanPacket);
 #endif
   initTasks();
-  WSWebServer::init();
-#if CFG_ENABLE_WEB_SERVER && CFG_START_WEB_SERVER_ON_STARTUP
-  webServerEnabled = true;
-  // WSWebServer::start();
-#endif
 }
 
 // Handled by FreeRTOS
@@ -90,16 +84,14 @@ void initTasks()
 
   xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 3, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_0);
-  xTaskCreate(taskDisplay, "display", stackSize, nullptr, 3, &displayHandle);
-  vTaskCoreAffinitySet(displayHandle, CORE_0);
   xTaskCreate(taskControlMotors, "ctrlMotors", stackSize, nullptr, 3, &controlMotorsHandle);
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
   xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 3, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
   xTaskCreate(taskPowerMonitor, "powerMonitor", stackSize, nullptr, 3, &powerMonitorHandle);
   vTaskCoreAffinitySet(powerMonitorHandle, CORE_0);
-  xTaskCreate(webServerConsumerTask, "wsConsumer", stackSize, nullptr, 3, &webServerConsumerHandle);
-  vTaskCoreAffinitySet(webServerConsumerHandle, CORE_0);
+  xTaskCreate(Companion::companionConsumerTask, "cpnConsumer", stackSize, nullptr, 3, &companionConsumerHandle);
+        vTaskCoreAffinitySet(companionConsumerHandle, CORE_0);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);
@@ -116,6 +108,10 @@ void initTasks()
   // Producer
   xTaskCreate(taskMotors, "motors", stackSize, nullptr, 1, &motorsHandle);
   vTaskCoreAffinitySet(motorsHandle, CORE_0);
+#endif
+#if CFG_ENABLE_COMPANION
+  xTaskCreate(Companion::companionProducerTask, "cpnProducer", stackSize, nullptr, 1, &companionProducerHandle);
+  vTaskCoreAffinitySet(companionProducerHandle, CORE_0);
 #endif
 }
 
