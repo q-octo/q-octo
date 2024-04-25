@@ -6,8 +6,7 @@
 static CanardInstance canard;
 static uint8_t memory_pool[1024];
 
-// TODO configure these appropriately
-float motorShutdownVoltage = 17.2f;
+float motorShutdownVoltage = 17.5f;
 float systemShutdownVoltage = 17.0f;
 int batteryCount = 4;
 
