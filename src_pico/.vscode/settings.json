@@ -22,6 +22,9 @@
         "cstdlib": "cpp",
         "algorithm": "cpp",
         "uavcan.equipment.power.batteryinfo.h": "c",
-        "canard.h": "c"
+        "canard.h": "c",
+        "arduino.h": "c",
+        "serial.h": "c",
+        "task_data_manager.h": "c"
     }
 }
