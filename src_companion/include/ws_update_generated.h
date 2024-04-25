@@ -17,30 +17,39 @@ namespace fbs {
 
 struct UpdateBatteries;
 struct UpdateBatteriesBuilder;
+struct UpdateBatteriesT;
 
 struct UpdateLowVoltageThreshold;
 struct UpdateLowVoltageThresholdBuilder;
+struct UpdateLowVoltageThresholdT;
 
 struct UpdateCriticalVoltageThreshold;
 struct UpdateCriticalVoltageThresholdBuilder;
+struct UpdateCriticalVoltageThresholdT;
 
 struct UpdateReferenceWheelAngle;
 struct UpdateReferenceWheelAngleBuilder;
+struct UpdateReferenceWheelAngleT;
 
 struct UpdateFoldWheels;
 struct UpdateFoldWheelsBuilder;
+struct UpdateFoldWheelsT;
 
 struct UpdateEnableRover;
 struct UpdateEnableRoverBuilder;
+struct UpdateEnableRoverT;
 
 struct UpdateLinkQualityThreshold;
 struct UpdateLinkQualityThresholdBuilder;
+struct UpdateLinkQualityThresholdT;
 
 struct UpdateRssiThreshold;
 struct UpdateRssiThresholdBuilder;
+struct UpdateRssiThresholdT;
 
 struct Update;
 struct UpdateBuilder;
+struct UpdateT;
 
 enum UpdateUnion : uint8_t {
   UpdateUnion_NONE = 0,
@@ -129,10 +138,148 @@ template<> struct UpdateUnionTraits<fbs::UpdateRssiThreshold> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
 };
 
+template<typename T> struct UpdateUnionUnionTraits {
+  static const UpdateUnion enum_value = UpdateUnion_NONE;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateBatteriesT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateBatteries;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateLowVoltageThresholdT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateLowVoltageThreshold;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateCriticalVoltageThresholdT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateCriticalVoltageThreshold;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateReferenceWheelAngleT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateReferenceWheelAngle;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateFoldWheelsT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateFoldWheels;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateEnableRoverT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateEnableRover;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateLinkQualityThresholdT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateLinkQualityThreshold;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateRssiThresholdT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
+};
+
+struct UpdateUnionUnion {
+  UpdateUnion type;
+  void *value;
+
+  UpdateUnionUnion() : type(UpdateUnion_NONE), value(nullptr) {}
+  UpdateUnionUnion(UpdateUnionUnion&& u) FLATBUFFERS_NOEXCEPT :
+    type(UpdateUnion_NONE), value(nullptr)
+    { std::swap(type, u.type); std::swap(value, u.value); }
+  UpdateUnionUnion(const UpdateUnionUnion &);
+  UpdateUnionUnion &operator=(const UpdateUnionUnion &u)
+    { UpdateUnionUnion t(u); std::swap(type, t.type); std::swap(value, t.value); return *this; }
+  UpdateUnionUnion &operator=(UpdateUnionUnion &&u) FLATBUFFERS_NOEXCEPT
+    { std::swap(type, u.type); std::swap(value, u.value); return *this; }
+  ~UpdateUnionUnion() { Reset(); }
+
+  void Reset();
+
+  template <typename T>
+  void Set(T&& val) {
+    typedef typename std::remove_reference<T>::type RT;
+    Reset();
+    type = UpdateUnionUnionTraits<RT>::enum_value;
+    if (type != UpdateUnion_NONE) {
+      value = new RT(std::forward<T>(val));
+    }
+  }
+
+  static void *UnPack(const void *obj, UpdateUnion type, const ::flatbuffers::resolver_function_t *resolver);
+  ::flatbuffers::Offset<void> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
+
+  fbs::UpdateBatteriesT *AsUpdateBatteries() {
+    return type == UpdateUnion_UpdateBatteries ?
+      reinterpret_cast<fbs::UpdateBatteriesT *>(value) : nullptr;
+  }
+  const fbs::UpdateBatteriesT *AsUpdateBatteries() const {
+    return type == UpdateUnion_UpdateBatteries ?
+      reinterpret_cast<const fbs::UpdateBatteriesT *>(value) : nullptr;
+  }
+  fbs::UpdateLowVoltageThresholdT *AsUpdateLowVoltageThreshold() {
+    return type == UpdateUnion_UpdateLowVoltageThreshold ?
+      reinterpret_cast<fbs::UpdateLowVoltageThresholdT *>(value) : nullptr;
+  }
+  const fbs::UpdateLowVoltageThresholdT *AsUpdateLowVoltageThreshold() const {
+    return type == UpdateUnion_UpdateLowVoltageThreshold ?
+      reinterpret_cast<const fbs::UpdateLowVoltageThresholdT *>(value) : nullptr;
+  }
+  fbs::UpdateCriticalVoltageThresholdT *AsUpdateCriticalVoltageThreshold() {
+    return type == UpdateUnion_UpdateCriticalVoltageThreshold ?
+      reinterpret_cast<fbs::UpdateCriticalVoltageThresholdT *>(value) : nullptr;
+  }
+  const fbs::UpdateCriticalVoltageThresholdT *AsUpdateCriticalVoltageThreshold() const {
+    return type == UpdateUnion_UpdateCriticalVoltageThreshold ?
+      reinterpret_cast<const fbs::UpdateCriticalVoltageThresholdT *>(value) : nullptr;
+  }
+  fbs::UpdateReferenceWheelAngleT *AsUpdateReferenceWheelAngle() {
+    return type == UpdateUnion_UpdateReferenceWheelAngle ?
+      reinterpret_cast<fbs::UpdateReferenceWheelAngleT *>(value) : nullptr;
+  }
+  const fbs::UpdateReferenceWheelAngleT *AsUpdateReferenceWheelAngle() const {
+    return type == UpdateUnion_UpdateReferenceWheelAngle ?
+      reinterpret_cast<const fbs::UpdateReferenceWheelAngleT *>(value) : nullptr;
+  }
+  fbs::UpdateFoldWheelsT *AsUpdateFoldWheels() {
+    return type == UpdateUnion_UpdateFoldWheels ?
+      reinterpret_cast<fbs::UpdateFoldWheelsT *>(value) : nullptr;
+  }
+  const fbs::UpdateFoldWheelsT *AsUpdateFoldWheels() const {
+    return type == UpdateUnion_UpdateFoldWheels ?
+      reinterpret_cast<const fbs::UpdateFoldWheelsT *>(value) : nullptr;
+  }
+  fbs::UpdateEnableRoverT *AsUpdateEnableRover() {
+    return type == UpdateUnion_UpdateEnableRover ?
+      reinterpret_cast<fbs::UpdateEnableRoverT *>(value) : nullptr;
+  }
+  const fbs::UpdateEnableRoverT *AsUpdateEnableRover() const {
+    return type == UpdateUnion_UpdateEnableRover ?
+      reinterpret_cast<const fbs::UpdateEnableRoverT *>(value) : nullptr;
+  }
+  fbs::UpdateLinkQualityThresholdT *AsUpdateLinkQualityThreshold() {
+    return type == UpdateUnion_UpdateLinkQualityThreshold ?
+      reinterpret_cast<fbs::UpdateLinkQualityThresholdT *>(value) : nullptr;
+  }
+  const fbs::UpdateLinkQualityThresholdT *AsUpdateLinkQualityThreshold() const {
+    return type == UpdateUnion_UpdateLinkQualityThreshold ?
+      reinterpret_cast<const fbs::UpdateLinkQualityThresholdT *>(value) : nullptr;
+  }
+  fbs::UpdateRssiThresholdT *AsUpdateRssiThreshold() {
+    return type == UpdateUnion_UpdateRssiThreshold ?
+      reinterpret_cast<fbs::UpdateRssiThresholdT *>(value) : nullptr;
+  }
+  const fbs::UpdateRssiThresholdT *AsUpdateRssiThreshold() const {
+    return type == UpdateUnion_UpdateRssiThreshold ?
+      reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value) : nullptr;
+  }
+};
+
 bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj, UpdateUnion type);
 bool VerifyUpdateUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
+struct UpdateBatteriesT : public ::flatbuffers::NativeTable {
+  typedef UpdateBatteries TableType;
+  int32_t batteries = 0;
+};
+
 struct UpdateBatteries FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateBatteriesT NativeTableType;
   typedef UpdateBatteriesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BATTERIES = 4
@@ -145,6 +292,9 @@ struct UpdateBatteries FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_BATTERIES, 4) &&
            verifier.EndTable();
   }
+  UpdateBatteriesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateBatteriesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateBatteries> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateBatteriesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateBatteriesBuilder {
@@ -173,7 +323,15 @@ inline ::flatbuffers::Offset<UpdateBatteries> CreateUpdateBatteries(
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateBatteries> CreateUpdateBatteries(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateBatteriesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateLowVoltageThresholdT : public ::flatbuffers::NativeTable {
+  typedef UpdateLowVoltageThreshold TableType;
+  float low_voltage_threshold = 0.0f;
+};
+
 struct UpdateLowVoltageThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateLowVoltageThresholdT NativeTableType;
   typedef UpdateLowVoltageThresholdBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LOW_VOLTAGE_THRESHOLD = 4
@@ -186,6 +344,9 @@ struct UpdateLowVoltageThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers
            VerifyField<float>(verifier, VT_LOW_VOLTAGE_THRESHOLD, 4) &&
            verifier.EndTable();
   }
+  UpdateLowVoltageThresholdT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateLowVoltageThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateLowVoltageThreshold> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLowVoltageThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateLowVoltageThresholdBuilder {
@@ -214,7 +375,15 @@ inline ::flatbuffers::Offset<UpdateLowVoltageThreshold> CreateUpdateLowVoltageTh
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateLowVoltageThreshold> CreateUpdateLowVoltageThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLowVoltageThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateCriticalVoltageThresholdT : public ::flatbuffers::NativeTable {
+  typedef UpdateCriticalVoltageThreshold TableType;
+  float critical_voltage_threshold = 0.0f;
+};
+
 struct UpdateCriticalVoltageThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateCriticalVoltageThresholdT NativeTableType;
   typedef UpdateCriticalVoltageThresholdBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_CRITICAL_VOLTAGE_THRESHOLD = 4
@@ -227,6 +396,9 @@ struct UpdateCriticalVoltageThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbu
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
            verifier.EndTable();
   }
+  UpdateCriticalVoltageThresholdT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateCriticalVoltageThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateCriticalVoltageThreshold> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCriticalVoltageThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateCriticalVoltageThresholdBuilder {
@@ -255,27 +427,47 @@ inline ::flatbuffers::Offset<UpdateCriticalVoltageThreshold> CreateUpdateCritica
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateCriticalVoltageThreshold> CreateUpdateCriticalVoltageThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCriticalVoltageThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateReferenceWheelAngleT : public ::flatbuffers::NativeTable {
+  typedef UpdateReferenceWheelAngle TableType;
+  int32_t left_motor_fold_angle = 0;
+  int32_t right_motor_fold_angle = 0;
+};
+
 struct UpdateReferenceWheelAngle FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateReferenceWheelAngleT NativeTableType;
   typedef UpdateReferenceWheelAngleBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_REFERENCE_WHEEL_ANGLE = 4
+    VT_LEFT_MOTOR_FOLD_ANGLE = 4,
+    VT_RIGHT_MOTOR_FOLD_ANGLE = 6
   };
-  int32_t reference_wheel_angle() const {
-    return GetField<int32_t>(VT_REFERENCE_WHEEL_ANGLE, 0);
+  int32_t left_motor_fold_angle() const {
+    return GetField<int32_t>(VT_LEFT_MOTOR_FOLD_ANGLE, 0);
+  }
+  int32_t right_motor_fold_angle() const {
+    return GetField<int32_t>(VT_RIGHT_MOTOR_FOLD_ANGLE, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_REFERENCE_WHEEL_ANGLE, 4) &&
+           VerifyField<int32_t>(verifier, VT_LEFT_MOTOR_FOLD_ANGLE, 4) &&
+           VerifyField<int32_t>(verifier, VT_RIGHT_MOTOR_FOLD_ANGLE, 4) &&
            verifier.EndTable();
   }
+  UpdateReferenceWheelAngleT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateReferenceWheelAngleT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateReferenceWheelAngle> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateReferenceWheelAngleT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateReferenceWheelAngleBuilder {
   typedef UpdateReferenceWheelAngle Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_reference_wheel_angle(int32_t reference_wheel_angle) {
-    fbb_.AddElement<int32_t>(UpdateReferenceWheelAngle::VT_REFERENCE_WHEEL_ANGLE, reference_wheel_angle, 0);
+  void add_left_motor_fold_angle(int32_t left_motor_fold_angle) {
+    fbb_.AddElement<int32_t>(UpdateReferenceWheelAngle::VT_LEFT_MOTOR_FOLD_ANGLE, left_motor_fold_angle, 0);
+  }
+  void add_right_motor_fold_angle(int32_t right_motor_fold_angle) {
+    fbb_.AddElement<int32_t>(UpdateReferenceWheelAngle::VT_RIGHT_MOTOR_FOLD_ANGLE, right_motor_fold_angle, 0);
   }
   explicit UpdateReferenceWheelAngleBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -290,18 +482,30 @@ struct UpdateReferenceWheelAngleBuilder {
 
 inline ::flatbuffers::Offset<UpdateReferenceWheelAngle> CreateUpdateReferenceWheelAngle(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t reference_wheel_angle = 0) {
+    int32_t left_motor_fold_angle = 0,
+    int32_t right_motor_fold_angle = 0) {
   UpdateReferenceWheelAngleBuilder builder_(_fbb);
-  builder_.add_reference_wheel_angle(reference_wheel_angle);
+  builder_.add_right_motor_fold_angle(right_motor_fold_angle);
+  builder_.add_left_motor_fold_angle(left_motor_fold_angle);
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateReferenceWheelAngle> CreateUpdateReferenceWheelAngle(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateReferenceWheelAngleT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateFoldWheelsT : public ::flatbuffers::NativeTable {
+  typedef UpdateFoldWheels TableType;
+};
+
 struct UpdateFoldWheels FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateFoldWheelsT NativeTableType;
   typedef UpdateFoldWheelsBuilder Builder;
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
   }
+  UpdateFoldWheelsT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateFoldWheelsT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateFoldWheels> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateFoldWheelsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateFoldWheelsBuilder {
@@ -325,7 +529,15 @@ inline ::flatbuffers::Offset<UpdateFoldWheels> CreateUpdateFoldWheels(
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateFoldWheels> CreateUpdateFoldWheels(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateFoldWheelsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateEnableRoverT : public ::flatbuffers::NativeTable {
+  typedef UpdateEnableRover TableType;
+  bool enable_rover = false;
+};
+
 struct UpdateEnableRover FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateEnableRoverT NativeTableType;
   typedef UpdateEnableRoverBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ENABLE_ROVER = 4
@@ -338,6 +550,9 @@ struct UpdateEnableRover FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
            VerifyField<uint8_t>(verifier, VT_ENABLE_ROVER, 1) &&
            verifier.EndTable();
   }
+  UpdateEnableRoverT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateEnableRoverT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateEnableRover> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateEnableRoverT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateEnableRoverBuilder {
@@ -366,7 +581,15 @@ inline ::flatbuffers::Offset<UpdateEnableRover> CreateUpdateEnableRover(
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateEnableRover> CreateUpdateEnableRover(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateEnableRoverT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateLinkQualityThresholdT : public ::flatbuffers::NativeTable {
+  typedef UpdateLinkQualityThreshold TableType;
+  int32_t link_quality_threshold = 0;
+};
+
 struct UpdateLinkQualityThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateLinkQualityThresholdT NativeTableType;
   typedef UpdateLinkQualityThresholdBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LINK_QUALITY_THRESHOLD = 4
@@ -379,6 +602,9 @@ struct UpdateLinkQualityThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffer
            VerifyField<int32_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 4) &&
            verifier.EndTable();
   }
+  UpdateLinkQualityThresholdT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateLinkQualityThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateLinkQualityThreshold> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLinkQualityThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateLinkQualityThresholdBuilder {
@@ -407,7 +633,15 @@ inline ::flatbuffers::Offset<UpdateLinkQualityThreshold> CreateUpdateLinkQuality
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateLinkQualityThreshold> CreateUpdateLinkQualityThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLinkQualityThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateRssiThresholdT : public ::flatbuffers::NativeTable {
+  typedef UpdateRssiThreshold TableType;
+  int32_t rssi_threshold = 0;
+};
+
 struct UpdateRssiThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateRssiThresholdT NativeTableType;
   typedef UpdateRssiThresholdBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_RSSI_THRESHOLD = 4
@@ -420,6 +654,9 @@ struct UpdateRssiThreshold FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
            VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
            verifier.EndTable();
   }
+  UpdateRssiThresholdT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateRssiThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateRssiThreshold> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 struct UpdateRssiThresholdBuilder {
@@ -448,7 +685,15 @@ inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateT : public ::flatbuffers::NativeTable {
+  typedef Update TableType;
+  fbs::UpdateUnionUnion update{};
+};
+
 struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateT NativeTableType;
   typedef UpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_UPDATE_TYPE = 4,
@@ -492,6 +737,9 @@ struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyUpdateUnion(verifier, update(), update_type()) &&
            verifier.EndTable();
   }
+  UpdateT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<Update> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
 template<> inline const fbs::UpdateBatteries *Update::update_as<fbs::UpdateBatteries>() const {
@@ -557,6 +805,245 @@ inline ::flatbuffers::Offset<Update> CreateUpdate(
   return builder_.Finish();
 }
 
+::flatbuffers::Offset<Update> CreateUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline UpdateBatteriesT *UpdateBatteries::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateBatteriesT>(new UpdateBatteriesT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateBatteries::UnPackTo(UpdateBatteriesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = batteries(); _o->batteries = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateBatteries> UpdateBatteries::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateBatteriesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateBatteries(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateBatteries> CreateUpdateBatteries(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateBatteriesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateBatteriesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _batteries = _o->batteries;
+  return fbs::CreateUpdateBatteries(
+      _fbb,
+      _batteries);
+}
+
+inline UpdateLowVoltageThresholdT *UpdateLowVoltageThreshold::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateLowVoltageThresholdT>(new UpdateLowVoltageThresholdT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateLowVoltageThreshold::UnPackTo(UpdateLowVoltageThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = low_voltage_threshold(); _o->low_voltage_threshold = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateLowVoltageThreshold> UpdateLowVoltageThreshold::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLowVoltageThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateLowVoltageThreshold(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateLowVoltageThreshold> CreateUpdateLowVoltageThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLowVoltageThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateLowVoltageThresholdT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _low_voltage_threshold = _o->low_voltage_threshold;
+  return fbs::CreateUpdateLowVoltageThreshold(
+      _fbb,
+      _low_voltage_threshold);
+}
+
+inline UpdateCriticalVoltageThresholdT *UpdateCriticalVoltageThreshold::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateCriticalVoltageThresholdT>(new UpdateCriticalVoltageThresholdT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateCriticalVoltageThreshold::UnPackTo(UpdateCriticalVoltageThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = critical_voltage_threshold(); _o->critical_voltage_threshold = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateCriticalVoltageThreshold> UpdateCriticalVoltageThreshold::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCriticalVoltageThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateCriticalVoltageThreshold(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateCriticalVoltageThreshold> CreateUpdateCriticalVoltageThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCriticalVoltageThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateCriticalVoltageThresholdT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _critical_voltage_threshold = _o->critical_voltage_threshold;
+  return fbs::CreateUpdateCriticalVoltageThreshold(
+      _fbb,
+      _critical_voltage_threshold);
+}
+
+inline UpdateReferenceWheelAngleT *UpdateReferenceWheelAngle::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateReferenceWheelAngleT>(new UpdateReferenceWheelAngleT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateReferenceWheelAngle::UnPackTo(UpdateReferenceWheelAngleT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = left_motor_fold_angle(); _o->left_motor_fold_angle = _e; }
+  { auto _e = right_motor_fold_angle(); _o->right_motor_fold_angle = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateReferenceWheelAngle> UpdateReferenceWheelAngle::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateReferenceWheelAngleT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateReferenceWheelAngle(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateReferenceWheelAngle> CreateUpdateReferenceWheelAngle(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateReferenceWheelAngleT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateReferenceWheelAngleT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _left_motor_fold_angle = _o->left_motor_fold_angle;
+  auto _right_motor_fold_angle = _o->right_motor_fold_angle;
+  return fbs::CreateUpdateReferenceWheelAngle(
+      _fbb,
+      _left_motor_fold_angle,
+      _right_motor_fold_angle);
+}
+
+inline UpdateFoldWheelsT *UpdateFoldWheels::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateFoldWheelsT>(new UpdateFoldWheelsT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateFoldWheels::UnPackTo(UpdateFoldWheelsT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+}
+
+inline ::flatbuffers::Offset<UpdateFoldWheels> UpdateFoldWheels::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateFoldWheelsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateFoldWheels(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateFoldWheels> CreateUpdateFoldWheels(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateFoldWheelsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateFoldWheelsT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  return fbs::CreateUpdateFoldWheels(
+      _fbb);
+}
+
+inline UpdateEnableRoverT *UpdateEnableRover::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateEnableRoverT>(new UpdateEnableRoverT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateEnableRover::UnPackTo(UpdateEnableRoverT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = enable_rover(); _o->enable_rover = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateEnableRover> UpdateEnableRover::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateEnableRoverT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateEnableRover(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateEnableRover> CreateUpdateEnableRover(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateEnableRoverT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateEnableRoverT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _enable_rover = _o->enable_rover;
+  return fbs::CreateUpdateEnableRover(
+      _fbb,
+      _enable_rover);
+}
+
+inline UpdateLinkQualityThresholdT *UpdateLinkQualityThreshold::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateLinkQualityThresholdT>(new UpdateLinkQualityThresholdT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateLinkQualityThreshold::UnPackTo(UpdateLinkQualityThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = link_quality_threshold(); _o->link_quality_threshold = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateLinkQualityThreshold> UpdateLinkQualityThreshold::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLinkQualityThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateLinkQualityThreshold(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateLinkQualityThreshold> CreateUpdateLinkQualityThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateLinkQualityThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateLinkQualityThresholdT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _link_quality_threshold = _o->link_quality_threshold;
+  return fbs::CreateUpdateLinkQualityThreshold(
+      _fbb,
+      _link_quality_threshold);
+}
+
+inline UpdateRssiThresholdT *UpdateRssiThreshold::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateRssiThresholdT>(new UpdateRssiThresholdT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateRssiThreshold::UnPackTo(UpdateRssiThresholdT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = rssi_threshold(); _o->rssi_threshold = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateRssiThreshold> UpdateRssiThreshold::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateRssiThreshold(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateRssiThresholdT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _rssi_threshold = _o->rssi_threshold;
+  return fbs::CreateUpdateRssiThreshold(
+      _fbb,
+      _rssi_threshold);
+}
+
+inline UpdateT *Update::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateT>(new UpdateT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Update::UnPackTo(UpdateT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = update_type(); _o->update.type = _e; }
+  { auto _e = update(); if (_e) _o->update.value = fbs::UpdateUnionUnion::UnPack(_e, update_type(), _resolver); }
+}
+
+inline ::flatbuffers::Offset<Update> Update::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdate(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<Update> CreateUpdate(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _update_type = _o->update.type;
+  auto _update = _o->update.Pack(_fbb);
+  return fbs::CreateUpdate(
+      _fbb,
+      _update_type,
+      _update);
+}
+
 inline bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj, UpdateUnion type) {
   switch (type) {
     case UpdateUnion_NONE: {
@@ -610,6 +1097,171 @@ inline bool VerifyUpdateUnionVector(::flatbuffers::Verifier &verifier, const ::f
   return true;
 }
 
+inline void *UpdateUnionUnion::UnPack(const void *obj, UpdateUnion type, const ::flatbuffers::resolver_function_t *resolver) {
+  (void)resolver;
+  switch (type) {
+    case UpdateUnion_UpdateBatteries: {
+      auto ptr = reinterpret_cast<const fbs::UpdateBatteries *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateLowVoltageThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateLowVoltageThreshold *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateCriticalVoltageThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateCriticalVoltageThreshold *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateReferenceWheelAngle: {
+      auto ptr = reinterpret_cast<const fbs::UpdateReferenceWheelAngle *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateFoldWheels: {
+      auto ptr = reinterpret_cast<const fbs::UpdateFoldWheels *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateEnableRover: {
+      auto ptr = reinterpret_cast<const fbs::UpdateEnableRover *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateLinkQualityThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateLinkQualityThreshold *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateRssiThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    default: return nullptr;
+  }
+}
+
+inline ::flatbuffers::Offset<void> UpdateUnionUnion::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher) const {
+  (void)_rehasher;
+  switch (type) {
+    case UpdateUnion_UpdateBatteries: {
+      auto ptr = reinterpret_cast<const fbs::UpdateBatteriesT *>(value);
+      return CreateUpdateBatteries(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateLowVoltageThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateLowVoltageThresholdT *>(value);
+      return CreateUpdateLowVoltageThreshold(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateCriticalVoltageThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateCriticalVoltageThresholdT *>(value);
+      return CreateUpdateCriticalVoltageThreshold(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateReferenceWheelAngle: {
+      auto ptr = reinterpret_cast<const fbs::UpdateReferenceWheelAngleT *>(value);
+      return CreateUpdateReferenceWheelAngle(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateFoldWheels: {
+      auto ptr = reinterpret_cast<const fbs::UpdateFoldWheelsT *>(value);
+      return CreateUpdateFoldWheels(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateEnableRover: {
+      auto ptr = reinterpret_cast<const fbs::UpdateEnableRoverT *>(value);
+      return CreateUpdateEnableRover(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateLinkQualityThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateLinkQualityThresholdT *>(value);
+      return CreateUpdateLinkQualityThreshold(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateRssiThreshold: {
+      auto ptr = reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value);
+      return CreateUpdateRssiThreshold(_fbb, ptr, _rehasher).Union();
+    }
+    default: return 0;
+  }
+}
+
+inline UpdateUnionUnion::UpdateUnionUnion(const UpdateUnionUnion &u) : type(u.type), value(nullptr) {
+  switch (type) {
+    case UpdateUnion_UpdateBatteries: {
+      value = new fbs::UpdateBatteriesT(*reinterpret_cast<fbs::UpdateBatteriesT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateLowVoltageThreshold: {
+      value = new fbs::UpdateLowVoltageThresholdT(*reinterpret_cast<fbs::UpdateLowVoltageThresholdT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateCriticalVoltageThreshold: {
+      value = new fbs::UpdateCriticalVoltageThresholdT(*reinterpret_cast<fbs::UpdateCriticalVoltageThresholdT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateReferenceWheelAngle: {
+      value = new fbs::UpdateReferenceWheelAngleT(*reinterpret_cast<fbs::UpdateReferenceWheelAngleT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateFoldWheels: {
+      value = new fbs::UpdateFoldWheelsT(*reinterpret_cast<fbs::UpdateFoldWheelsT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateEnableRover: {
+      value = new fbs::UpdateEnableRoverT(*reinterpret_cast<fbs::UpdateEnableRoverT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateLinkQualityThreshold: {
+      value = new fbs::UpdateLinkQualityThresholdT(*reinterpret_cast<fbs::UpdateLinkQualityThresholdT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateRssiThreshold: {
+      value = new fbs::UpdateRssiThresholdT(*reinterpret_cast<fbs::UpdateRssiThresholdT *>(u.value));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+inline void UpdateUnionUnion::Reset() {
+  switch (type) {
+    case UpdateUnion_UpdateBatteries: {
+      auto ptr = reinterpret_cast<fbs::UpdateBatteriesT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateLowVoltageThreshold: {
+      auto ptr = reinterpret_cast<fbs::UpdateLowVoltageThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateCriticalVoltageThreshold: {
+      auto ptr = reinterpret_cast<fbs::UpdateCriticalVoltageThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateReferenceWheelAngle: {
+      auto ptr = reinterpret_cast<fbs::UpdateReferenceWheelAngleT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateFoldWheels: {
+      auto ptr = reinterpret_cast<fbs::UpdateFoldWheelsT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateEnableRover: {
+      auto ptr = reinterpret_cast<fbs::UpdateEnableRoverT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateLinkQualityThreshold: {
+      auto ptr = reinterpret_cast<fbs::UpdateLinkQualityThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateRssiThreshold: {
+      auto ptr = reinterpret_cast<fbs::UpdateRssiThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    default: break;
+  }
+  value = nullptr;
+  type = UpdateUnion_NONE;
+}
+
 inline const fbs::Update *GetUpdate(const void *buf) {
   return ::flatbuffers::GetRoot<fbs::Update>(buf);
 }
@@ -652,6 +1304,18 @@ inline void FinishSizePrefixedUpdateBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
     ::flatbuffers::Offset<fbs::Update> root) {
   fbb.FinishSizePrefixed(root, UpdateIdentifier());
+}
+
+inline std::unique_ptr<fbs::UpdateT> UnPackUpdate(
+    const void *buf,
+    const ::flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<fbs::UpdateT>(GetUpdate(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<fbs::UpdateT> UnPackSizePrefixedUpdate(
+    const void *buf,
+    const ::flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<fbs::UpdateT>(GetSizePrefixedUpdate(buf)->UnPack(res));
 }
 
 }  // namespace fbs

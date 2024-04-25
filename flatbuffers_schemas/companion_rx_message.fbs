@@ -1,3 +1,4 @@
+include "robot_state.fbs";
 namespace fbs;
 
 // Source: Main Pico
@@ -11,6 +12,7 @@ table SetWebServerEnabled {
 
 union CompanionRxUnion {
     SetWebServerEnabled,
+    Robot, // from robot_state.fbs
 }
 
 table CompanionRx {

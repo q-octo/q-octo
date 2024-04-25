@@ -19,4 +19,4 @@ table CompanionTx {
     message: CompanionTxUnion; 
 }
 
-root_type CompanionRx;
+root_type CompanionTx;

@@ -30,7 +30,7 @@ union OnboardComputerTxUnion {
 }
 
 table OnboardComputerTx {
-    message: OnboardComputerTxUnion
+    message: OnboardComputerTxUnion;
 }
 
 root_type OnboardComputerTx;

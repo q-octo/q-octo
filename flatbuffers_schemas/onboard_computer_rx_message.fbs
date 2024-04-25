@@ -1,4 +1,6 @@
+include "robot_state.fbs";
 namespace fbs;
+
 
 // Source: Main Pico
 // Destination: Onboard Computer
@@ -30,10 +32,11 @@ table CrsfData {
 
 union OnboardComputerRxUnion {
     CrsfData,
+    Robot, // from robot_state.fbs
 }
 
 table OnboardComputerRx {
-    message: OnboardComputerRxUnion
+    message: OnboardComputerRxUnion;
 }
 
 root_type OnboardComputerRx;
