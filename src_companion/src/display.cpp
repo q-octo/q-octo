@@ -26,13 +26,6 @@ void Display::loop()
     blinkLED();
   }
 
-  if (state == nullptr)
-  {
-    // Skip display update because we do not have anything to show yet.
-    return;
-  }
-
-
   // Repaint the screen every 32ms (30fps)
   if (currentMillis - lastRepaintMillis >= 32)
   {
@@ -52,7 +45,7 @@ void Display::repaintDisplay()
 {
 
   // An example of how to access state.
-  state->batteries();
+  //  state.batteries;
   
   // bitmap6, bitmap8, bitmap14_outline
   graphics.set_font("bitmap8");

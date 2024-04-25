@@ -6,7 +6,7 @@
 #include "pico_graphics.hpp"
 #include "rgbled.hpp"
 #include "st7789.hpp"
-#include <ws_robot_generated.h>
+#include "robot_state_generated.h"
 #include "config.h"
 #include <sstream>
 
@@ -47,13 +47,7 @@ public:
     {
     }
     void loop();
-    void updateState(uint8_t *payload, size_t length)
-    {
-        assert(length <= CFG_STATE_MESSAGE_SIZE);
-        stateBufferLength = length;
-        memcpy(stateBuffer, payload, length);
-        state = GetRobot(stateBuffer);
-    }
+    void updateState(const RobotT& robot) { state = robot; }
 
 private:
     void repaintDisplay();
@@ -74,9 +68,7 @@ private:
     ButtonCallback button_b_callback;
     ButtonCallback button_x_callback;
 
-    uint8_t stateBuffer[CFG_STATE_MESSAGE_SIZE];
-    uint8_t stateBufferLength = 0;
-    const Robot *state = nullptr;
+    RobotT state = RobotT();
 
     // Internal state
     // TODO phase this out in favor of the Robot object

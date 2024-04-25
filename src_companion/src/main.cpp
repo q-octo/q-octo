@@ -26,14 +26,6 @@ void setup()
 
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
-
-  // Initialise the display & web server with the initial state.
-  auto fbb = flatbuffers::FlatBufferBuilder();
-  auto robot = CreateRobot(fbb);
-  fbb.Finish(robot);
-  display.updateState(fbb.GetBufferPointer(), fbb.GetSize());
-  webServer.updateState(fbb.GetBufferPointer(), fbb.GetSize());
-  
 }
 
 void loop()

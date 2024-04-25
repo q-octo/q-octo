@@ -8,7 +8,7 @@
 #include <WebServer.h>
 #include <DNSServer.h>
 #include <LEAmDNS.h>
-#include "ws_robot_generated.h"
+#include "robot_state_generated.h"
 #include "ws_update_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
 using namespace fbs;
@@ -20,13 +20,7 @@ public:
     void loop();
     void start();
     void stop();
-    void updateState(uint8_t *payload, size_t length)
-    {
-        assert(length <= CFG_STATE_MESSAGE_SIZE);
-        stateBufferLength = length;
-        memcpy(stateBuffer, payload, length);
-        state = GetRobot(stateBuffer);
-    }
+    void updateState(const RobotT& robot) { state = robot; }
 
 private:
     void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
@@ -39,14 +33,12 @@ private:
     void processRemoteBinaryUpdate(uint8_t *payload, size_t length);
     const char *textToMIMEType(const char *text);
 
-    uint8_t stateBuffer[CFG_STATE_MESSAGE_SIZE];
-    uint8_t stateBufferLength = 0;
-    const Robot *state = nullptr;
+    RobotT state = RobotT();
     IPAddress apIP;
     long lastWebSocketBroadcast = 0;
 
-    WebServer *webServer;
-    WebSocketsServer *webSocket;
+    WebServer *webServer = nullptr;
+    WebSocketsServer *webSocket = nullptr;
     flatbuffers::FlatBufferBuilder fbb;
     bool webServerIsRunning = false;
     uint32_t lastWebSocketRestart = 0;
