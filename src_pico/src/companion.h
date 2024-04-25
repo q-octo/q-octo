@@ -28,11 +28,12 @@ public:
   static uint8_t serialBuffer[255];
 
 private:
-  static void sendToCompanion(uint8_t *data, size_t length);
-  static void serialiseState(TaskMessage::State &state);
-  static void sendStateToCompanion(TaskMessage::State &state);
+  static void sendToCompanion(const uint8_t *data, size_t length);
+  static void serialiseState(const TaskMessage::State &state);
+  static void sendStateToCompanion(const TaskMessage::State &state);
   static void handleUpdateMessage(uint8_t *payload, size_t length);
-  static void sendTaskMessage(TaskMessage::Message &message);
+  static void sendTaskMessage(const TaskMessage::Message &message);
 
-  static flatbuffers::FlatBufferBuilder fbb;
+  // 1024 is the default size, but it will grow automatically.
+  static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
 };

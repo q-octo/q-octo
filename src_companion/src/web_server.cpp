@@ -4,7 +4,7 @@
 #include "packed_fs.h"
 
 #define AUTO_RESTART_WEBSOCKETS 0
-#define RESTART_WEBSOCKETS_FREQUENCY 1000 * 15 // 15 seconds
+#define RESTART_WEBSOCKETS_FREQUENCY (1000 * 15) // 15 seconds
 #define WEBSOCKET_BROADCAST_FREQ 500
 
 const char *QOctoWebServer::textToMIMEType(const char *text)
@@ -56,13 +56,13 @@ void QOctoWebServer::start()
     WiFi.softAP("Q-Octo (rover.local)");
     delayMicroseconds(500 * 1000); // Without delay the IP might be blank (according to an example)
     Serial.print("AP IP address: ");
-    Serial.println(WiFi.softAPIP() + " (rover.local)");
+    Serial.printf("%s (rover.local)\n", WiFi.softAPIP().toString().c_str());
 
     webServer = new WebServer(80);
     webServer->on("/", [this]()
                   { handleRoot(); });
     const struct packed_file *p;
-    for (p = packed_files; p->name != NULL; p++)
+    for (p = packed_files; p->name != nullptr; p++)
     {
         webServer->on(p->name, [p, this]()
                       { onFileRoute(p); });
@@ -93,25 +93,14 @@ void QOctoWebServer::start()
 
 void QOctoWebServer::broadcastData()
 {
-    auto r = GetRobot(nullptr);
     Serial.println("Broadcasting data");
-    if (stateBufferLength == 0)
-    {
-        Serial.println("No data to broadcast");
-        return;
-    }
-    webSocket->broadcastBIN(stateBuffer, stateBufferLength);
+    webSocket->broadcastBIN(fbb.GetBufferPointer(), fbb.GetSize());
     lastWebSocketBroadcast = millis();
 }
 
 void QOctoWebServer::sendDataToClient(uint8_t num)
 {
-    if (stateBufferLength == 0)
-    {
-        Serial.println("No data to send to client");
-        return;
-    }
-    webSocket->sendBIN(num, stateBuffer, stateBufferLength);
+    webSocket->sendBIN(num, fbb.GetBufferPointer(), fbb.GetSize());
 }
 
 void QOctoWebServer::stop()
@@ -218,6 +207,9 @@ void QOctoWebServer::webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload
         processRemoteBinaryUpdate(payload, length);
         break;
     }
+    default:
+        Serial.println("[WARN] Unexpected websocket event");
+        break;
     }
 }
 

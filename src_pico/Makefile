@@ -19,10 +19,12 @@ $(FLATC):
 
 # Rule to convert .fbs to .h for the main pico
 $(FBS_PICO1_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
+	rm -rf $(FBS_PICO1_OUT_DIR)/_generated.h
 	$(FLATC) --gen-object-api -o $(FBS_PICO1_OUT_DIR) --cpp $<
 
 # Rule to convert .fbs to .h for the second pico
 $(FBS_PICO2_OUT_DIR)/%_generated.h: $(FBS_SRC_DIR)/%.fbs
+	rm -rf $(FBS_PICO2_OUT_DIR)/_generated.h
 	$(FLATC) --gen-object-api -o $(FBS_PICO2_OUT_DIR) --cpp $<
 
 # Rule to convert .fbs to .ts (TypeScript)

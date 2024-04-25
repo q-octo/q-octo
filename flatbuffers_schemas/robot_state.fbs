@@ -49,9 +49,9 @@ table Robot {
     critical_voltage_threshold: float = 16.0;
     rssi_threshold: int = 0;
     link_quality_threshold: int = 0;
-    reference_wheel_angle: int = 0;
+    left_motor_fold_angle: int;
+    right_motor_fold_angle: int;
     motor_error_code: string; // Defaults not supported for strings
-    wheels_folded: bool = false;
     enable_rover: bool = false;
     display_messages: DisplayMessages;
 }

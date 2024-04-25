@@ -102,21 +102,21 @@ linkQualityThreshold():number {
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
-referenceWheelAngle():number {
+leftMotorFoldAngle():number {
   const offset = this.bb!.__offset(this.bb_pos, 32);
+  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+}
+
+rightMotorFoldAngle():number {
+  const offset = this.bb!.__offset(this.bb_pos, 34);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 motorErrorCode():string|null
 motorErrorCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 motorErrorCode(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 34);
-  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
-}
-
-wheelsFolded():boolean {
   const offset = this.bb!.__offset(this.bb_pos, 36);
-  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 enableRover():boolean {
@@ -189,16 +189,16 @@ static addLinkQualityThreshold(builder:flatbuffers.Builder, linkQualityThreshold
   builder.addFieldInt32(13, linkQualityThreshold, 0);
 }
 
-static addReferenceWheelAngle(builder:flatbuffers.Builder, referenceWheelAngle:number) {
-  builder.addFieldInt32(14, referenceWheelAngle, 0);
+static addLeftMotorFoldAngle(builder:flatbuffers.Builder, leftMotorFoldAngle:number) {
+  builder.addFieldInt32(14, leftMotorFoldAngle, 0);
+}
+
+static addRightMotorFoldAngle(builder:flatbuffers.Builder, rightMotorFoldAngle:number) {
+  builder.addFieldInt32(15, rightMotorFoldAngle, 0);
 }
 
 static addMotorErrorCode(builder:flatbuffers.Builder, motorErrorCodeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(15, motorErrorCodeOffset, 0);
-}
-
-static addWheelsFolded(builder:flatbuffers.Builder, wheelsFolded:boolean) {
-  builder.addFieldInt8(16, +wheelsFolded, +false);
+  builder.addFieldOffset(16, motorErrorCodeOffset, 0);
 }
 
 static addEnableRover(builder:flatbuffers.Builder, enableRover:boolean) {

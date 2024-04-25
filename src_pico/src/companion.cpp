@@ -1,4 +1,6 @@
 #include "companion.h"
+#include "companion_rx_generated.h"
+#include "companion_tx_generated.h"
 #include "config.h"
 #include <Arduino.h>
 using namespace fbs;
@@ -38,7 +40,7 @@ void Companion::loop() {
   }
 }
 
-void Companion::sendTaskMessage(TaskMessage::Message &message) {
+void Companion::sendTaskMessage(const TaskMessage::Message &message) {
   xQueueSend(dataManagerQueue, &message, 0);
 }
 
@@ -136,44 +138,41 @@ void Companion::companionConsumerTask(void *pvParameters) {
   }
 }
 
-void Companion::sendToCompanion(uint8_t *data, size_t length) {
+void Companion::sendToCompanion(const uint8_t *data, size_t length) {
   // Send the length of the message first
   companionSerial.write(length);
   // Send the message
   companionSerial.write(data, length);
 }
 
-void Companion::sendStateToCompanion(TaskMessage::State &state) {
+void Companion::sendStateToCompanion(const TaskMessage::State &state) {
   Serial.println("Sending state to companion");
   serialiseState(state);
   sendToCompanion(fbb.GetBufferPointer(), fbb.GetSize());
 }
 
-void Companion::serialiseState(TaskMessage::State &state) {
+void Companion::serialiseState(const TaskMessage::State &state) {
   fbb.Reset();
-  // TODO move these varaibles into TaskMessage::State
-  ControlSource control_source = ControlSource_RC;
-  Status status = Status_OK;
-  float max_speed = 0.0f;
-  int reference_wheel_angle = 0;
-  std::string motor_error_code;
-  bool wheels_folded = false;
-  bool enable_rover = false;
-
-  auto motor1 = CreateMotor(fbb, state.motors.left.temperature,
-                            state.motors.left.RPM, state.motors.left.position);
-  auto motor2 =
-      CreateMotor(fbb, state.motors.right.temperature, state.motors.right.RPM,
-                  state.motors.right.position);
-  auto motors = CreateMotors(fbb, motor1, motor2);
-
-  auto robot = CreateRobot(
-      fbb, state.batteryCount, control_source, status, motors,
-      state.battery.voltage, state.battery.current, state.battery.fuel,
-      0, // TODO fix schema (rssi = signal strength)
-      0, max_speed, state.lowVoltageThreshold, state.criticalVoltageThreshold,
-      reference_wheel_angle, fbb.CreateString(motor_error_code), wheels_folded,
-      enable_rover);
-
-  fbb.Finish(robot);
+  RobotT robot = RobotT();
+  robot.batteries = state.batteryCount;
+  // TODO add these fields:
+  robot.control_source = ControlSource_RC;
+  robot.status = Status_OK;
+  robot.voltage = state.battery.voltage;
+  robot.current = state.battery.current;
+  robot.fuel = state.battery.fuel;
+  robot.rssi = state.rc.rssi;
+  robot.link_quality = state.rc.linkQuality;
+  // TODO add these fields:
+  robot.max_speed = 30;
+  robot.low_voltage_threshold = state.lowVoltageThreshold;
+  robot.critical_voltage_threshold = state.criticalVoltageThreshold;
+  // TODO add these fields:
+  //  robot.rssi_threshold = state.rc.rssiThreshold;
+  //  robot.link_quality_threshold = state.rc.linkQualityThreshold;
+  robot.left_motor_fold_angle = 0;
+  robot.right_motor_fold_angle = 0;
+  robot.motor_error_code = "";
+  robot.enable_rover = true;
+  FinishRobotBuffer(fbb, Robot::Pack(fbb, &robot));
 }

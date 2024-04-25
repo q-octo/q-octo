@@ -431,9 +431,9 @@ struct RobotT : public ::flatbuffers::NativeTable {
   float critical_voltage_threshold = 16.0f;
   int32_t rssi_threshold = 0;
   int32_t link_quality_threshold = 0;
-  int32_t reference_wheel_angle = 0;
+  int32_t left_motor_fold_angle = 0;
+  int32_t right_motor_fold_angle = 0;
   std::string motor_error_code{};
-  bool wheels_folded = false;
   bool enable_rover = false;
   std::unique_ptr<fbs::DisplayMessagesT> display_messages{};
   RobotT() = default;
@@ -460,9 +460,9 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CRITICAL_VOLTAGE_THRESHOLD = 26,
     VT_RSSI_THRESHOLD = 28,
     VT_LINK_QUALITY_THRESHOLD = 30,
-    VT_REFERENCE_WHEEL_ANGLE = 32,
-    VT_MOTOR_ERROR_CODE = 34,
-    VT_WHEELS_FOLDED = 36,
+    VT_LEFT_MOTOR_FOLD_ANGLE = 32,
+    VT_RIGHT_MOTOR_FOLD_ANGLE = 34,
+    VT_MOTOR_ERROR_CODE = 36,
     VT_ENABLE_ROVER = 38,
     VT_DISPLAY_MESSAGES = 40
   };
@@ -508,14 +508,14 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   int32_t link_quality_threshold() const {
     return GetField<int32_t>(VT_LINK_QUALITY_THRESHOLD, 0);
   }
-  int32_t reference_wheel_angle() const {
-    return GetField<int32_t>(VT_REFERENCE_WHEEL_ANGLE, 0);
+  int32_t left_motor_fold_angle() const {
+    return GetField<int32_t>(VT_LEFT_MOTOR_FOLD_ANGLE, 0);
+  }
+  int32_t right_motor_fold_angle() const {
+    return GetField<int32_t>(VT_RIGHT_MOTOR_FOLD_ANGLE, 0);
   }
   const ::flatbuffers::String *motor_error_code() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MOTOR_ERROR_CODE);
-  }
-  bool wheels_folded() const {
-    return GetField<uint8_t>(VT_WHEELS_FOLDED, 0) != 0;
   }
   bool enable_rover() const {
     return GetField<uint8_t>(VT_ENABLE_ROVER, 0) != 0;
@@ -540,10 +540,10 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
            VerifyField<int32_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 4) &&
-           VerifyField<int32_t>(verifier, VT_REFERENCE_WHEEL_ANGLE, 4) &&
+           VerifyField<int32_t>(verifier, VT_LEFT_MOTOR_FOLD_ANGLE, 4) &&
+           VerifyField<int32_t>(verifier, VT_RIGHT_MOTOR_FOLD_ANGLE, 4) &&
            VerifyOffset(verifier, VT_MOTOR_ERROR_CODE) &&
            verifier.VerifyString(motor_error_code()) &&
-           VerifyField<uint8_t>(verifier, VT_WHEELS_FOLDED, 1) &&
            VerifyField<uint8_t>(verifier, VT_ENABLE_ROVER, 1) &&
            VerifyOffset(verifier, VT_DISPLAY_MESSAGES) &&
            verifier.VerifyTable(display_messages()) &&
@@ -600,14 +600,14 @@ struct RobotBuilder {
   void add_link_quality_threshold(int32_t link_quality_threshold) {
     fbb_.AddElement<int32_t>(Robot::VT_LINK_QUALITY_THRESHOLD, link_quality_threshold, 0);
   }
-  void add_reference_wheel_angle(int32_t reference_wheel_angle) {
-    fbb_.AddElement<int32_t>(Robot::VT_REFERENCE_WHEEL_ANGLE, reference_wheel_angle, 0);
+  void add_left_motor_fold_angle(int32_t left_motor_fold_angle) {
+    fbb_.AddElement<int32_t>(Robot::VT_LEFT_MOTOR_FOLD_ANGLE, left_motor_fold_angle, 0);
+  }
+  void add_right_motor_fold_angle(int32_t right_motor_fold_angle) {
+    fbb_.AddElement<int32_t>(Robot::VT_RIGHT_MOTOR_FOLD_ANGLE, right_motor_fold_angle, 0);
   }
   void add_motor_error_code(::flatbuffers::Offset<::flatbuffers::String> motor_error_code) {
     fbb_.AddOffset(Robot::VT_MOTOR_ERROR_CODE, motor_error_code);
-  }
-  void add_wheels_folded(bool wheels_folded) {
-    fbb_.AddElement<uint8_t>(Robot::VT_WHEELS_FOLDED, static_cast<uint8_t>(wheels_folded), 0);
   }
   void add_enable_rover(bool enable_rover) {
     fbb_.AddElement<uint8_t>(Robot::VT_ENABLE_ROVER, static_cast<uint8_t>(enable_rover), 0);
@@ -642,15 +642,16 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     float critical_voltage_threshold = 16.0f,
     int32_t rssi_threshold = 0,
     int32_t link_quality_threshold = 0,
-    int32_t reference_wheel_angle = 0,
+    int32_t left_motor_fold_angle = 0,
+    int32_t right_motor_fold_angle = 0,
     ::flatbuffers::Offset<::flatbuffers::String> motor_error_code = 0,
-    bool wheels_folded = false,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0) {
   RobotBuilder builder_(_fbb);
   builder_.add_display_messages(display_messages);
   builder_.add_motor_error_code(motor_error_code);
-  builder_.add_reference_wheel_angle(reference_wheel_angle);
+  builder_.add_right_motor_fold_angle(right_motor_fold_angle);
+  builder_.add_left_motor_fold_angle(left_motor_fold_angle);
   builder_.add_link_quality_threshold(link_quality_threshold);
   builder_.add_rssi_threshold(rssi_threshold);
   builder_.add_critical_voltage_threshold(critical_voltage_threshold);
@@ -664,7 +665,6 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_motors(motors);
   builder_.add_batteries(batteries);
   builder_.add_enable_rover(enable_rover);
-  builder_.add_wheels_folded(wheels_folded);
   builder_.add_status(status);
   builder_.add_control_source(control_source);
   return builder_.Finish();
@@ -686,9 +686,9 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     float critical_voltage_threshold = 16.0f,
     int32_t rssi_threshold = 0,
     int32_t link_quality_threshold = 0,
-    int32_t reference_wheel_angle = 0,
+    int32_t left_motor_fold_angle = 0,
+    int32_t right_motor_fold_angle = 0,
     const char *motor_error_code = nullptr,
-    bool wheels_folded = false,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0) {
   auto motor_error_code__ = motor_error_code ? _fbb.CreateString(motor_error_code) : 0;
@@ -708,9 +708,9 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       critical_voltage_threshold,
       rssi_threshold,
       link_quality_threshold,
-      reference_wheel_angle,
+      left_motor_fold_angle,
+      right_motor_fold_angle,
       motor_error_code__,
-      wheels_folded,
       enable_rover,
       display_messages);
 }
@@ -851,9 +851,9 @@ inline RobotT::RobotT(const RobotT &o)
         critical_voltage_threshold(o.critical_voltage_threshold),
         rssi_threshold(o.rssi_threshold),
         link_quality_threshold(o.link_quality_threshold),
-        reference_wheel_angle(o.reference_wheel_angle),
+        left_motor_fold_angle(o.left_motor_fold_angle),
+        right_motor_fold_angle(o.right_motor_fold_angle),
         motor_error_code(o.motor_error_code),
-        wheels_folded(o.wheels_folded),
         enable_rover(o.enable_rover),
         display_messages((o.display_messages) ? new fbs::DisplayMessagesT(*o.display_messages) : nullptr) {
 }
@@ -873,9 +873,9 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(critical_voltage_threshold, o.critical_voltage_threshold);
   std::swap(rssi_threshold, o.rssi_threshold);
   std::swap(link_quality_threshold, o.link_quality_threshold);
-  std::swap(reference_wheel_angle, o.reference_wheel_angle);
+  std::swap(left_motor_fold_angle, o.left_motor_fold_angle);
+  std::swap(right_motor_fold_angle, o.right_motor_fold_angle);
   std::swap(motor_error_code, o.motor_error_code);
-  std::swap(wheels_folded, o.wheels_folded);
   std::swap(enable_rover, o.enable_rover);
   std::swap(display_messages, o.display_messages);
   return *this;
@@ -904,9 +904,9 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = critical_voltage_threshold(); _o->critical_voltage_threshold = _e; }
   { auto _e = rssi_threshold(); _o->rssi_threshold = _e; }
   { auto _e = link_quality_threshold(); _o->link_quality_threshold = _e; }
-  { auto _e = reference_wheel_angle(); _o->reference_wheel_angle = _e; }
+  { auto _e = left_motor_fold_angle(); _o->left_motor_fold_angle = _e; }
+  { auto _e = right_motor_fold_angle(); _o->right_motor_fold_angle = _e; }
   { auto _e = motor_error_code(); if (_e) _o->motor_error_code = _e->str(); }
-  { auto _e = wheels_folded(); _o->wheels_folded = _e; }
   { auto _e = enable_rover(); _o->enable_rover = _e; }
   { auto _e = display_messages(); if (_e) { if(_o->display_messages) { _e->UnPackTo(_o->display_messages.get(), _resolver); } else { _o->display_messages = std::unique_ptr<fbs::DisplayMessagesT>(_e->UnPack(_resolver)); } } else if (_o->display_messages) { _o->display_messages.reset(); } }
 }
@@ -933,9 +933,9 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _critical_voltage_threshold = _o->critical_voltage_threshold;
   auto _rssi_threshold = _o->rssi_threshold;
   auto _link_quality_threshold = _o->link_quality_threshold;
-  auto _reference_wheel_angle = _o->reference_wheel_angle;
+  auto _left_motor_fold_angle = _o->left_motor_fold_angle;
+  auto _right_motor_fold_angle = _o->right_motor_fold_angle;
   auto _motor_error_code = _o->motor_error_code.empty() ? 0 : _fbb.CreateString(_o->motor_error_code);
-  auto _wheels_folded = _o->wheels_folded;
   auto _enable_rover = _o->enable_rover;
   auto _display_messages = _o->display_messages ? CreateDisplayMessages(_fbb, _o->display_messages.get(), _rehasher) : 0;
   return fbs::CreateRobot(
@@ -954,9 +954,9 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _critical_voltage_threshold,
       _rssi_threshold,
       _link_quality_threshold,
-      _reference_wheel_angle,
+      _left_motor_fold_angle,
+      _right_motor_fold_angle,
       _motor_error_code,
-      _wheels_folded,
       _enable_rover,
       _display_messages);
 }

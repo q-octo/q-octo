@@ -16,11 +16,18 @@ using namespace fbs;
 class QOctoWebServer
 {
 public:
-    QOctoWebServer() : apIP(192, 168, 4, 1) {}
+    QOctoWebServer() : apIP(192, 168, 4, 1) {
+      // Initialises state & the flatbuffers builder
+      updateState(RobotT());
+    }
     void loop();
     void start();
     void stop();
-    void updateState(const RobotT& robot) { state = robot; }
+    void updateState(const RobotT& robot) {
+      state = robot;
+      fbb.Reset();
+      FinishRobotBuffer(fbb, Robot::Pack(fbb, &state));
+    }
 
 private:
     void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
@@ -31,11 +38,11 @@ private:
     void sendDataToClient(uint8_t num);
     void onFileRoute(const struct packed_file *file);
     void processRemoteBinaryUpdate(uint8_t *payload, size_t length);
-    const char *textToMIMEType(const char *text);
+    static const char *textToMIMEType(const char *text);
 
-    RobotT state = RobotT();
+    RobotT state;
     IPAddress apIP;
-    long lastWebSocketBroadcast = 0;
+    unsigned long lastWebSocketBroadcast = 0;
 
     WebServer *webServer = nullptr;
     WebSocketsServer *webSocket = nullptr;
