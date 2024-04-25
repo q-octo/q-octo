@@ -9,22 +9,22 @@ import { MixedDriveConfig, MixedDriveConfigT } from '../fbs/mixed-drive-config.j
 import { TankDriveConfig, TankDriveConfigT } from '../fbs/tank-drive-config.js';
 
 
-export class RobotDriveConfig implements flatbuffers.IUnpackableObject<RobotDriveConfigT> {
+export class DriveRobot implements flatbuffers.IUnpackableObject<DriveRobotT> {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):RobotDriveConfig {
+  __init(i:number, bb:flatbuffers.ByteBuffer):DriveRobot {
   this.bb_pos = i;
   this.bb = bb;
   return this;
 }
 
-static getRootAsRobotDriveConfig(bb:flatbuffers.ByteBuffer, obj?:RobotDriveConfig):RobotDriveConfig {
-  return (obj || new RobotDriveConfig()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+static getRootAsDriveRobot(bb:flatbuffers.ByteBuffer, obj?:DriveRobot):DriveRobot {
+  return (obj || new DriveRobot()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-static getSizePrefixedRootAsRobotDriveConfig(bb:flatbuffers.ByteBuffer, obj?:RobotDriveConfig):RobotDriveConfig {
+static getSizePrefixedRootAsDriveRobot(bb:flatbuffers.ByteBuffer, obj?:DriveRobot):DriveRobot {
   bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new RobotDriveConfig()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  return (obj || new DriveRobot()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
 configType():DriveConfig {
@@ -37,7 +37,7 @@ config<T extends flatbuffers.Table>(obj:any):any|null {
   return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
 }
 
-static startRobotDriveConfig(builder:flatbuffers.Builder) {
+static startDriveRobot(builder:flatbuffers.Builder) {
   builder.startObject(2);
 }
 
@@ -49,20 +49,20 @@ static addConfig(builder:flatbuffers.Builder, configOffset:flatbuffers.Offset) {
   builder.addFieldOffset(1, configOffset, 0);
 }
 
-static endRobotDriveConfig(builder:flatbuffers.Builder):flatbuffers.Offset {
+static endDriveRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }
 
-static createRobotDriveConfig(builder:flatbuffers.Builder, configType:DriveConfig, configOffset:flatbuffers.Offset):flatbuffers.Offset {
-  RobotDriveConfig.startRobotDriveConfig(builder);
-  RobotDriveConfig.addConfigType(builder, configType);
-  RobotDriveConfig.addConfig(builder, configOffset);
-  return RobotDriveConfig.endRobotDriveConfig(builder);
+static createDriveRobot(builder:flatbuffers.Builder, configType:DriveConfig, configOffset:flatbuffers.Offset):flatbuffers.Offset {
+  DriveRobot.startDriveRobot(builder);
+  DriveRobot.addConfigType(builder, configType);
+  DriveRobot.addConfig(builder, configOffset);
+  return DriveRobot.endDriveRobot(builder);
 }
 
-unpack(): RobotDriveConfigT {
-  return new RobotDriveConfigT(
+unpack(): DriveRobotT {
+  return new DriveRobotT(
     this.configType(),
     (() => {
       const temp = unionToDriveConfig(this.configType(), this.config.bind(this));
@@ -73,7 +73,7 @@ unpack(): RobotDriveConfigT {
 }
 
 
-unpackTo(_o: RobotDriveConfigT): void {
+unpackTo(_o: DriveRobotT): void {
   _o.configType = this.configType();
   _o.config = (() => {
       const temp = unionToDriveConfig(this.configType(), this.config.bind(this));
@@ -83,7 +83,7 @@ unpackTo(_o: RobotDriveConfigT): void {
 }
 }
 
-export class RobotDriveConfigT implements flatbuffers.IGeneratedObject {
+export class DriveRobotT implements flatbuffers.IGeneratedObject {
 constructor(
   public configType: DriveConfig = DriveConfig.NONE,
   public config: MixedDriveConfigT|TankDriveConfigT|null = null
@@ -93,7 +93,7 @@ constructor(
 pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const config = builder.createObjectOffset(this.config);
 
-  return RobotDriveConfig.createRobotDriveConfig(builder,
+  return DriveRobot.createDriveRobot(builder,
     this.configType,
     config
   );

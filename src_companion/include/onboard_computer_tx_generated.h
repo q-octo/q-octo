@@ -27,9 +27,9 @@ struct MixedDriveConfig;
 struct MixedDriveConfigBuilder;
 struct MixedDriveConfigT;
 
-struct RobotDriveConfig;
-struct RobotDriveConfigBuilder;
-struct RobotDriveConfigT;
+struct DriveRobot;
+struct DriveRobotBuilder;
+struct DriveRobotT;
 
 struct OnboardComputerTx;
 struct OnboardComputerTxBuilder;
@@ -175,17 +175,18 @@ bool VerifyDriveConfigVector(::flatbuffers::Verifier &verifier, const ::flatbuff
 
 enum OnboardComputerTxUnion : uint8_t {
   OnboardComputerTxUnion_NONE = 0,
+  /// A frame to be sent to the transmitter.
   OnboardComputerTxUnion_CrsfFrame = 1,
-  OnboardComputerTxUnion_RobotDriveConfig = 2,
+  OnboardComputerTxUnion_DriveRobot = 2,
   OnboardComputerTxUnion_MIN = OnboardComputerTxUnion_NONE,
-  OnboardComputerTxUnion_MAX = OnboardComputerTxUnion_RobotDriveConfig
+  OnboardComputerTxUnion_MAX = OnboardComputerTxUnion_DriveRobot
 };
 
 inline const OnboardComputerTxUnion (&EnumValuesOnboardComputerTxUnion())[3] {
   static const OnboardComputerTxUnion values[] = {
     OnboardComputerTxUnion_NONE,
     OnboardComputerTxUnion_CrsfFrame,
-    OnboardComputerTxUnion_RobotDriveConfig
+    OnboardComputerTxUnion_DriveRobot
   };
   return values;
 }
@@ -194,14 +195,14 @@ inline const char * const *EnumNamesOnboardComputerTxUnion() {
   static const char * const names[4] = {
     "NONE",
     "CrsfFrame",
-    "RobotDriveConfig",
+    "DriveRobot",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameOnboardComputerTxUnion(OnboardComputerTxUnion e) {
-  if (::flatbuffers::IsOutRange(e, OnboardComputerTxUnion_NONE, OnboardComputerTxUnion_RobotDriveConfig)) return "";
+  if (::flatbuffers::IsOutRange(e, OnboardComputerTxUnion_NONE, OnboardComputerTxUnion_DriveRobot)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOnboardComputerTxUnion()[index];
 }
@@ -214,8 +215,8 @@ template<> struct OnboardComputerTxUnionTraits<fbs::CrsfFrame> {
   static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_CrsfFrame;
 };
 
-template<> struct OnboardComputerTxUnionTraits<fbs::RobotDriveConfig> {
-  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_RobotDriveConfig;
+template<> struct OnboardComputerTxUnionTraits<fbs::DriveRobot> {
+  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DriveRobot;
 };
 
 template<typename T> struct OnboardComputerTxUnionUnionTraits {
@@ -226,8 +227,8 @@ template<> struct OnboardComputerTxUnionUnionTraits<fbs::CrsfFrameT> {
   static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_CrsfFrame;
 };
 
-template<> struct OnboardComputerTxUnionUnionTraits<fbs::RobotDriveConfigT> {
-  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_RobotDriveConfig;
+template<> struct OnboardComputerTxUnionUnionTraits<fbs::DriveRobotT> {
+  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DriveRobot;
 };
 
 struct OnboardComputerTxUnionUnion {
@@ -268,13 +269,13 @@ struct OnboardComputerTxUnionUnion {
     return type == OnboardComputerTxUnion_CrsfFrame ?
       reinterpret_cast<const fbs::CrsfFrameT *>(value) : nullptr;
   }
-  fbs::RobotDriveConfigT *AsRobotDriveConfig() {
-    return type == OnboardComputerTxUnion_RobotDriveConfig ?
-      reinterpret_cast<fbs::RobotDriveConfigT *>(value) : nullptr;
+  fbs::DriveRobotT *AsDriveRobot() {
+    return type == OnboardComputerTxUnion_DriveRobot ?
+      reinterpret_cast<fbs::DriveRobotT *>(value) : nullptr;
   }
-  const fbs::RobotDriveConfigT *AsRobotDriveConfig() const {
-    return type == OnboardComputerTxUnion_RobotDriveConfig ?
-      reinterpret_cast<const fbs::RobotDriveConfigT *>(value) : nullptr;
+  const fbs::DriveRobotT *AsDriveRobot() const {
+    return type == OnboardComputerTxUnion_DriveRobot ?
+      reinterpret_cast<const fbs::DriveRobotT *>(value) : nullptr;
   }
 };
 
@@ -496,14 +497,14 @@ inline ::flatbuffers::Offset<MixedDriveConfig> CreateMixedDriveConfig(
 
 ::flatbuffers::Offset<MixedDriveConfig> CreateMixedDriveConfig(::flatbuffers::FlatBufferBuilder &_fbb, const MixedDriveConfigT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct RobotDriveConfigT : public ::flatbuffers::NativeTable {
-  typedef RobotDriveConfig TableType;
+struct DriveRobotT : public ::flatbuffers::NativeTable {
+  typedef DriveRobot TableType;
   fbs::DriveConfigUnion config{};
 };
 
-struct RobotDriveConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef RobotDriveConfigT NativeTableType;
-  typedef RobotDriveConfigBuilder Builder;
+struct DriveRobot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef DriveRobotT NativeTableType;
+  typedef DriveRobotBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_CONFIG_TYPE = 4,
     VT_CONFIG = 6
@@ -528,51 +529,51 @@ struct RobotDriveConfig FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyDriveConfig(verifier, config(), config_type()) &&
            verifier.EndTable();
   }
-  RobotDriveConfigT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(RobotDriveConfigT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<RobotDriveConfig> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const RobotDriveConfigT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  DriveRobotT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(DriveRobotT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<DriveRobot> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const DriveRobotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-template<> inline const fbs::TankDriveConfig *RobotDriveConfig::config_as<fbs::TankDriveConfig>() const {
+template<> inline const fbs::TankDriveConfig *DriveRobot::config_as<fbs::TankDriveConfig>() const {
   return config_as_TankDriveConfig();
 }
 
-template<> inline const fbs::MixedDriveConfig *RobotDriveConfig::config_as<fbs::MixedDriveConfig>() const {
+template<> inline const fbs::MixedDriveConfig *DriveRobot::config_as<fbs::MixedDriveConfig>() const {
   return config_as_MixedDriveConfig();
 }
 
-struct RobotDriveConfigBuilder {
-  typedef RobotDriveConfig Table;
+struct DriveRobotBuilder {
+  typedef DriveRobot Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_config_type(fbs::DriveConfig config_type) {
-    fbb_.AddElement<uint8_t>(RobotDriveConfig::VT_CONFIG_TYPE, static_cast<uint8_t>(config_type), 0);
+    fbb_.AddElement<uint8_t>(DriveRobot::VT_CONFIG_TYPE, static_cast<uint8_t>(config_type), 0);
   }
   void add_config(::flatbuffers::Offset<void> config) {
-    fbb_.AddOffset(RobotDriveConfig::VT_CONFIG, config);
+    fbb_.AddOffset(DriveRobot::VT_CONFIG, config);
   }
-  explicit RobotDriveConfigBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit DriveRobotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<RobotDriveConfig> Finish() {
+  ::flatbuffers::Offset<DriveRobot> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<RobotDriveConfig>(end);
+    auto o = ::flatbuffers::Offset<DriveRobot>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<RobotDriveConfig> CreateRobotDriveConfig(
+inline ::flatbuffers::Offset<DriveRobot> CreateDriveRobot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     fbs::DriveConfig config_type = fbs::DriveConfig_NONE,
     ::flatbuffers::Offset<void> config = 0) {
-  RobotDriveConfigBuilder builder_(_fbb);
+  DriveRobotBuilder builder_(_fbb);
   builder_.add_config(config);
   builder_.add_config_type(config_type);
   return builder_.Finish();
 }
 
-::flatbuffers::Offset<RobotDriveConfig> CreateRobotDriveConfig(::flatbuffers::FlatBufferBuilder &_fbb, const RobotDriveConfigT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+::flatbuffers::Offset<DriveRobot> CreateDriveRobot(::flatbuffers::FlatBufferBuilder &_fbb, const DriveRobotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct OnboardComputerTxT : public ::flatbuffers::NativeTable {
   typedef OnboardComputerTx TableType;
@@ -596,8 +597,8 @@ struct OnboardComputerTx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const fbs::CrsfFrame *message_as_CrsfFrame() const {
     return message_type() == fbs::OnboardComputerTxUnion_CrsfFrame ? static_cast<const fbs::CrsfFrame *>(message()) : nullptr;
   }
-  const fbs::RobotDriveConfig *message_as_RobotDriveConfig() const {
-    return message_type() == fbs::OnboardComputerTxUnion_RobotDriveConfig ? static_cast<const fbs::RobotDriveConfig *>(message()) : nullptr;
+  const fbs::DriveRobot *message_as_DriveRobot() const {
+    return message_type() == fbs::OnboardComputerTxUnion_DriveRobot ? static_cast<const fbs::DriveRobot *>(message()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -615,8 +616,8 @@ template<> inline const fbs::CrsfFrame *OnboardComputerTx::message_as<fbs::CrsfF
   return message_as_CrsfFrame();
 }
 
-template<> inline const fbs::RobotDriveConfig *OnboardComputerTx::message_as<fbs::RobotDriveConfig>() const {
-  return message_as_RobotDriveConfig();
+template<> inline const fbs::DriveRobot *OnboardComputerTx::message_as<fbs::DriveRobot>() const {
+  return message_as_DriveRobot();
 }
 
 struct OnboardComputerTxBuilder {
@@ -742,30 +743,30 @@ inline ::flatbuffers::Offset<MixedDriveConfig> CreateMixedDriveConfig(::flatbuff
       _direction);
 }
 
-inline RobotDriveConfigT *RobotDriveConfig::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<RobotDriveConfigT>(new RobotDriveConfigT());
+inline DriveRobotT *DriveRobot::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<DriveRobotT>(new DriveRobotT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void RobotDriveConfig::UnPackTo(RobotDriveConfigT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+inline void DriveRobot::UnPackTo(DriveRobotT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
   { auto _e = config_type(); _o->config.type = _e; }
   { auto _e = config(); if (_e) _o->config.value = fbs::DriveConfigUnion::UnPack(_e, config_type(), _resolver); }
 }
 
-inline ::flatbuffers::Offset<RobotDriveConfig> RobotDriveConfig::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const RobotDriveConfigT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateRobotDriveConfig(_fbb, _o, _rehasher);
+inline ::flatbuffers::Offset<DriveRobot> DriveRobot::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const DriveRobotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateDriveRobot(_fbb, _o, _rehasher);
 }
 
-inline ::flatbuffers::Offset<RobotDriveConfig> CreateRobotDriveConfig(::flatbuffers::FlatBufferBuilder &_fbb, const RobotDriveConfigT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+inline ::flatbuffers::Offset<DriveRobot> CreateDriveRobot(::flatbuffers::FlatBufferBuilder &_fbb, const DriveRobotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const RobotDriveConfigT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const DriveRobotT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _config_type = _o->config.type;
   auto _config = _o->config.Pack(_fbb);
-  return fbs::CreateRobotDriveConfig(
+  return fbs::CreateDriveRobot(
       _fbb,
       _config_type,
       _config);
@@ -901,8 +902,8 @@ inline bool VerifyOnboardComputerTxUnion(::flatbuffers::Verifier &verifier, cons
       auto ptr = reinterpret_cast<const fbs::CrsfFrame *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case OnboardComputerTxUnion_RobotDriveConfig: {
-      auto ptr = reinterpret_cast<const fbs::RobotDriveConfig *>(obj);
+    case OnboardComputerTxUnion_DriveRobot: {
+      auto ptr = reinterpret_cast<const fbs::DriveRobot *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;
@@ -928,8 +929,8 @@ inline void *OnboardComputerTxUnionUnion::UnPack(const void *obj, OnboardCompute
       auto ptr = reinterpret_cast<const fbs::CrsfFrame *>(obj);
       return ptr->UnPack(resolver);
     }
-    case OnboardComputerTxUnion_RobotDriveConfig: {
-      auto ptr = reinterpret_cast<const fbs::RobotDriveConfig *>(obj);
+    case OnboardComputerTxUnion_DriveRobot: {
+      auto ptr = reinterpret_cast<const fbs::DriveRobot *>(obj);
       return ptr->UnPack(resolver);
     }
     default: return nullptr;
@@ -943,9 +944,9 @@ inline ::flatbuffers::Offset<void> OnboardComputerTxUnionUnion::Pack(::flatbuffe
       auto ptr = reinterpret_cast<const fbs::CrsfFrameT *>(value);
       return CreateCrsfFrame(_fbb, ptr, _rehasher).Union();
     }
-    case OnboardComputerTxUnion_RobotDriveConfig: {
-      auto ptr = reinterpret_cast<const fbs::RobotDriveConfigT *>(value);
-      return CreateRobotDriveConfig(_fbb, ptr, _rehasher).Union();
+    case OnboardComputerTxUnion_DriveRobot: {
+      auto ptr = reinterpret_cast<const fbs::DriveRobotT *>(value);
+      return CreateDriveRobot(_fbb, ptr, _rehasher).Union();
     }
     default: return 0;
   }
@@ -957,8 +958,8 @@ inline OnboardComputerTxUnionUnion::OnboardComputerTxUnionUnion(const OnboardCom
       value = new fbs::CrsfFrameT(*reinterpret_cast<fbs::CrsfFrameT *>(u.value));
       break;
     }
-    case OnboardComputerTxUnion_RobotDriveConfig: {
-      value = new fbs::RobotDriveConfigT(*reinterpret_cast<fbs::RobotDriveConfigT *>(u.value));
+    case OnboardComputerTxUnion_DriveRobot: {
+      value = new fbs::DriveRobotT(*reinterpret_cast<fbs::DriveRobotT *>(u.value));
       break;
     }
     default:
@@ -973,8 +974,8 @@ inline void OnboardComputerTxUnionUnion::Reset() {
       delete ptr;
       break;
     }
-    case OnboardComputerTxUnion_RobotDriveConfig: {
-      auto ptr = reinterpret_cast<fbs::RobotDriveConfigT *>(value);
+    case OnboardComputerTxUnion_DriveRobot: {
+      auto ptr = reinterpret_cast<fbs::DriveRobotT *>(value);
       delete ptr;
       break;
     }

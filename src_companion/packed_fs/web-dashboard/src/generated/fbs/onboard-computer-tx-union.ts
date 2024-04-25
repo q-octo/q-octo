@@ -3,36 +3,40 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 import { CrsfFrame, CrsfFrameT } from '../fbs/crsf-frame.js';
-import { RobotDriveConfig, RobotDriveConfigT } from '../fbs/robot-drive-config.js';
+import { DriveRobot, DriveRobotT } from '../fbs/drive-robot.js';
 
 
 export enum OnboardComputerTxUnion {
   NONE = 0,
+
+  /**
+   * A frame to be sent to the transmitter.
+   */
   CrsfFrame = 1,
-  RobotDriveConfig = 2
+  DriveRobot = 2
 }
 
 export function unionToOnboardComputerTxUnion(
   type: OnboardComputerTxUnion,
-  accessor: (obj:CrsfFrame|RobotDriveConfig) => CrsfFrame|RobotDriveConfig|null
-): CrsfFrame|RobotDriveConfig|null {
+  accessor: (obj:CrsfFrame|DriveRobot) => CrsfFrame|DriveRobot|null
+): CrsfFrame|DriveRobot|null {
   switch(OnboardComputerTxUnion[type]) {
     case 'NONE': return null; 
     case 'CrsfFrame': return accessor(new CrsfFrame())! as CrsfFrame;
-    case 'RobotDriveConfig': return accessor(new RobotDriveConfig())! as RobotDriveConfig;
+    case 'DriveRobot': return accessor(new DriveRobot())! as DriveRobot;
     default: return null;
   }
 }
 
 export function unionListToOnboardComputerTxUnion(
   type: OnboardComputerTxUnion, 
-  accessor: (index: number, obj:CrsfFrame|RobotDriveConfig) => CrsfFrame|RobotDriveConfig|null, 
+  accessor: (index: number, obj:CrsfFrame|DriveRobot) => CrsfFrame|DriveRobot|null, 
   index: number
-): CrsfFrame|RobotDriveConfig|null {
+): CrsfFrame|DriveRobot|null {
   switch(OnboardComputerTxUnion[type]) {
     case 'NONE': return null; 
     case 'CrsfFrame': return accessor(index, new CrsfFrame())! as CrsfFrame;
-    case 'RobotDriveConfig': return accessor(index, new RobotDriveConfig())! as RobotDriveConfig;
+    case 'DriveRobot': return accessor(index, new DriveRobot())! as DriveRobot;
     default: return null;
   }
 }

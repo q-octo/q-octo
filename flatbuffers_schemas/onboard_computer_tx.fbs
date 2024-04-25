@@ -20,13 +20,14 @@ table MixedDriveConfig { rad_s: float; direction: float; }
 
 union DriveConfig { TankDriveConfig, MixedDriveConfig }
 
-table RobotDriveConfig {
+table DriveRobot {
     config: DriveConfig;
 }
 
-union OnboardComputerTxUnion {
+union OnboardComputerTxUnion { 
+    /// A frame to be sent to the transmitter.
     CrsfFrame,
-    RobotDriveConfig,
+    DriveRobot,
 }
 
 table OnboardComputerTx {

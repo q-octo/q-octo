@@ -5,8 +5,8 @@
 import * as flatbuffers from 'flatbuffers';
 
 import { CrsfFrame, CrsfFrameT } from '../fbs/crsf-frame.js';
+import { DriveRobot, DriveRobotT } from '../fbs/drive-robot.js';
 import { OnboardComputerTxUnion, unionToOnboardComputerTxUnion, unionListToOnboardComputerTxUnion } from '../fbs/onboard-computer-tx-union.js';
-import { RobotDriveConfig, RobotDriveConfigT } from '../fbs/robot-drive-config.js';
 
 
 export class OnboardComputerTx implements flatbuffers.IUnpackableObject<OnboardComputerTxT> {
@@ -98,7 +98,7 @@ unpackTo(_o: OnboardComputerTxT): void {
 export class OnboardComputerTxT implements flatbuffers.IGeneratedObject {
 constructor(
   public messageType: OnboardComputerTxUnion = OnboardComputerTxUnion.NONE,
-  public message: CrsfFrameT|RobotDriveConfigT|null = null
+  public message: CrsfFrameT|DriveRobotT|null = null
 ){}
 
 
