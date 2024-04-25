@@ -6,7 +6,6 @@
 
 
 typedef enum {
-  TASK_DISPLAY,
   TASK_CONTROL_MOTORS,
   TASK_SEND_TO_RC,
   TASK_DATA_MANAGER,

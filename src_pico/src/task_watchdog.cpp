@@ -51,32 +51,31 @@ void taskWatchdog(void *pvParameters)
             tasks[message] += 1;
         }
         const uint32_t currentMillis = millis();
-        // if (currentMillis - lastHealthCheckMs > HEALTH_CHECK_FREQUENCY)
-        // {
-        //     lastHealthCheckMs = currentMillis;
-        //     for (uint8_t i = 0; i < Task::numValues; i++)
-        //     {
-        //         if (tasks[i] == 0)
-        //         {
-        //             Serial.printf("Task %d is not operational\n", i);
-        //             delay(WATCHDOG_TIMEOUT);
-        //             // rp2040.reboot();
-        //         }
-        //     }
-        //     // All tasks are operational
-        //     // rp2040.wdt_reset();
-        //     for (uint8_t i = 0; i < Task::numValues; i++)
-        //     {
-        //         tasks[i] = 0;
-        //     }
-        // }
-        // if (currentMillis - lastMemoryLog > LOG_MEMORY_FREQUENCY)
-        // {
-        //     lastMemoryLog = currentMillis;
-        //     Serial.printf("free heap: %d\n", rp2040.getFreeHeap());
-        // }
-        
-    }
+        if (currentMillis - lastHealthCheckMs > HEALTH_CHECK_FREQUENCY)
+        {
+            lastHealthCheckMs = currentMillis;
+            for (uint8_t i = 0; i < Task::numValues; i++)
+            {
+                if (tasks[i] == 0)
+                {
+                    Serial.printf("Task %d is not operational\n", i);
+                    delay(WATCHDOG_TIMEOUT);
+                    // rp2040.reboot();
+                }
+            }
+            // All tasks are operational
+            // rp2040.wdt_reset();
+            for (uint8_t i = 0; i < Task::numValues; i++)
+            {
+                tasks[i] = 0;
+            }
+        }
+        if (currentMillis - lastMemoryLog > LOG_MEMORY_FREQUENCY)
+        {
+            lastMemoryLog = currentMillis;
+            Serial.printf("free heap: %d\n", rp2040.getFreeHeap());
+        }
+        }
 }
 
 /*
