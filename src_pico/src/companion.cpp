@@ -19,36 +19,65 @@ void Companion::receiveMessage(const Message &message) {
 }
 
 void Companion::loop() {
-  //  Check for incoming serial messages
-  if (companionSerial.available()) {
-    // Read first byte to get the message length
-    uint8_t messageLength = companionSerial.read();
-    // Read message into serialBuffer
-    companionSerial.readBytes(serialBuffer, messageLength);
+  parseIncomingSerialData();
+}
 
-    auto verifier = flatbuffers::Verifier(serialBuffer, messageLength);
-    if (CompanionTxBufferHasIdentifier(serialBuffer) && VerifyCompanionTxBuffer(verifier)) {
-      auto companionMessage = GetCompanionTx(serialBuffer);
-      switch (companionMessage->message_type()) {
-        case CompanionTxUnion::CompanionTxUnion_NONE:
-          break;
-        case CompanionTxUnion::CompanionTxUnion_Update: {
-          auto update = companionMessage->message_as_Update();
-          handleUpdateMessage(*update);
-          break;
-        }
-        case CompanionTxUnion::CompanionTxUnion_ButtonPressed: {
-          auto buttonPressed = companionMessage->message_as_ButtonPressed();
-          handleButtonPressedMessage(*buttonPressed);
-          break;
-        }
-      }
+void Companion::parseIncomingSerialData() {
+  //  Check for incoming serial messages
+  int offset = 0;
+  uint32_t remainingBytes = 0;
+
+  while (companionSerial.available()) {
+    serialBuffer[offset++] = companionSerial.read();
+    if (offset < 4) {
+      continue;
+    }
+
+    if (offset == 4) {
+      remainingBytes = flatbuffers::GetPrefixedSize(serialBuffer);
+    }
+
+    if (remainingBytes > 0) {
+      continue;
+    }
+    auto verifier = flatbuffers::Verifier(serialBuffer, offset);
+
+    const bool hasExpectedIdentifier = SizePrefixedCompanionTxBufferHasIdentifier(serialBuffer);
+    const bool isValid = VerifySizePrefixedCompanionTxBuffer(verifier);
+    if (hasExpectedIdentifier && isValid) {
+      auto companionMessage = GetSizePrefixedCompanionTx(serialBuffer);
+      handleCompanionTx(*companionMessage);
     } else {
       Serial.println("[WARN] received invalid message from companion pico, dropping remaining bytes.");
       // Drop the remaining data, so we can get a fresh start next time
       while (companionSerial.available()) {
         companionSerial.read();
       }
+    }
+  }
+
+  if (remainingBytes > 0) {
+    Serial.println("[WARN] expected more bytes from companion pico, but none available.");
+  }
+
+  if (offset < 4) {
+    Serial.println("[WARN] expected a size-prefixed message from companion pico, < 4 bytes received.");
+  }
+}
+
+void Companion::handleCompanionTx(const CompanionTx &companionMessage) {
+  switch (companionMessage.message_type()) {
+    case CompanionTxUnion::CompanionTxUnion_NONE:
+      break;
+    case CompanionTxUnion::CompanionTxUnion_Update: {
+      auto update = companionMessage.message_as_Update();
+      handleUpdateMessage(*update);
+      break;
+    }
+    case CompanionTxUnion::CompanionTxUnion_ButtonPressed: {
+      auto buttonPressed = companionMessage.message_as_ButtonPressed();
+      handleButtonPressedMessage(*buttonPressed);
+      break;
     }
   }
 }
@@ -217,5 +246,5 @@ void Companion::serialiseState(const TaskMessage::State &state) {
   robot.right_motor_fold_angle = 0;
   robot.motor_error_code = "";
   robot.enable_rover = true;
-  FinishRobotBuffer(fbb, Robot::Pack(fbb, &robot));
+  FinishSizePrefixedRobotBuffer(fbb, Robot::Pack(fbb, &robot));
 }

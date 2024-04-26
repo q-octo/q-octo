@@ -37,9 +37,11 @@ private:
   static void sendToCompanion(const uint8_t *data, size_t length);
   static void serialiseState(const TaskMessage::State &state);
   static void sendStateToCompanion(const TaskMessage::State &state);
+  static void handleCompanionTx(const CompanionTx &companionTx);
   static void handleUpdateMessage(const Update &update);
   static void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
   static void sendTaskMessage(const TaskMessage::Message &message);
+  static void parseIncomingSerialData();
 
   // 1024 is the default size, but it will grow automatically.
   static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
