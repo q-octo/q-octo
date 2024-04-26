@@ -22,47 +22,17 @@ void Companion::loop() {
   parseIncomingSerialData();
 }
 
+bool Companion::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier) {
+  return SizePrefixedCompanionTxBufferHasIdentifier(fbSerialParser.buffer) &&
+         VerifySizePrefixedCompanionTxBuffer(verifier);
+}
+
 void Companion::parseIncomingSerialData() {
-  //  Check for incoming serial messages
-  int offset = 0;
-  uint32_t remainingBytes = 0;
-
-  while (companionSerial.available()) {
-    serialBuffer[offset++] = companionSerial.read();
-    if (offset < 4) {
-      continue;
-    }
-
-    if (offset == 4) {
-      remainingBytes = flatbuffers::GetPrefixedSize(serialBuffer);
-    }
-
-    if (remainingBytes > 0) {
-      continue;
-    }
-    auto verifier = flatbuffers::Verifier(serialBuffer, offset);
-
-    const bool hasExpectedIdentifier = SizePrefixedCompanionTxBufferHasIdentifier(serialBuffer);
-    const bool isValid = VerifySizePrefixedCompanionTxBuffer(verifier);
-    if (hasExpectedIdentifier && isValid) {
-      auto companionMessage = GetSizePrefixedCompanionTx(serialBuffer);
-      handleCompanionTx(*companionMessage);
-    } else {
-      Serial.println("[WARN] received invalid message from companion pico, dropping remaining bytes.");
-      // Drop the remaining data, so we can get a fresh start next time
-      while (companionSerial.available()) {
-        companionSerial.read();
-      }
-    }
+  if (!fbSerialParser.parseMessage()) {
+    return;
   }
-
-  if (remainingBytes > 0) {
-    Serial.println("[WARN] expected more bytes from companion pico, but none available.");
-  }
-
-  if (offset < 4) {
-    Serial.println("[WARN] expected a size-prefixed message from companion pico, < 4 bytes received.");
-  }
+  auto companionMessage = GetSizePrefixedCompanionTx(fbSerialParser.buffer);
+  handleCompanionTx(*companionMessage);
 }
 
 void Companion::handleCompanionTx(const CompanionTx &companionMessage) {
@@ -211,9 +181,6 @@ void Companion::companionConsumerTask(void *pvParameters) {
 }
 
 void Companion::sendToCompanion(const uint8_t *data, size_t length) {
-  // Send the length of the message first
-  companionSerial.write(length);
-  // Send the message
   companionSerial.write(data, length);
 }
 
