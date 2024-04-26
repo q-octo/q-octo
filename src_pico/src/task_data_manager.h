@@ -13,6 +13,7 @@ namespace TaskMessage
     STATE_RC,     // taskReceiveFromRC
     ENABLE_WEB_SERVER,
     DISABLE_WEB_SERVER,
+    TOGGLE_WEB_SERVER_ENABLED,
     ENABLE_MOTORS,
     DISABLE_MOTORS,
     SET_MOTOR_SPEED_COMBINED,       // taskReceiveFromRC (onboard computer in future)
@@ -31,6 +32,7 @@ namespace TaskMessage
     SET_CRITICAL_VOLTAGE_THRESHOLD, // web server
     SET_BATTERY_COUNT,              // web server
     FOLD_WHEELS,                    // web server, taskReceiveFromRC
+    DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
   } Type;
 
   typedef struct
@@ -92,6 +94,8 @@ namespace TaskMessage
     uint8_t len;
   } CanMessage;
 
+  typedef enum { A,B } DisplayButton;
+
   typedef struct
   {
     Type type;
@@ -106,6 +110,7 @@ namespace TaskMessage
       CanMessage canMessage;
       float voltageThreshold;
       int batteryCount;
+      DisplayButton displayButton;
     } as;
   } Message;
 

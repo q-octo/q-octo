@@ -1,42 +1,55 @@
 #include <Arduino.h>
 #include "companion.h"
-#include "companion_rx_generated.h"
-#include "companion_tx_generated.h"
 #include "config.h"
-using namespace fbs;
 
-void Companion::accept(const Message &message) {
+void Companion::receiveMessage(const Message &message) {
   switch (message.type) {
-  case ENABLE_WEB_SERVER:
-    Serial.println("Enable web server");
-    break;
-  case DISABLE_WEB_SERVER:
-    Serial.println("Disable web server");
-    break;
-  case STATE_UPDATE:
-    Serial.println("State update");
-    TaskMessage::State state = message.as.state;
-    sendStateToCompanion(state);
-    break;
+    case ENABLE_WEB_SERVER:
+      Serial.println("Enable web server");
+      break;
+    case DISABLE_WEB_SERVER:
+      Serial.println("Disable web server");
+      break;
+    case STATE_UPDATE:
+      Serial.println("State update");
+      TaskMessage::State state = message.as.state;
+      sendStateToCompanion(state);
+      break;
   }
 }
 
 void Companion::loop() {
   //  Check for incoming serial messages
-
   if (companionSerial.available()) {
     // Read first byte to get the message length
     uint8_t messageLength = companionSerial.read();
     // Read message into serialBuffer
     companionSerial.readBytes(serialBuffer, messageLength);
-    // TODO Parse flatbuffers message (either a parameter update or a web server
-    // enable/disable request)
 
-    if (UpdateBufferHasIdentifier(serialBuffer)) {
-      // This is an update message
-      auto update = GetUpdate(serialBuffer);
+    auto verifier = flatbuffers::Verifier(serialBuffer, messageLength);
+    if (CompanionTxBufferHasIdentifier(serialBuffer) && VerifyCompanionTxBuffer(verifier)) {
+      auto companionMessage = GetCompanionTx(serialBuffer);
+      switch (companionMessage->message_type()) {
+        case CompanionTxUnion::CompanionTxUnion_NONE:
+          break;
+        case CompanionTxUnion::CompanionTxUnion_Update: {
+          auto update = companionMessage->message_as_Update();
+          handleUpdateMessage(*update);
+          break;
+        }
+        case CompanionTxUnion::CompanionTxUnion_ButtonPressed: {
+          auto buttonPressed = companionMessage->message_as_ButtonPressed();
+          handleButtonPressedMessage(*buttonPressed);
+          break;
+        }
+      }
+    } else {
+      Serial.println("[WARN] received invalid message from companion pico, dropping remaining bytes.");
+      // Drop the remaining data, so we can get a fresh start next time
+      while (companionSerial.available()) {
+        companionSerial.read();
+      }
     }
-  } else {
   }
 }
 
@@ -44,72 +57,96 @@ void Companion::sendTaskMessage(const TaskMessage::Message &message) {
   xQueueSend(dataManagerQueue, &message, 0);
 }
 
-void Companion::handleUpdateMessage(uint8_t *payload, size_t length) {
-  auto update = GetUpdate(payload);
+void Companion::handleUpdateMessage(const Update &update) {
   static TaskMessage::Message taskMessage;
-  switch (update->update_type()) {
-  case UpdateUnion::UpdateUnion_NONE:
-    break;
-  case UpdateUnion::UpdateUnion_UpdateBatteries: {
-    auto updateBatteries = update->update_as_UpdateBatteries();
-    taskMessage = {
-        .type = TaskMessage::Type::SET_BATTERY_COUNT,
-        .as = {.batteryCount = updateBatteries->batteries()},
-    };
-    sendTaskMessage(taskMessage);
-    break;
+  switch (update.update_type()) {
+    case UpdateUnion::UpdateUnion_NONE:
+      break;
+    case UpdateUnion::UpdateUnion_UpdateBatteries: {
+      auto updateBatteries = update.update_as_UpdateBatteries();
+      taskMessage = {
+              .type = TaskMessage::Type::SET_BATTERY_COUNT,
+              .as = {.batteryCount = updateBatteries->batteries()},
+      };
+      sendTaskMessage(taskMessage);
+      break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateLowVoltageThreshold: {
+      auto updateLowVoltageThreshold =
+              update.update_as_UpdateLowVoltageThreshold();
+      taskMessage = {
+              .type = TaskMessage::Type::SET_LOW_VOLTAGE_THRESHOLD,
+              .as =
+                      {
+                              .voltageThreshold =
+                              updateLowVoltageThreshold->low_voltage_threshold(),
+                      },
+      };
+      sendTaskMessage(taskMessage);
+      break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold: {
+      auto updateCriticalVoltageThreshold =
+              update.update_as_UpdateCriticalVoltageThreshold();
+      taskMessage = {
+              .type = TaskMessage::Type::SET_CRITICAL_VOLTAGE_THRESHOLD,
+              .as =
+                      {
+                              .voltageThreshold = updateCriticalVoltageThreshold
+                                      ->critical_voltage_threshold(),
+                      },
+      };
+      sendTaskMessage(taskMessage);
+      break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateReferenceWheelAngle: {
+      auto updateReferenceWheelAngle =
+              update.update_as_UpdateReferenceWheelAngle();
+      // TODO implement
+      // robot.reference_wheel_angle =
+      // updateReferenceWheelAngle->reference_wheel_angle();
+      break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateFoldWheels: {
+      // robot.wheels_folded = true;
+      break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateRssiThreshold:
+      break;
+    case UpdateUnion::UpdateUnion_UpdateEnableRover:
+      break;
+    case UpdateUnion::UpdateUnion_UpdateLinkQualityThreshold:
+      break;
   }
-  case UpdateUnion::UpdateUnion_UpdateLowVoltageThreshold: {
-    auto updateLowVoltageThreshold =
-        update->update_as_UpdateLowVoltageThreshold();
-    taskMessage = {
-        .type = TaskMessage::Type::SET_LOW_VOLTAGE_THRESHOLD,
-        .as =
-            {
-                .voltageThreshold =
-                    updateLowVoltageThreshold->low_voltage_threshold(),
-            },
-    };
-    sendTaskMessage(taskMessage);
-    break;
-  }
-  case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold: {
-    auto updateCriticalVoltageThreshold =
-        update->update_as_UpdateCriticalVoltageThreshold();
-    taskMessage = {
-        .type = TaskMessage::Type::SET_CRITICAL_VOLTAGE_THRESHOLD,
-        .as =
-            {
-                .voltageThreshold = updateCriticalVoltageThreshold
-                                        ->critical_voltage_threshold(),
-            },
-    };
-    sendTaskMessage(taskMessage);
-    break;
-  }
-  case UpdateUnion::UpdateUnion_UpdateReferenceWheelAngle: {
-    auto updateReferenceWheelAngle =
-        update->update_as_UpdateReferenceWheelAngle();
-    // TODO implement
-    // robot.reference_wheel_angle =
-    // updateReferenceWheelAngle->reference_wheel_angle();
-    break;
-  }
-  case UpdateUnion::UpdateUnion_UpdateFoldWheels: {
-    // robot.wheels_folded = true;
-    break;
-  }
-  case UpdateUnion::UpdateUnion_UpdateRssiThreshold:
-    break;
-  case UpdateUnion::UpdateUnion_UpdateEnableRover:
-    break;
-  case UpdateUnion::UpdateUnion_UpdateLinkQualityThreshold:
-    break;
+}
+
+void Companion::handleButtonPressedMessage(const ButtonPressed &buttonPressed) {
+  static TaskMessage::Message taskMessage;
+  switch (buttonPressed.button()) {
+    case Button_A:
+      taskMessage = {
+              .type = TaskMessage::Type::DISPLAY_BUTTON_PRESSED,
+              .as = {.displayButton = TaskMessage::DisplayButton::A}
+      };
+      sendTaskMessage(taskMessage);
+      break;
+    case Button_B:
+      taskMessage = {
+              .type = TaskMessage::Type::DISPLAY_BUTTON_PRESSED,
+              .as = {.displayButton = TaskMessage::DisplayButton::B}
+      };
+      sendTaskMessage(taskMessage);
+      break;
+    case Button_X:
+      // Toggle wifi
+      taskMessage = {.type = TaskMessage::Type::TOGGLE_WEB_SERVER_ENABLED};
+      sendTaskMessage(taskMessage);
+      break;
   }
 }
 
 void Companion::companionProducerTask(void *pvParameters) {
-  (void)pvParameters; //  To avoid warnings
+  (void) pvParameters; //  To avoid warnings
 
   companionSerial.begin(115200);
 
@@ -121,7 +158,7 @@ void Companion::companionProducerTask(void *pvParameters) {
 }
 
 void Companion::companionConsumerTask(void *pvParameters) {
-  (void)pvParameters; //  To avoid warnings
+  (void) pvParameters; //  To avoid warnings
   Serial.println("Companion consumer task started");
   companionQueue = xQueueCreate(10, sizeof(Message));
   if (companionQueue == nullptr) {
@@ -139,7 +176,7 @@ void Companion::companionConsumerTask(void *pvParameters) {
 
   for (;;) {
     if (xQueueReceive(companionQueue, &message, portMAX_DELAY)) {
-      accept(message);
+      receiveMessage(message);
     }
   }
 }

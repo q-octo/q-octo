@@ -7,7 +7,11 @@
 #include "task_data_manager.h"
 #include "robot_state_generated.h"
 #include "ws_update_generated.h"
+#include "companion_rx_generated.h"
+#include "companion_tx_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
+
+using namespace fbs;
 
 class Companion {
 public:
@@ -19,7 +23,7 @@ public:
     } as;
   } Message;
 
-  static void accept(const Message &message);
+  static void receiveMessage(const Message &message);
   static void loop();
   static void companionProducerTask(void *pvParameters);
   static void companionConsumerTask(void *pvParameters);
@@ -33,7 +37,8 @@ private:
   static void sendToCompanion(const uint8_t *data, size_t length);
   static void serialiseState(const TaskMessage::State &state);
   static void sendStateToCompanion(const TaskMessage::State &state);
-  static void handleUpdateMessage(uint8_t *payload, size_t length);
+  static void handleUpdateMessage(const Update &update);
+  static void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
   static void sendTaskMessage(const TaskMessage::Message &message);
 
   // 1024 is the default size, but it will grow automatically.
