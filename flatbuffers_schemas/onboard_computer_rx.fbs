@@ -1,4 +1,5 @@
 include "robot_state.fbs";
+include "companion_tx.fbs";
 namespace fbs;
 
 
@@ -32,7 +33,8 @@ table CrsfData {
 
 union OnboardComputerRxUnion {
     CrsfData,
-    Robot, // from robot_state.fbs
+    Robot, // from robot_state.fbs,
+    ButtonPressed, // from companion_tx.fbs
 }
 
 table OnboardComputerRx {

@@ -2,6 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
+import { ButtonPressed, ButtonPressedT } from '../fbs/button-pressed.js';
 import { CrsfData, CrsfDataT } from '../fbs/crsf-data.js';
 import { Robot, RobotT } from '../fbs/robot.js';
 
@@ -9,30 +10,33 @@ import { Robot, RobotT } from '../fbs/robot.js';
 export enum OnboardComputerRxUnion {
   NONE = 0,
   CrsfData = 1,
-  Robot = 2
+  Robot = 2,
+  ButtonPressed = 3
 }
 
 export function unionToOnboardComputerRxUnion(
   type: OnboardComputerRxUnion,
-  accessor: (obj:CrsfData|Robot) => CrsfData|Robot|null
-): CrsfData|Robot|null {
+  accessor: (obj:ButtonPressed|CrsfData|Robot) => ButtonPressed|CrsfData|Robot|null
+): ButtonPressed|CrsfData|Robot|null {
   switch(OnboardComputerRxUnion[type]) {
     case 'NONE': return null; 
     case 'CrsfData': return accessor(new CrsfData())! as CrsfData;
     case 'Robot': return accessor(new Robot())! as Robot;
+    case 'ButtonPressed': return accessor(new ButtonPressed())! as ButtonPressed;
     default: return null;
   }
 }
 
 export function unionListToOnboardComputerRxUnion(
   type: OnboardComputerRxUnion, 
-  accessor: (index: number, obj:CrsfData|Robot) => CrsfData|Robot|null, 
+  accessor: (index: number, obj:ButtonPressed|CrsfData|Robot) => ButtonPressed|CrsfData|Robot|null, 
   index: number
-): CrsfData|Robot|null {
+): ButtonPressed|CrsfData|Robot|null {
   switch(OnboardComputerRxUnion[type]) {
     case 'NONE': return null; 
     case 'CrsfData': return accessor(index, new CrsfData())! as CrsfData;
     case 'Robot': return accessor(index, new Robot())! as Robot;
+    case 'ButtonPressed': return accessor(index, new ButtonPressed())! as ButtonPressed;
     default: return null;
   }
 }

@@ -3,11 +3,13 @@
 #include "task_motors.h"
 #include "task_power_monitor.h"
 #include "task_rc.h"
+#include "computer.h"
 
 QueueHandle_t dataManagerQueue;
 
 static TaskMessage::State state;
 static Companion::Message companionMessage;
+static Computer::Message computerMessage;
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -25,6 +27,11 @@ void broadcastStateUpdate() {
           .as = {.state = state},
   };
   xQueueSend(Companion::companionQueue, &companionMessage, 0);
+  computerMessage = {
+          .type = Computer::MessageType::STATE_UPDATE,
+          .as = {.state = state},
+  };
+  xQueueSend(Computer::computerQueue, &computerMessage, 0);
 }
 
 void setWebServerEnabled(bool enabled) {
@@ -180,10 +187,16 @@ void taskDataManager(void *pvParameters) {
           xQueueSend(controlMotorsQueue, &controlMotorsMessage, 0);
           break;
         case DISPLAY_BUTTON_PRESSED:
-          // TODO forward to onboard computer
+          computerMessage = {
+                  .type = Computer::MessageType::DISPLAY_BUTTON,
+                  .as = {.displayButton = message.as.displayButton},
+          };
+          xQueueSend(Computer::computerQueue, &computerMessage, 0);
         default:
           Serial.println("[ERROR] Unknown message type");
       }
     }
   }
 }
+
+
