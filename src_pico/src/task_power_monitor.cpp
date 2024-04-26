@@ -135,6 +135,8 @@ void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer)
 
     static TaskMessage::Message taskMessage;
     memset(&taskMessage, 0, sizeof(taskMessage));
+    
+    // TODO check every x ms consecutively in case we get a temporary voltage drop
 
     if (msg.voltage <= systemShutdownVoltage)
     {

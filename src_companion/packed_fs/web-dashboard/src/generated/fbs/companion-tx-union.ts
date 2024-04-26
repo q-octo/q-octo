@@ -3,32 +3,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 import { ButtonPressed, ButtonPressedT } from '../fbs/button-pressed.js';
+import { Update, UpdateT } from '../fbs/update.js';
 
 
 export enum CompanionTxUnion {
   NONE = 0,
-  ButtonPressed = 1
+  ButtonPressed = 1,
+  Update = 2
 }
 
 export function unionToCompanionTxUnion(
   type: CompanionTxUnion,
-  accessor: (obj:ButtonPressed) => ButtonPressed|null
-): ButtonPressed|null {
+  accessor: (obj:ButtonPressed|Update) => ButtonPressed|Update|null
+): ButtonPressed|Update|null {
   switch(CompanionTxUnion[type]) {
     case 'NONE': return null; 
     case 'ButtonPressed': return accessor(new ButtonPressed())! as ButtonPressed;
+    case 'Update': return accessor(new Update())! as Update;
     default: return null;
   }
 }
 
 export function unionListToCompanionTxUnion(
   type: CompanionTxUnion, 
-  accessor: (index: number, obj:ButtonPressed) => ButtonPressed|null, 
+  accessor: (index: number, obj:ButtonPressed|Update) => ButtonPressed|Update|null, 
   index: number
-): ButtonPressed|null {
+): ButtonPressed|Update|null {
   switch(CompanionTxUnion[type]) {
     case 'NONE': return null; 
     case 'ButtonPressed': return accessor(index, new ButtonPressed())! as ButtonPressed;
+    case 'Update': return accessor(index, new Update())! as Update;
     default: return null;
   }
 }

@@ -6,6 +6,7 @@ import * as flatbuffers from 'flatbuffers';
 
 import { ButtonPressed, ButtonPressedT } from '../fbs/button-pressed.js';
 import { CompanionTxUnion, unionToCompanionTxUnion, unionListToCompanionTxUnion } from '../fbs/companion-tx-union.js';
+import { Update, UpdateT } from '../fbs/update.js';
 
 
 export class CompanionTx implements flatbuffers.IUnpackableObject<CompanionTxT> {
@@ -97,7 +98,7 @@ unpackTo(_o: CompanionTxT): void {
 export class CompanionTxT implements flatbuffers.IGeneratedObject {
 constructor(
   public messageType: CompanionTxUnion = CompanionTxUnion.NONE,
-  public message: ButtonPressedT|null = null
+  public message: ButtonPressedT|UpdateT|null = null
 ){}
 
 

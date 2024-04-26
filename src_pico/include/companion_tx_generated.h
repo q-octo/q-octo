@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
               FLATBUFFERS_VERSION_REVISION == 25,
              "Non-compatible flatbuffers version included");
 
+#include "ws_update_generated.h"
+
 namespace fbs {
 
 struct ButtonPressed;
@@ -59,29 +61,32 @@ inline const char *EnumNameButton(Button e) {
 enum CompanionTxUnion : uint8_t {
   CompanionTxUnion_NONE = 0,
   CompanionTxUnion_ButtonPressed = 1,
+  CompanionTxUnion_Update = 2,
   CompanionTxUnion_MIN = CompanionTxUnion_NONE,
-  CompanionTxUnion_MAX = CompanionTxUnion_ButtonPressed
+  CompanionTxUnion_MAX = CompanionTxUnion_Update
 };
 
-inline const CompanionTxUnion (&EnumValuesCompanionTxUnion())[2] {
+inline const CompanionTxUnion (&EnumValuesCompanionTxUnion())[3] {
   static const CompanionTxUnion values[] = {
     CompanionTxUnion_NONE,
-    CompanionTxUnion_ButtonPressed
+    CompanionTxUnion_ButtonPressed,
+    CompanionTxUnion_Update
   };
   return values;
 }
 
 inline const char * const *EnumNamesCompanionTxUnion() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
     "NONE",
     "ButtonPressed",
+    "Update",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameCompanionTxUnion(CompanionTxUnion e) {
-  if (::flatbuffers::IsOutRange(e, CompanionTxUnion_NONE, CompanionTxUnion_ButtonPressed)) return "";
+  if (::flatbuffers::IsOutRange(e, CompanionTxUnion_NONE, CompanionTxUnion_Update)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesCompanionTxUnion()[index];
 }
@@ -94,12 +99,20 @@ template<> struct CompanionTxUnionTraits<fbs::ButtonPressed> {
   static const CompanionTxUnion enum_value = CompanionTxUnion_ButtonPressed;
 };
 
+template<> struct CompanionTxUnionTraits<fbs::Update> {
+  static const CompanionTxUnion enum_value = CompanionTxUnion_Update;
+};
+
 template<typename T> struct CompanionTxUnionUnionTraits {
   static const CompanionTxUnion enum_value = CompanionTxUnion_NONE;
 };
 
 template<> struct CompanionTxUnionUnionTraits<fbs::ButtonPressedT> {
   static const CompanionTxUnion enum_value = CompanionTxUnion_ButtonPressed;
+};
+
+template<> struct CompanionTxUnionUnionTraits<fbs::UpdateT> {
+  static const CompanionTxUnion enum_value = CompanionTxUnion_Update;
 };
 
 struct CompanionTxUnionUnion {
@@ -139,6 +152,14 @@ struct CompanionTxUnionUnion {
   const fbs::ButtonPressedT *AsButtonPressed() const {
     return type == CompanionTxUnion_ButtonPressed ?
       reinterpret_cast<const fbs::ButtonPressedT *>(value) : nullptr;
+  }
+  fbs::UpdateT *AsUpdate() {
+    return type == CompanionTxUnion_Update ?
+      reinterpret_cast<fbs::UpdateT *>(value) : nullptr;
+  }
+  const fbs::UpdateT *AsUpdate() const {
+    return type == CompanionTxUnion_Update ?
+      reinterpret_cast<const fbs::UpdateT *>(value) : nullptr;
   }
 };
 
@@ -219,6 +240,9 @@ struct CompanionTx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::ButtonPressed *message_as_ButtonPressed() const {
     return message_type() == fbs::CompanionTxUnion_ButtonPressed ? static_cast<const fbs::ButtonPressed *>(message()) : nullptr;
   }
+  const fbs::Update *message_as_Update() const {
+    return message_type() == fbs::CompanionTxUnion_Update ? static_cast<const fbs::Update *>(message()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_MESSAGE_TYPE, 1) &&
@@ -233,6 +257,10 @@ struct CompanionTx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
 
 template<> inline const fbs::ButtonPressed *CompanionTx::message_as<fbs::ButtonPressed>() const {
   return message_as_ButtonPressed();
+}
+
+template<> inline const fbs::Update *CompanionTx::message_as<fbs::Update>() const {
+  return message_as_Update();
 }
 
 struct CompanionTxBuilder {
@@ -332,6 +360,10 @@ inline bool VerifyCompanionTxUnion(::flatbuffers::Verifier &verifier, const void
       auto ptr = reinterpret_cast<const fbs::ButtonPressed *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case CompanionTxUnion_Update: {
+      auto ptr = reinterpret_cast<const fbs::Update *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -355,6 +387,10 @@ inline void *CompanionTxUnionUnion::UnPack(const void *obj, CompanionTxUnion typ
       auto ptr = reinterpret_cast<const fbs::ButtonPressed *>(obj);
       return ptr->UnPack(resolver);
     }
+    case CompanionTxUnion_Update: {
+      auto ptr = reinterpret_cast<const fbs::Update *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -366,6 +402,10 @@ inline ::flatbuffers::Offset<void> CompanionTxUnionUnion::Pack(::flatbuffers::Fl
       auto ptr = reinterpret_cast<const fbs::ButtonPressedT *>(value);
       return CreateButtonPressed(_fbb, ptr, _rehasher).Union();
     }
+    case CompanionTxUnion_Update: {
+      auto ptr = reinterpret_cast<const fbs::UpdateT *>(value);
+      return CreateUpdate(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -374,6 +414,10 @@ inline CompanionTxUnionUnion::CompanionTxUnionUnion(const CompanionTxUnionUnion 
   switch (type) {
     case CompanionTxUnion_ButtonPressed: {
       value = new fbs::ButtonPressedT(*reinterpret_cast<fbs::ButtonPressedT *>(u.value));
+      break;
+    }
+    case CompanionTxUnion_Update: {
+      value = new fbs::UpdateT(*reinterpret_cast<fbs::UpdateT *>(u.value));
       break;
     }
     default:
@@ -385,6 +429,11 @@ inline void CompanionTxUnionUnion::Reset() {
   switch (type) {
     case CompanionTxUnion_ButtonPressed: {
       auto ptr = reinterpret_cast<fbs::ButtonPressedT *>(value);
+      delete ptr;
+      break;
+    }
+    case CompanionTxUnion_Update: {
+      auto ptr = reinterpret_cast<fbs::UpdateT *>(value);
       delete ptr;
       break;
     }
