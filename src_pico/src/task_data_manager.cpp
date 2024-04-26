@@ -132,7 +132,7 @@ void taskDataManager(void *pvParameters) {
                   .type = TaskPowerMonitor::MessageType::CAN_MESSAGE,
                   .as = {.canMessage = message.as.canMessage},
           };
-          xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+          TaskPowerMonitor::receiveMessage(powerMonitorMessage);
           break;
         case BATT_OK:
           state.battery = message.as.battery;
@@ -159,7 +159,7 @@ void taskDataManager(void *pvParameters) {
                   .type = TaskPowerMonitor::MessageType::SET_LOW_VOLTAGE_THRESHOLD,
                   .as = {.voltageThreshold = message.as.voltageThreshold},
           };
-          xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+          TaskPowerMonitor::receiveMessage(powerMonitorMessage);
           broadcastStateUpdate();
           break;
         case SET_CRITICAL_VOLTAGE_THRESHOLD:
@@ -169,7 +169,7 @@ void taskDataManager(void *pvParameters) {
                   TaskPowerMonitor::MessageType::SET_CRITICAL_VOLTAGE_THRESHOLD,
                   .as = {.voltageThreshold = message.as.voltageThreshold},
           };
-          xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+          TaskPowerMonitor::receiveMessage(powerMonitorMessage);
           broadcastStateUpdate();
           break;
         case SET_BATTERY_COUNT:
@@ -178,7 +178,7 @@ void taskDataManager(void *pvParameters) {
                   .type = TaskPowerMonitor::MessageType::SET_BATTERY_COUNT,
                   .as = {.batteryCount = message.as.batteryCount},
           };
-          xQueueSend(powerMonitorQueue, &powerMonitorMessage, 0);
+          TaskPowerMonitor::receiveMessage(powerMonitorMessage);
           broadcastStateUpdate();
           break;
         case FOLD_WHEELS:

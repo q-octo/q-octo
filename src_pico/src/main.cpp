@@ -23,7 +23,6 @@ void initTasks();
 TaskHandle_t watchdogHandle = nullptr;
 TaskHandle_t receiveFromRCHandle = nullptr;
 TaskHandle_t sendToRCHandle = nullptr;
-TaskHandle_t powerMonitorHandle = nullptr;
 TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
@@ -91,12 +90,11 @@ void initTasks()
   vTaskCoreAffinitySet(controlMotorsHandle, CORE_0);
   xTaskCreate(taskSendToRC, "sndToRC", stackSize, nullptr, 3, &sendToRCHandle);
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
-  xTaskCreate(taskPowerMonitor, "powerMonitor", stackSize, nullptr, 3, &powerMonitorHandle);
-  vTaskCoreAffinitySet(powerMonitorHandle, CORE_0);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);
   vTaskCoreAffinitySet(dataManagerHandle, CORE_0);
+  TaskPowerMonitor::init();
 #if CFG_ENABLE_RC
   xTaskCreate(taskReceiveFromRC, "recFromRC", stackSize, nullptr, 1, &receiveFromRCHandle);
   vTaskCoreAffinitySet(receiveFromRCHandle, CORE_0);
