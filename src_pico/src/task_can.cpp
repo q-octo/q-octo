@@ -6,20 +6,21 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-bool isPowerMonitorPacket(uint32_t packetId);
-
-void taskCAN(void *pvParameters)
-{
-  (void)pvParameters; //  To avoid warnings
-  Serial.println("taskCAN started");
-  for (;;)
-  {
-    CanCommunication::checkForPacket();
-    vTaskDelay(pdMS_TO_TICKS(1));
-  }
+void TaskCAN::init() {
+  #if !CFG_ENABLE_CAN
+  return;
+#endif
+  // IMPORTANT that this occurs outside a FreeRTOS task (maybe so that we
+  // don't send a CAN message before CAN is initialized?)
+  CanCommunication::init(onReceiveCanPacket);
+  Serial.println("TaskCAN::init complete");
 }
 
-void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
+void TaskCAN::loop() {
+  CanCommunication::checkForPacket();
+}
+
+void TaskCAN::onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
                         bool extended)
 {
   // Serial.print("Received packet with id 0x");
@@ -35,7 +36,7 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
     return;
   }
 
-  TaskMessage::Message message = {
+  DataManager::Message message = {
       .as = {.canMessage =
                  {.id = packetId, .data = packetData, .len = packetLength}}};
 
@@ -47,8 +48,8 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
 
   if (isPowerMonitor)
   {
-    message.type = TaskMessage::Type::CAN_MESSAGE_POWER_MONITOR;
-    xQueueSend(dataManagerQueue, &message, 0);
+    message.type = DataManager::Type::CAN_MESSAGE_POWER_MONITOR;
+    DataManager::receiveMessage(message);
     return;
   }
 
@@ -62,13 +63,13 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
 
       if (motorId == CYBERGEAR_CAN_ID_L)
       {
-        message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_L;
-        xQueueSend(dataManagerQueue, &message, 0);
+        message.type = DataManager::Type::CAN_MESSAGE_MOTOR_L;
+        DataManager::receiveMessage(message);
       }
       if (motorId == CYBERGEAR_CAN_ID_R)
       {
-        message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_R;
-        xQueueSend(dataManagerQueue, &message, 0);
+        message.type = DataManager::Type::CAN_MESSAGE_MOTOR_R;
+        DataManager::receiveMessage(message);
       }
       break;
     }
@@ -76,10 +77,10 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
     {
       Serial.println("[WARN] Received fault feedback frame");
       // Just send to both motors for now
-      message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_L;
-      xQueueSend(dataManagerQueue, &message, 0);
-      message.type = TaskMessage::Type::CAN_MESSAGE_MOTOR_R;
-      xQueueSend(dataManagerQueue, &message, 0);
+      message.type = DataManager::Type::CAN_MESSAGE_MOTOR_L;
+      DataManager::receiveMessage(message);
+      message.type = DataManager::Type::CAN_MESSAGE_MOTOR_R;
+      DataManager::receiveMessage(message);
       break;
     }
     default:
@@ -108,7 +109,7 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
   }
 }
 
-bool isPowerMonitorPacket(uint32_t packetId)
+bool TaskCAN::isPowerMonitorPacket(uint32_t packetId)
 {
   // Assuming that we only expect the message frame type.
   const uint16_t messageTypeId = (packetId & 0xFFFF00) >> 8;

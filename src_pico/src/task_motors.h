@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Arduino.h> // Always include this first
 #include "task_data_manager.h"
 #include "xiaomi_cybergear_driver.h"
@@ -7,11 +8,10 @@ const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
 const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
 const uint8_t MASTER_CAN_ID = 0x00;
 
-extern XiaomiCyberGearDriver cybergearL;
-extern XiaomiCyberGearDriver cybergearR;
-
 namespace TaskControlMotors
 {
+
+  // public:
   typedef enum
   {
     ENABLE,
@@ -28,14 +28,22 @@ namespace TaskControlMotors
     MessageType type;
     union
     {
-      TaskMessage::SetMotorSpeedIndividual speedIndividual;
-      TaskMessage::SetMotorSpeedCombined speedCombined;
-      TaskMessage::CanMessage canMessage;
+      DataManager::SetMotorSpeedIndividual speedIndividual;
+      DataManager::SetMotorSpeedCombined speedCombined;
+      DataManager::CanMessage canMessage;
     } as;
   } Message;
-}
 
-void taskControlMotors(void *pvParameters);
-void taskMotors(void *pvParameters);
+  void init();
 
-extern QueueHandle_t controlMotorsQueue;
+  void receiveMessage(const Message &message);
+
+  // private:
+  void broadcastStatusUpdate();
+
+  void setSpeedIndividual(float speedL, float speedR);
+
+  void initMotors();
+
+  void debugPrintMotorStatus(); 
+};

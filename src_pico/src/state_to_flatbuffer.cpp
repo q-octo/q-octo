@@ -1,7 +1,7 @@
 
 #include "state_to_flatbuffer.h"
 
-void stateToFlatbuffer(const TaskMessage::State &robotState, RobotT &robot)
+void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot)
 {
   robot.batteries = robotState.batteryCount;
   // TODO add these fields:

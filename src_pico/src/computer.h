@@ -14,35 +14,38 @@
 
 using namespace fbs;
 
-class Computer {
-public:
-  enum MessageType { STATE_UPDATE, CRSF_DATA, DISPLAY_BUTTON};
-  typedef struct {
+namespace Computer
+{
+  // public:
+  enum MessageType
+  {
+    STATE_UPDATE,
+    CRSF_DATA,
+    DISPLAY_BUTTON
+  };
+  typedef struct
+  {
     MessageType type;
-    union {
-      TaskMessage::State state;
-      TaskMessage::DisplayButton displayButton;
+    union
+    {
+      DataManager::State state;
+      DataManager::DisplayButton displayButton;
     } as;
   } Message;
 
+  void receiveMessage(const Message &message);
+  void init();
+  void loop();
 
-  static void receiveMessage(const Message &message);
-  static void loop();
-  static void task(void *pvParameters);
 
-  static inline SerialUART computerSerial = Serial2;
+  // private:
+  void serialiseState(const DataManager::State &state);
+  void sendStateToComputer(const DataManager::State &state);
+  void handleComputerTx(const OnboardComputerTx &computerTx);
+  void sendTaskMessage(const DataManager::Message &message);
+  void sendDisplayButtonToComputer(const DataManager::DisplayButton &displayButton);
+  void parseIncomingSerialData();
+  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
+  Button serialiseDisplayButton(const DataManager::DisplayButton &displayButton);
 
-private:
-  static void serialiseState(const TaskMessage::State &state);
-  static void sendStateToComputer(const TaskMessage::State &state);
-  static void handleComputerTx(const OnboardComputerTx &computerTx);
-  static void sendTaskMessage(const TaskMessage::Message &message);
-  static void sendDisplayButtonToComputer(const TaskMessage::DisplayButton &displayButton);
-  static void parseIncomingSerialData();
-  static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-  static Button serialiseDisplayButton(const TaskMessage::DisplayButton &displayButton);
-
-  // 1024 is the default size, but it will grow automatically.
-  static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
-  static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(computerSerial, verifyIncomingFlatbuffer);
-};
+}

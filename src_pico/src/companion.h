@@ -4,7 +4,9 @@
 #include "config.h"
 #include "FreeRTOS.h"
 #include "queue.h"
+
 #include "task_data_manager.h"
+
 #include "robot_state_generated.h"
 #include "ws_update_generated.h"
 #include "companion_rx_generated.h"
@@ -15,35 +17,37 @@
 
 using namespace fbs;
 
-class Companion {
-public:
-  enum MessageType { ENABLE_WEB_SERVER, DISABLE_WEB_SERVER, STATE_UPDATE };
-  typedef struct {
+namespace Companion
+{
+  // public:
+  enum MessageType
+  {
+    ENABLE_WEB_SERVER,
+    DISABLE_WEB_SERVER,
+    STATE_UPDATE
+  };
+  typedef struct
+  {
     MessageType type;
-    union {
-      TaskMessage::State state;
+    union
+    {
+      DataManager::State state;
     } as;
   } Message;
 
-  static void init();
-  static void receiveMessage(const Message &message);
-  static void loop();
-  static void task(void *pvParameters);
+  void init();
+  void receiveMessage(const Message &message);
+  void loop();
 
-  static inline SerialPIO companionSerial =
-      SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 32);
 
-private:
-  static void serialiseState(const TaskMessage::State &state);
-  static void sendStateToCompanion(const TaskMessage::State &state);
-  static void handleCompanionTx(const CompanionTx &companionTx);
-  static void handleUpdateMessage(const Update &update);
-  static void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
-  static void sendTaskMessage(const TaskMessage::Message &message);
-  static void parseIncomingSerialData();
-  static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
+  // private:
+  void serialiseState(const DataManager::State &state);
+  void sendStateToCompanion(const DataManager::State &state);
+  void handleCompanionTx(const CompanionTx &companionTx);
+  void handleUpdateMessage(const Update &update);
+  void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
+  void sendTaskMessage(const DataManager::Message &message);
+  void parseIncomingSerialData();
+  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
 
-  // 1024 is the default size, but it will grow automatically.
-  static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
-  static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
-};
+}
