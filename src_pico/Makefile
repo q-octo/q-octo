@@ -4,7 +4,7 @@ FBS_SRC_DIR = ../flatbuffers_schemas
 FBS_PICO1_OUT_DIR = include
 FBS_PICO2_OUT_DIR = ../src_companion/include
 FBS_TS_OUT_DIR = ../src_companion/packed_fs/web-dashboard/src/generated
-FBS_PYTHON_OUT_DIR = ../src_onboard/python/generated
+FBS_PYTHON_OUT_DIR = ../src_onboard
 
 # Find all .fbs files in the FBS_SRC_DIR
 FBS_FILES = $(wildcard $(FBS_SRC_DIR)/*.fbs)
