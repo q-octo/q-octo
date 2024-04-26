@@ -4,6 +4,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
+import { ButtonPressed, ButtonPressedT } from '../fbs/button-pressed.js';
 import { CrsfData, CrsfDataT } from '../fbs/crsf-data.js';
 import { OnboardComputerRxUnion, unionToOnboardComputerRxUnion, unionListToOnboardComputerRxUnion } from '../fbs/onboard-computer-rx-union.js';
 import { Robot, RobotT } from '../fbs/robot.js';
@@ -98,7 +99,7 @@ unpackTo(_o: OnboardComputerRxT): void {
 export class OnboardComputerRxT implements flatbuffers.IGeneratedObject {
 constructor(
   public messageType: OnboardComputerRxUnion = OnboardComputerRxUnion.NONE,
-  public message: CrsfDataT|RobotT|null = null
+  public message: ButtonPressedT|CrsfDataT|RobotT|null = null
 ){}
 
 

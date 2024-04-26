@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
               FLATBUFFERS_VERSION_REVISION == 25,
              "Non-compatible flatbuffers version included");
 
+#include "companion_tx_generated.h"
 #include "robot_state_generated.h"
 
 namespace fbs {
@@ -35,31 +36,34 @@ enum OnboardComputerRxUnion : uint8_t {
   OnboardComputerRxUnion_NONE = 0,
   OnboardComputerRxUnion_CrsfData = 1,
   OnboardComputerRxUnion_Robot = 2,
+  OnboardComputerRxUnion_ButtonPressed = 3,
   OnboardComputerRxUnion_MIN = OnboardComputerRxUnion_NONE,
-  OnboardComputerRxUnion_MAX = OnboardComputerRxUnion_Robot
+  OnboardComputerRxUnion_MAX = OnboardComputerRxUnion_ButtonPressed
 };
 
-inline const OnboardComputerRxUnion (&EnumValuesOnboardComputerRxUnion())[3] {
+inline const OnboardComputerRxUnion (&EnumValuesOnboardComputerRxUnion())[4] {
   static const OnboardComputerRxUnion values[] = {
     OnboardComputerRxUnion_NONE,
     OnboardComputerRxUnion_CrsfData,
-    OnboardComputerRxUnion_Robot
+    OnboardComputerRxUnion_Robot,
+    OnboardComputerRxUnion_ButtonPressed
   };
   return values;
 }
 
 inline const char * const *EnumNamesOnboardComputerRxUnion() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NONE",
     "CrsfData",
     "Robot",
+    "ButtonPressed",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameOnboardComputerRxUnion(OnboardComputerRxUnion e) {
-  if (::flatbuffers::IsOutRange(e, OnboardComputerRxUnion_NONE, OnboardComputerRxUnion_Robot)) return "";
+  if (::flatbuffers::IsOutRange(e, OnboardComputerRxUnion_NONE, OnboardComputerRxUnion_ButtonPressed)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOnboardComputerRxUnion()[index];
 }
@@ -76,6 +80,10 @@ template<> struct OnboardComputerRxUnionTraits<fbs::Robot> {
   static const OnboardComputerRxUnion enum_value = OnboardComputerRxUnion_Robot;
 };
 
+template<> struct OnboardComputerRxUnionTraits<fbs::ButtonPressed> {
+  static const OnboardComputerRxUnion enum_value = OnboardComputerRxUnion_ButtonPressed;
+};
+
 template<typename T> struct OnboardComputerRxUnionUnionTraits {
   static const OnboardComputerRxUnion enum_value = OnboardComputerRxUnion_NONE;
 };
@@ -86,6 +94,10 @@ template<> struct OnboardComputerRxUnionUnionTraits<fbs::CrsfDataT> {
 
 template<> struct OnboardComputerRxUnionUnionTraits<fbs::RobotT> {
   static const OnboardComputerRxUnion enum_value = OnboardComputerRxUnion_Robot;
+};
+
+template<> struct OnboardComputerRxUnionUnionTraits<fbs::ButtonPressedT> {
+  static const OnboardComputerRxUnion enum_value = OnboardComputerRxUnion_ButtonPressed;
 };
 
 struct OnboardComputerRxUnionUnion {
@@ -133,6 +145,14 @@ struct OnboardComputerRxUnionUnion {
   const fbs::RobotT *AsRobot() const {
     return type == OnboardComputerRxUnion_Robot ?
       reinterpret_cast<const fbs::RobotT *>(value) : nullptr;
+  }
+  fbs::ButtonPressedT *AsButtonPressed() {
+    return type == OnboardComputerRxUnion_ButtonPressed ?
+      reinterpret_cast<fbs::ButtonPressedT *>(value) : nullptr;
+  }
+  const fbs::ButtonPressedT *AsButtonPressed() const {
+    return type == OnboardComputerRxUnion_ButtonPressed ?
+      reinterpret_cast<const fbs::ButtonPressedT *>(value) : nullptr;
   }
 };
 
@@ -351,6 +371,9 @@ struct OnboardComputerRx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const fbs::Robot *message_as_Robot() const {
     return message_type() == fbs::OnboardComputerRxUnion_Robot ? static_cast<const fbs::Robot *>(message()) : nullptr;
   }
+  const fbs::ButtonPressed *message_as_ButtonPressed() const {
+    return message_type() == fbs::OnboardComputerRxUnion_ButtonPressed ? static_cast<const fbs::ButtonPressed *>(message()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_MESSAGE_TYPE, 1) &&
@@ -369,6 +392,10 @@ template<> inline const fbs::CrsfData *OnboardComputerRx::message_as<fbs::CrsfDa
 
 template<> inline const fbs::Robot *OnboardComputerRx::message_as<fbs::Robot>() const {
   return message_as_Robot();
+}
+
+template<> inline const fbs::ButtonPressed *OnboardComputerRx::message_as<fbs::ButtonPressed>() const {
+  return message_as_ButtonPressed();
 }
 
 struct OnboardComputerRxBuilder {
@@ -526,6 +553,10 @@ inline bool VerifyOnboardComputerRxUnion(::flatbuffers::Verifier &verifier, cons
       auto ptr = reinterpret_cast<const fbs::Robot *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case OnboardComputerRxUnion_ButtonPressed: {
+      auto ptr = reinterpret_cast<const fbs::ButtonPressed *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -553,6 +584,10 @@ inline void *OnboardComputerRxUnionUnion::UnPack(const void *obj, OnboardCompute
       auto ptr = reinterpret_cast<const fbs::Robot *>(obj);
       return ptr->UnPack(resolver);
     }
+    case OnboardComputerRxUnion_ButtonPressed: {
+      auto ptr = reinterpret_cast<const fbs::ButtonPressed *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -568,6 +603,10 @@ inline ::flatbuffers::Offset<void> OnboardComputerRxUnionUnion::Pack(::flatbuffe
       auto ptr = reinterpret_cast<const fbs::RobotT *>(value);
       return CreateRobot(_fbb, ptr, _rehasher).Union();
     }
+    case OnboardComputerRxUnion_ButtonPressed: {
+      auto ptr = reinterpret_cast<const fbs::ButtonPressedT *>(value);
+      return CreateButtonPressed(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -580,6 +619,10 @@ inline OnboardComputerRxUnionUnion::OnboardComputerRxUnionUnion(const OnboardCom
     }
     case OnboardComputerRxUnion_Robot: {
       value = new fbs::RobotT(*reinterpret_cast<fbs::RobotT *>(u.value));
+      break;
+    }
+    case OnboardComputerRxUnion_ButtonPressed: {
+      value = new fbs::ButtonPressedT(*reinterpret_cast<fbs::ButtonPressedT *>(u.value));
       break;
     }
     default:
@@ -596,6 +639,11 @@ inline void OnboardComputerRxUnionUnion::Reset() {
     }
     case OnboardComputerRxUnion_Robot: {
       auto ptr = reinterpret_cast<fbs::RobotT *>(value);
+      delete ptr;
+      break;
+    }
+    case OnboardComputerRxUnion_ButtonPressed: {
+      auto ptr = reinterpret_cast<fbs::ButtonPressedT *>(value);
       delete ptr;
       break;
     }
