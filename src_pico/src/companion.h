@@ -25,12 +25,11 @@ public:
     } as;
   } Message;
 
+  static void init();
   static void receiveMessage(const Message &message);
   static void loop();
-  static void taskProducer(void *pvParameters);
-  static void taskConsumer(void *pvParameters);
+  static void task(void *pvParameters);
 
-  static inline QueueHandle_t companionQueue = nullptr;
   static inline SerialPIO companionSerial =
       SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 32);
 

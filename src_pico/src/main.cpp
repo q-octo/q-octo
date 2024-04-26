@@ -28,10 +28,8 @@ TaskHandle_t dataManagerHandle = nullptr;
 TaskHandle_t canHandle = nullptr;
 TaskHandle_t motorsHandle = nullptr;
 TaskHandle_t controlMotorsHandle = nullptr;
-TaskHandle_t companionConsumerHandle = nullptr;
-TaskHandle_t companionProducerHandle = nullptr;
-TaskHandle_t computerProducerHandle = nullptr;
-TaskHandle_t computerConsumerHandle = nullptr;
+TaskHandle_t companionTask = nullptr;
+TaskHandle_t computerTask = nullptr;
 
 std::map<eTaskState, const char *> eTaskStateName{{eReady, "Ready"},
                                                   {eRunning, "Running"},
@@ -84,6 +82,9 @@ void initTasks()
   // We likely only needed this for the controlMotor task?
   const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
 
+  // Remaining 'tasks'
+  // wifi switch, motor off switch, voice module, flight controller
+
   xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 4, &watchdogHandle);
   vTaskCoreAffinitySet(watchdogHandle, CORE_0);
   xTaskCreate(taskControlMotors, "ctrlMotors", stackSize, nullptr, 3, &controlMotorsHandle);
@@ -92,9 +93,6 @@ void initTasks()
   vTaskCoreAffinitySet(sendToRCHandle, CORE_0);
   xTaskCreate(taskPowerMonitor, "powerMonitor", stackSize, nullptr, 3, &powerMonitorHandle);
   vTaskCoreAffinitySet(powerMonitorHandle, CORE_0);
-  xTaskCreate(Companion::taskConsumer, "cpnConsumer", stackSize, nullptr, 3, &companionConsumerHandle);
-        vTaskCoreAffinitySet(companionConsumerHandle, CORE_0);
-  xTaskCreate(Computer::taskConsumer, "cptrConsumer", stackSize, nullptr, 3, &computerConsumerHandle);
   // Data Manager has a higher priority than producers (to prevent queue
   // overflows) and lower priority than consumers.
   xTaskCreate(taskDataManager, "dataManager", stackSize, nullptr, 2, &dataManagerHandle);
@@ -113,12 +111,12 @@ void initTasks()
   vTaskCoreAffinitySet(motorsHandle, CORE_0);
 #endif
 #if CFG_ENABLE_COMPANION
-  xTaskCreate(Companion::taskProducer, "cpnProducer", stackSize, nullptr, 1, &companionProducerHandle);
-  vTaskCoreAffinitySet(companionProducerHandle, CORE_0);
+  xTaskCreate(Companion::task, "cpnProducer", stackSize, nullptr, 1, &companionTask);
+  vTaskCoreAffinitySet(companionTask, CORE_0);
 #endif
 #if CFG_ENABLE_ONBOARD_COMPUTER
-  xTaskCreate(Computer::taskProducer, "cptrProducer", stackSize, nullptr, 1, &computerProducerHandle);
-  vTaskCoreAffinitySet(computerProducerHandle, CORE_0);
+  xTaskCreate(Computer::task, "cptrProducer", stackSize, nullptr, 1, &computerTask);
+  vTaskCoreAffinitySet(computerTask, CORE_0);
 #endif
 }
 

@@ -26,12 +26,12 @@ void broadcastStateUpdate() {
           .type = Companion::MessageType::STATE_UPDATE,
           .as = {.state = state},
   };
-  xQueueSend(Companion::companionQueue, &companionMessage, 0);
+  Companion::receiveMessage(companionMessage);
   computerMessage = {
           .type = Computer::MessageType::STATE_UPDATE,
           .as = {.state = state},
   };
-  xQueueSend(Computer::computerQueue, &computerMessage, 0);
+  Computer::receiveMessage(computerMessage);
 }
 
 void setWebServerEnabled(bool enabled) {
@@ -41,7 +41,7 @@ void setWebServerEnabled(bool enabled) {
                   Companion::MessageType::ENABLE_WEB_SERVER :
                   Companion::MessageType::DISABLE_WEB_SERVER,
   };
-  xQueueSend(Companion::companionQueue, &companionMessage, 0);
+  Companion::receiveMessage(companionMessage);
   broadcastStateUpdate();
 }
 
@@ -191,7 +191,7 @@ void taskDataManager(void *pvParameters) {
                   .type = Computer::MessageType::DISPLAY_BUTTON,
                   .as = {.displayButton = message.as.displayButton},
           };
-          xQueueSend(Computer::computerQueue, &computerMessage, 0);
+          Computer::receiveMessage(computerMessage);
         default:
           Serial.println("[ERROR] Unknown message type");
       }

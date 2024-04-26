@@ -4,6 +4,9 @@
 
 void Companion::receiveMessage(const Message &message)
 {
+#if !CFG_ENABLE_COMPANION
+  return;
+#endif
   switch (message.type)
   {
   case ENABLE_WEB_SERVER:
@@ -162,11 +165,15 @@ void Companion::handleButtonPressedMessage(const ButtonPressed &buttonPressed)
   }
 }
 
-void Companion::taskProducer(void *pvParameters)
+void Companion::init()
+{
+  companionSerial.begin(115200);
+}
+
+void Companion::task(void *pvParameters)
 {
   (void)pvParameters; //  To avoid warnings
-
-  companionSerial.begin(115200);
+  init();
 
   for (;;)
   {
@@ -211,7 +218,6 @@ void Companion::sendStateToCompanion(const TaskMessage::State &state)
   serialiseState(state);
   companionSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
-
 
 void Companion::serialiseState(const TaskMessage::State &state)
 {

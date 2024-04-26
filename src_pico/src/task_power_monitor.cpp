@@ -6,8 +6,8 @@
 static CanardInstance canard;
 static uint8_t memory_pool[1024];
 
-float motorShutdownVoltage = 17.5f;
-float systemShutdownVoltage = 17.0f;
+float motorShutdownVoltage = 17.5f; // 3.5V * 5
+float systemShutdownVoltage = 17.0f; // 3.4V * 5
 int batteryCount = 4;
 
 QueueHandle_t powerMonitorQueue;

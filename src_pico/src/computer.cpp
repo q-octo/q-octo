@@ -3,6 +3,9 @@
 #include "config.h"
 
 void Computer::receiveMessage(const Message &message) {
+#if !CFG_ENABLE_ONBOARD_COMPUTER
+  return;
+#endif
   switch (message.type) {
     case STATE_UPDATE:
       sendStateToComputer(message.as.state);
@@ -53,7 +56,7 @@ void Computer::sendTaskMessage(const TaskMessage::Message &message) {
   xQueueSend(dataManagerQueue, &message, 0);
 }
 
-void Computer::taskProducer(void *pvParameters) {
+void Computer::task(void *pvParameters) {
   (void) pvParameters; //  To avoid warnings
   Serial.println("Started onboard computer producer task");
 
@@ -66,29 +69,6 @@ void Computer::taskProducer(void *pvParameters) {
   }
 }
 
-void Computer::taskConsumer(void *pvParameters) {
-  (void) pvParameters; //  To avoid warnings
-  Serial.println("Started onboard computer consumer task");
-  computerQueue = xQueueCreate(10, sizeof(Message));
-  if (computerQueue == nullptr) {
-    Serial.println("Failed to create computerQueue");
-    vTaskDelete(nullptr);
-  }
-  static Message message;
-
-#if !CFG_ENABLE_ONBOARD_COMPUTER
-  Serial.println("Computer disabled");
-  for (;;) {
-    xQueueReceive(computerQueue, &message, portMAX_DELAY);
-  }
-#endif
-
-  for (;;) {
-    if (xQueueReceive(computerQueue, &message, portMAX_DELAY)) {
-      receiveMessage(message);
-    }
-  }
-}
 
 void Computer::sendStateToComputer(const TaskMessage::State &state) {
   Serial.println("Sending state to onboard computer");

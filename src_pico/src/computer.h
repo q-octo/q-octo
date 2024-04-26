@@ -28,10 +28,8 @@ public:
 
   static void receiveMessage(const Message &message);
   static void loop();
-  static void taskProducer(void *pvParameters);
-  static void taskConsumer(void *pvParameters);
+  static void task(void *pvParameters);
 
-  static inline QueueHandle_t computerQueue = nullptr;
   static inline SerialUART computerSerial = Serial2;
 
 private:
