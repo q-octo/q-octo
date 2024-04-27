@@ -23,6 +23,13 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="EmbeddedSvdWindowState">
+    <option name="loadedFiles">
+      <list>
+        <option value="$USER_HOME$/.platformio/platforms/raspberrypi@src-7170295abe15989fa583476f418105e4/misc/svd/rp2040.svd" />
+      </list>
+    </option>
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="pico" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -79,6 +86,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "PlatformIO.PlatformIO.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
@@ -95,8 +103,6 @@
   },
   "keyToStringList": {
     "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
       "repository"
     ]
   }
@@ -127,11 +133,24 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714081889584</updated>
-      <workItem from="1714081890737" duration="22420000" />
+      <workItem from="1714081890737" duration="26632000" />
     </task>
+    <task id="LOCAL-00001" summary="disable tasks when config says so">
+      <option name="closed" value="true" />
+      <created>1714217998335</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1714217998335</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="disable tasks when config says so" />
+    <option name="LAST_COMMIT_MESSAGE" value="disable tasks when config says so" />
   </component>
 </project>
