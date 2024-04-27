@@ -2,7 +2,30 @@
 #include "computer.h"
 #include "config.h"
 
+namespace Computer {
+
+  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
+
+  SerialUART computerSerial = Serial2;
+  // 1024 is the default size, but it will grow automatically.
+  flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
+  FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(computerSerial, verifyIncomingFlatbuffer);
+
+}
+
+void Computer::init() {
+  if (!CFG_ENABLE_ONBOARD_COMPUTER) {
+    return;
+  }
+
+  computerSerial.setPinout(CFG_ONBOARD_COMPUTER_UART_TX, CFG_ONBOARD_COMPUTER_UART_RX);
+  computerSerial.begin(115200);
+}
+
 void Computer::receiveMessage(const Message &message) {
+  if (!CFG_ENABLE_ONBOARD_COMPUTER) {
+    return;
+  }
   switch (message.type) {
     case STATE_UPDATE:
       sendStateToComputer(message.as.state);
@@ -46,76 +69,38 @@ void Computer::handleComputerTx(const OnboardComputerTx &computerMessage) {
       Serial.println("Received drive robot message");
       break;
   }
-
 }
 
-void Computer::sendTaskMessage(const TaskMessage::Message &message) {
-  xQueueSend(dataManagerQueue, &message, 0);
+void Computer::sendTaskMessage(const DataManager::Message &message) {
+  DataManager::receiveMessage(message);
 }
 
-void Computer::taskProducer(void *pvParameters) {
-  (void) pvParameters; //  To avoid warnings
-  Serial.println("Started onboard computer producer task");
-
-  computerSerial.setPinout(CFG_ONBOARD_COMPUTER_UART_TX, CFG_ONBOARD_COMPUTER_UART_RX);
-  computerSerial.begin(115200);
-
-  for (;;) {
-    loop();
-    vTaskDelay(pdMS_TO_TICKS(8));
-  }
-}
-
-void Computer::taskConsumer(void *pvParameters) {
-  (void) pvParameters; //  To avoid warnings
-  Serial.println("Started onboard computer consumer task");
-  computerQueue = xQueueCreate(10, sizeof(Message));
-  if (computerQueue == nullptr) {
-    Serial.println("Failed to create computerQueue");
-    vTaskDelete(nullptr);
-  }
-  static Message message;
-
-#if !CFG_ENABLE_ONBOARD_COMPUTER
-  Serial.println("Computer disabled");
-  for (;;) {
-    xQueueReceive(computerQueue, &message, portMAX_DELAY);
-  }
-#endif
-
-  for (;;) {
-    if (xQueueReceive(computerQueue, &message, portMAX_DELAY)) {
-      receiveMessage(message);
-    }
-  }
-}
-
-void Computer::sendStateToComputer(const TaskMessage::State &state) {
+void Computer::sendStateToComputer(const DataManager::State &state) {
   Serial.println("Sending state to onboard computer");
   serialiseState(state);
   computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
 
-//void Computer::sendCrsfDataToComputer(const TaskMessage:: &crsfFrame) {
-//  fbb.Reset();
+// void Computer::sendCrsfDataToComputer(const DataManager:: &crsfFrame) {
+//   fbb.Reset();
 //
-//  auto crsfFrameOffset = CreateCrsfFrame(fbb, &crsfFrame);
-//  auto message = CreateOnboardComputerRx(fbb, OnboardComputerRxUnion_CrsfData, crsfFrameOffset.Union());
-//  FinishSizePrefixedOnboardComputerRxBuffer(fbb, message);
-//  computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
-//}
+//   auto crsfFrameOffset = CreateCrsfFrame(fbb, &crsfFrame);
+//   auto message = CreateOnboardComputerRx(fbb, OnboardComputerRxUnion_CrsfData, crsfFrameOffset.Union());
+//   FinishSizePrefixedOnboardComputerRxBuffer(fbb, message);
+//   computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
+// }
 
-Button Computer::serialiseDisplayButton(const TaskMessage::DisplayButton &displayButton) {
+Button Computer::serialiseDisplayButton(const DataManager::DisplayButton &displayButton) {
   switch (displayButton) {
-    case TaskMessage::DisplayButton::A:
+    case DataManager::DisplayButton::A:
       return Button_A;
-    case TaskMessage::DisplayButton::B:
+    case DataManager::DisplayButton::B:
       return Button_B;
   }
   return Button_A;
 }
 
-void Computer::sendDisplayButtonToComputer(const TaskMessage::DisplayButton &displayButton) {
+void Computer::sendDisplayButtonToComputer(const DataManager::DisplayButton &displayButton) {
   Serial.println("Sending display button to onboard computer");
   fbb.Reset();
 
@@ -125,7 +110,7 @@ void Computer::sendDisplayButtonToComputer(const TaskMessage::DisplayButton &dis
   computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
 
-void Computer::serialiseState(const TaskMessage::State &state) {
+void Computer::serialiseState(const DataManager::State &state) {
   fbb.Reset();
 
   RobotT robot = RobotT();
