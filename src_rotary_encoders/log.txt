@@ -1,0 +1,8 @@
+0x7EFE is the ID the motor responds with
+Does this payload from the motor mean something.
+0x583131313033310A 
+
+Received standard packet with id 0x64 and length 6
+0x 01 A1 C9 80 27 FF
+
+0x0199318037FF

@@ -1,0 +1,162 @@
+---- Reopened serial port /dev/tty.usbmodem14101 ----
+Live on core 0 ofc
+CAN init complete
+Initialized Canard
+Received extended packet with id 0x18F47500 and length 8
+0x01430029000850C4
+Received DNA message: Node ID: 0, Unique ID: 43 00 29 00 08 50 
+Is first stage request: 1
+Canard response: 0
+[sendCANPacket] Sending packet with id 0x18000161
+Data: F1 43 00 29 00 08 50 C0 
+Received extended packet with id 0x18DBF500 and length 8
+0x00483948333820C5
+Received DNA message: Node ID: 0, Unique ID: 48 39 48 33 38 20 
+Is first stage request: 0
+Canard response: 0
+[sendCANPacket] Sending packet with id 0x18000161
+Data: DB 57 F0 43 00 29 00 81 
+[sendCANPacket] Sending packet with id 0x18000161
+Data: 08 50 48 39 48 33 38 21 
+[sendCANPacket] Sending packet with id 0x18000161
+Data: 20 41 
+Received extended packet with id 0x18221900 and length 6
+0x0000000000C6
+Received DNA message: Node ID: 0, Unique ID: 00 00 00 00 
+Is first stage request: 0
+Canard response: 0
+[sendCANPacket] Sending packet with id 0x18000161
+Data: 73 B1 F0 43 00 29 00 82 
+[sendCANPacket] Sending packet with id 0x18000161
+Data: 08 50 48 39 48 33 38 22 
+[sendCANPacket] Sending packet with id 0x18000161
+Data: 20 00 00 00 00 42 
+
+Received extended packet with id 0x18044478 and length 8
+0xC32700000000EC80
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000100
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E20
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3140
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0x7DC000006612EC81
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000101
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E21
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3141
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0xBA8C00006612BC82
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000102
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E22
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3142
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0xECC8000066129283
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000103
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E23
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3143
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0x073C000000009284
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000104
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E24
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3144
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0xEEDE00006612EC85
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000105
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E25
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3145
+Canard response: -17
+Received extended packet with id 0x18015578 and length 8
+0x0400000000707CC0
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x1800000000000026
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x656B4C3433312D06
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3146
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x7D19000000003887
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000107
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E27
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3147
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0x72BB000000003888
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000108
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E28
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3148
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0x6B1F000000000089
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000109
+Canard response: -14
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E29
+Canard response: 0
+Received extended packet with id 0x18044478 and length 4
+0x202D3149
+Canard response: -17
+Received extended packet with id 0x18044478 and length 8
+0x953400006616088A
+Canard response: 0
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC000010A
+Canard response: -14
+Received extended packet with id 0x
+---- Closed the serial port /dev/tty.usbmodem14101 ----
