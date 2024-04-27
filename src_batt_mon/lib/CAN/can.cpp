@@ -1,0 +1,118 @@
+#include <Adafruit_MCP2515.h>
+#include "can.h"
+
+// https://github.com/adafruit/Adafruit_MCP2515/blob/4814941a02d663b82ecdb9548386f20b03ec108a/examples/MCP2515_CAN_ReceiverCallback/MCP2515_CAN_ReceiverCallback.ino#L32-L33
+#define CS_PIN 22
+#define INT_PIN 21
+
+// Set CAN bus baud rate
+#define CAN_BAUDRATE (1000000) // 1Mbit/s (determined by the motor)
+Adafruit_MCP2515 mcp(CS_PIN);
+
+#define DEBUG_CAN 0
+
+PacketCallback _onPacketReceived;
+
+void CanCommunication::init(PacketCallback onPacketReceived)
+{
+    if (!mcp.begin(CAN_BAUDRATE))
+    {
+        Serial.println("Starting CAN (MCP2515) failed");
+        return;
+    }
+    _onPacketReceived = onPacketReceived;
+    Serial.println("CAN init complete");
+}
+
+void CanCommunication::checkForPacket()
+{
+    uint8_t packetSize = mcp.parsePacket();
+
+    if (packetSize)
+    {
+
+        bool extended = mcp.packetExtended();
+#if DEBUG_CAN
+        // received a packet
+        Serial.print("Received ");
+
+        if (extended)
+        {
+            Serial.print("extended ");
+        }
+
+        if (mcp.packetRtr())
+        {
+            // Remote transmission request, packet contains no data
+            Serial.print("RTR ");
+        }
+
+        Serial.print("packet with id 0x");
+        Serial.print(mcp.packetId(), HEX);
+#endif
+        if (mcp.packetRtr())
+        {
+            // Serial.print(" and requested length ");
+            // Serial.println(mcp.packetDlc());
+        }
+        else
+        {
+            // Serial.print(" and length ");
+            // Serial.println(packetSize);
+            uint8_t packetData[8] = {0};
+            int i = 0;
+            // only print packet data for non-RTR packets
+            while (mcp.available())
+            {
+                packetData[i] = mcp.read();
+                i++;
+            }
+            _onPacketReceived(packetSize, mcp.packetId(), packetData, extended);
+
+            // Serial.println();
+        }
+
+        // Serial.println();
+    }
+}
+
+/**
+ * Sends a CAN packet with the specified ID and data.
+ * Assumes that the data length is 8 bytes.
+ *
+ * @param id The ID of the CAN packet.
+ * @param data Pointer to the data to be sent.
+ */
+void CanCommunication::sendCANPacket(uint32_t id, const uint8_t *data, uint8_t length, bool extended)
+{
+    Serial.print("[sendCANPacket] Sending packet with id 0x");
+    Serial.println(id, HEX);
+    Serial.print("Data: ");
+    for (int i = 0; i < length; i++)
+    {
+        Serial.printf("%02X ", data[i]);
+    }
+    Serial.println();
+
+    //
+    // Remote transmission request (false for data frame, true for remote frame)
+    bool rtr = false;
+    // Data Length Code (how many bytes are being transmitted)
+    int dlc = length;
+    if (!mcp.beginExtendedPacket(id, dlc, rtr))
+    {
+        Serial.println("Failed to begin packet");
+        return;
+    }
+    // if ((extended && !mcp.beginExtendedPacket(id, length, rtr)) || (!extended && !mcp.beginPacket(id, length, rtr)))
+    // {
+    //     Serial.println("Failed to begin packet");
+    //     return;
+    // }
+    mcp.write(data, length);
+    if (!mcp.endPacket())
+    {
+        Serial.println("Failed to end packet");
+        return;
+    }
+}
