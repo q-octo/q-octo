@@ -4,6 +4,7 @@ class QOctoSerial
 {
 public:
     QOctoSerial();
+    void init();
     void loop();
 
 private:
