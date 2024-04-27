@@ -1,9 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <FreeRTOS.h>
-#include <queue.h>
-#include <task.h>
 
 namespace DataManager {
 // public:

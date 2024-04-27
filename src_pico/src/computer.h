@@ -2,8 +2,6 @@
 
 #include <Arduino.h>
 #include "config.h"
-#include "FreeRTOS.h"
-#include "queue.h"
 #include "task_data_manager.h"
 #include "robot_state_generated.h"
 #include "onboard_computer_rx_generated.h"

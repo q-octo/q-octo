@@ -1,17 +1,16 @@
 #include "config.h"
 #include <Arduino.h>
 
-#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
-#include <task.h>     // Enables FreeRTOS tasks
+//#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
+//#include <task.h>     // Enables FreeRTOS tasks
 
-#include "can.h"
 #include "task_motors.h"
 #include "task_rc.h"
 #include "task_watchdog.h"
-#include "task_power_monitor.h"
 #include "companion.h"
 #include "computer.h"
 #include "task_can.h"
+#include "task_power_monitor.h"
 
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -22,13 +21,13 @@ void printHeapStats();
 
 void initTasks();
 
-TaskHandle_t watchdogHandle = nullptr;
+//TaskHandle_t watchdogHandle = nullptr;
 
-std::map<eTaskState, const char *> eTaskStateName{{eReady,     "Ready"},
-                                                  {eRunning,   "Running"},
-                                                  {eBlocked,   "Blocked"},
-                                                  {eSuspended, "Suspended"},
-                                                  {eDeleted,   "Deleted"}};
+//std::map<eTaskState, const char *> eTaskStateName{{eReady,     "Ready"},
+//                                                  {eRunning,   "Running"},
+//                                                  {eBlocked,   "Blocked"},
+//                                                  {eSuspended, "Suspended"},
+//                                                  {eDeleted,   "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
 
 void setup() {
@@ -37,6 +36,13 @@ void setup() {
   while (!Serial);
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
+  TaskCAN::init();
+  TaskRC::init();
+  TaskPowerMonitor::init();
+  TaskControlMotors::init();
+  Companion::init();
+  Computer::init();
+  Watchdog::init();
   initTasks();
 }
 
@@ -50,13 +56,21 @@ void loop() {
     printTaskStatus();
   }
 #endif
-#if CFG_ENABLE_WEB_SERVER
-  WSWebServer::loop();
-#endif
+
+  TaskCAN::loop();
+  TaskRC::loop();
+  // TODO this should run slower
+  TaskControlMotors::broadcastStatusUpdate();
+  Companion::loop();
+  Computer::loop();
+
+  Watchdog::taskCompleted(Watchdog::Task::FAST_LOOP);
+  Watchdog::loop();
   // It appears that a task labelled CORE0 runs this loop in a task
   // So if this loop never blocks, no other task on core 0 will run!
-  vTaskDelay(pdMS_TO_TICKS(1));
+//  vTaskDelay(pdMS_TO_TICKS(1));
 }
+
 
 void initTasks() {
   // Setup FreeRTOS tasks
@@ -64,22 +78,18 @@ void initTasks() {
   // overflow
 
   // We likely only needed this for the controlMotor task?
-  const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
+//  const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
 
   // Remaining 'tasks'
   // wifi switch, motor off switch, voice module, flight controller
-  TaskCAN::init();
-  TaskRC::init();
-  TaskPowerMonitor::init();
-  TaskControlMotors::init();
-  Companion::init();
-  Computer::init();
 
-  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 4, &watchdogHandle);
-  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
+
+//  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 4, &watchdogHandle);
+//  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
 }
 
 void printTaskStatus() {
+  /*
   uint32_t tasks = uxTaskGetNumberOfTasks();
   auto *pxTaskStatusArray = new TaskStatus_t[tasks];
   unsigned long runtime;
@@ -94,4 +104,5 @@ void printTaskStatus() {
                   pxTaskStatusArray[i].ulRunTimeCounter);
   }
   delete[] pxTaskStatusArray;
+   */
 }

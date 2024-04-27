@@ -3,9 +3,6 @@
 #include "task_motors.h"
 #include "task_data_manager.h"
 
-#include "FreeRTOS.h"
-#include "queue.h"
-
 void TaskCAN::init() {
   #if !CFG_ENABLE_CAN
   return;

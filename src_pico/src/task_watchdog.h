@@ -1,21 +1,22 @@
 #pragma once
 
 #include "Arduino.h"
-#include "FreeRTOS.h"
-#include "queue.h"
 
+class Watchdog {
+public:
+  typedef enum {
+    FAST_LOOP,
+    numValues
+  } Task;
 
-typedef enum {
-  TASK_CONTROL_MOTORS,
-  TASK_SEND_TO_RC,
-  TASK_DATA_MANAGER,
-  TASK_RECEIVE_FROM_RC,
-  TASK_CAN,
-  TASK_MOTORS,
-  numValues
-} Task;
+  static void init();
 
-extern QueueHandle_t watchdogQueue;
+  static void taskCompleted(Task task);
 
+  static void loop();
 
-void taskWatchdog(void *pvParameters);
+private:
+  static inline uint32_t lastMemoryLogMs = 0;
+  static inline uint32_t lastHealthCheckMs = 0;
+  static inline long tasks[Task::numValues] = {0};
+};

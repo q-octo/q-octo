@@ -1,8 +1,5 @@
 #include "config.h"
 #include <Arduino.h> // Always include this first
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
 #include "task_rc.h"
 
 #define DEBUG_LOG_RC_CHANNELS 1

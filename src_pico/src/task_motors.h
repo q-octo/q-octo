@@ -38,8 +38,8 @@ namespace TaskControlMotors
 
   void receiveMessage(const Message &message);
 
-  // private:
   void broadcastStatusUpdate();
+  // private:
 
   void setSpeedIndividual(float speedL, float speedR);
 

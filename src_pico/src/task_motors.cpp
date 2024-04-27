@@ -1,10 +1,6 @@
 #include "config.h"
 #include "task_motors.h"
 
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "task.h"
-
 #define MOTOR_SPEED_LIMIT 10.0f
 #define MOTOR_CURRENT_LIMIT 5.0f
 #define STATUS_BROADCAST_FREQUENCY 20 // ms
