@@ -3,7 +3,7 @@
 class QOctoSerial
 {
 public:
-    QOctoSerial();
+    static void init();
     void loop();
 
 private:

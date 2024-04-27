@@ -26,6 +26,7 @@ void setup()
 
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
+  QOctoSerial::init();
 }
 
 void loop()
