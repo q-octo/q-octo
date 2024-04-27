@@ -33,7 +33,7 @@ uint32_t lastDebugListTasksMs = 0;
 void setup() {
   Serial.begin(115200);
   // Wait for serial connection to be established
-  // while (!Serial);
+  while (!Serial);
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
   TaskCAN::init();
