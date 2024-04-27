@@ -1,12 +1,13 @@
+#include "config.h"
 #include "task_can.h"
 #include "can.h"
 #include "task_motors.h"
 #include "task_data_manager.h"
 
 void TaskCAN::init() {
-#if !CFG_ENABLE_CAN
-  return;
-#endif
+  if (!CFG_ENABLE_CAN) {
+    return;
+  }
   // IMPORTANT that this occurs outside a FreeRTOS task (maybe so that we
   // don't send a CAN message before CAN is initialized?)
   CanCommunication::init(onReceiveCanPacket);
@@ -14,9 +15,9 @@ void TaskCAN::init() {
 }
 
 void TaskCAN::loop() {
-#if !CFG_ENABLE_CAN
+if (!CFG_ENABLE_CAN) {
   return;
-#endif
+}
   CanCommunication::checkForPacket();
 }
 

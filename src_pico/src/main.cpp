@@ -48,14 +48,13 @@ void setup() {
 
 // Handled by FreeRTOS
 void loop() {
-#if CFG_DEBUG_LIST_TASKS
-  const uint32_t currentMillis = millis();
-  if (currentMillis - lastDebugListTasksMs >= 5000)
-  {
-    lastDebugListTasksMs = currentMillis;
-    printTaskStatus();
+  if (CFG_DEBUG_LIST_TASKS) {
+    const uint32_t currentMillis = millis();
+    if (currentMillis - lastDebugListTasksMs >= 5000) {
+      lastDebugListTasksMs = currentMillis;
+      printTaskStatus();
+    }
   }
-#endif
 
   TaskCAN::loop();
   TaskRC::loop();

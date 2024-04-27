@@ -43,9 +43,9 @@ float lastRPM = 0;
 #define RC_LINK_STATS_LOG_FREQUENCY 2000 // ms
 
 void TaskRC::init() {
-#if !CFG_ENABLE_RC
-  return;
-#endif
+  if (!CFG_ENABLE_RC) {
+    return;
+  }
 
   crsf_set_link_quality_threshold(70);
   crsf_set_rssi_threshold(105);
@@ -58,9 +58,9 @@ void TaskRC::init() {
 }
 
 void TaskRC::loop() {
-#if !CFG_ENABLE_RC
-  return;
-#endif
+  if (!CFG_ENABLE_RC) {
+    return;
+  }
   crsf_process_frames();
 }
 

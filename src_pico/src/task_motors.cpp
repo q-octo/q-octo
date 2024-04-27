@@ -10,94 +10,106 @@ uint32_t lastStatusRequestMs = 0;
 uint32_t lastStatusBroadcastMs = 0;
 
 XiaomiCyberGearDriver cybergearL =
-    XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
+        XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
 XiaomiCyberGearDriver cybergearR =
-    XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
+        XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
 
-void TaskControlMotors::init()
-{
-#if !CFG_ENABLE_MOTORS
-  return;
-#endif
+void TaskControlMotors::init() {
+  if (!CFG_ENABLE_MOTORS) {
+    return;
+  }
+
   initMotors();
   Serial.println("Motor class init complete");
 }
 
-void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message)
-{
-#if !CFG_ENABLE_MOTORS
+void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message) {
+if (!CFG_ENABLE_MOTORS) {
   return;
-#endif
-
-  switch (message.type)
-  {
-  case TaskControlMotors::ENABLE:
-    motorsEnabled = true;
-    cybergearL.enable_motor();
-    cybergearR.enable_motor();
-    break;
-  case TaskControlMotors::DISABLE:
-    motorsEnabled = false;
-    cybergearL.stop_motor();
-    cybergearR.stop_motor();
-    break;
-  case TaskControlMotors::SET_SPEED_COMBINED:
-    // TODO implement mixing
-    setSpeedIndividual(-message.as.speedCombined.rpm,
-                       message.as.speedCombined.rpm);
-    break;
-  case TaskControlMotors::SET_SPEED_INDIVIDUAL:
-    setSpeedIndividual(message.as.speedIndividual.rpmL,
-                       message.as.speedIndividual.rpmR);
-    break;
-  case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
-    cybergearL.process_message(message.as.canMessage.id, message.as.canMessage.data);
-    break;
-  case TaskControlMotors::CAN_MESSAGE_MOTOR_R:
-    cybergearR.process_message(message.as.canMessage.id, message.as.canMessage.data);
-    break;
-  case TaskControlMotors::FOLD_WHEELS:
-    // TODO implement folding
-    break;
-  }
 }
 
-void TaskControlMotors::broadcastStatusUpdate()
-{
+switch (message.type) {
+case TaskControlMotors::ENABLE:
+motorsEnabled = true;
+cybergearL.
+
+enable_motor();
+
+cybergearR.
+
+enable_motor();
+
+break;
+case TaskControlMotors::DISABLE:
+motorsEnabled = false;
+cybergearL.
+
+stop_motor();
+
+cybergearR.
+
+stop_motor();
+
+break;
+case TaskControlMotors::SET_SPEED_COMBINED:
+// TODO implement mixing
+setSpeedIndividual(-message.as.speedCombined.rpm,
+message.as.speedCombined.rpm);
+break;
+case TaskControlMotors::SET_SPEED_INDIVIDUAL:
+setSpeedIndividual(message
+.as.speedIndividual.rpmL,
+message.as.speedIndividual.rpmR);
+break;
+case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
+cybergearL.
+process_message(message
+.as.canMessage.id, message.as.canMessage.data);
+break;
+case TaskControlMotors::CAN_MESSAGE_MOTOR_R:
+cybergearR.
+process_message(message
+.as.canMessage.id, message.as.canMessage.data);
+break;
+case TaskControlMotors::FOLD_WHEELS:
+// TODO implement folding
+break;
+}
+}
+
+void TaskControlMotors::broadcastStatusUpdate() {
   auto statusL = cybergearL.get_status();
   auto statusR = cybergearR.get_status();
   DataManager::Motors motors = {
-      .left =
-          {
-              .temperature = statusL.temperature,
-              .RPM = statusL.speed,
-              .torque = statusL.torque,
-              .position = statusL.position,
-          },
-      .right =
-          {
-              // .temperature = statusR.temperature,
-              .temperature = static_cast<uint16_t>((millis() % 24)),
-              .RPM = statusR.speed,
-              .torque = statusR.torque,
-              .position = statusR.position,
-          },
+          .left =
+                  {
+                          .temperature = statusL.temperature,
+                          .RPM = statusL.speed,
+                          .torque = statusL.torque,
+                          .position = statusL.position,
+                  },
+          .right =
+                  {
+                          // .temperature = statusR.temperature,
+                          .temperature = static_cast<uint16_t>((millis() % 24)),
+                          .RPM = statusR.speed,
+                          .torque = statusR.torque,
+                          .position = statusR.position,
+                  },
   };
   DataManager::Message message = {.type = DataManager::Type::STATE_MOTORS,
-                                  .as = {.motors = motors}};
+          .as = {.motors = motors}};
   DataManager::receiveMessage(message);
 }
 
-void TaskControlMotors::setSpeedIndividual(float speedL, float speedR)
-{
-  // TODO this is actually rad/s not RPM
+void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
+  // cybergearL.enable_motor();
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
 
-void TaskControlMotors::initMotors()
-{
+void TaskControlMotors::initMotors() {
   // Command + 3 x ram write + command (for each motor)
   // Seems like we only get two responses back though, so are we sending
   // the messages too fast? The motor needs 500us between messages
@@ -123,10 +135,10 @@ void TaskControlMotors::initMotors()
   cybergearR.set_limit_current(MOTOR_CURRENT_LIMIT);
   delayMicroseconds(500);
   cybergearR.enable_motor();
+  Serial.println("Motors initialised");
 }
 
-void TaskControlMotors::debugPrintMotorStatus()
-{
+void TaskControlMotors::debugPrintMotorStatus() {
   XiaomiCyberGearStatus statusL = cybergearL.get_status();
   XiaomiCyberGearStatus statusR = cybergearR.get_status();
   Serial.printf("L: POS:%f V:%f T:%f temp:%d\n", statusL.position,

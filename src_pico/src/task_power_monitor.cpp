@@ -8,9 +8,9 @@ float systemShutdownVoltage = 17.0f; // 3.4V * 5
 int batteryCount = 4;
 
 void TaskPowerMonitor::init() {
-#if !CFG_ENABLE_POWER_MONITOR
-  return;
-#endif
+  if (!CFG_ENABLE_POWER_MONITOR) {
+    return;
+  }
   // Initialize the Canard library
   canardInit(&canard,
              memory_pool,
@@ -22,9 +22,9 @@ void TaskPowerMonitor::init() {
 }
 
 void TaskPowerMonitor::receiveMessage(const TaskPowerMonitor::Message &message) {
-#if !CFG_ENABLE_POWER_MONITOR
-  return;
-#endif
+  if (!CFG_ENABLE_POWER_MONITOR) {
+    return;
+  }
 
   switch (message.type) {
     case TaskPowerMonitor::MessageType::CAN_MESSAGE: {
