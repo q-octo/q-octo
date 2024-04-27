@@ -1,28 +1,42 @@
 #pragma once
 
 #include "task_data_manager.h"
+#include "crsf.h"
 
 namespace TaskRC
 {
-    typedef enum
-    {
-        BATTERY,
-    } MessageType;
+  // public:
+  typedef enum
+  {
+    BATTERY,
+  } MessageType;
 
-
-typedef struct
-{
+  typedef struct
+  {
     MessageType type;
     union
     {
-        TaskMessage::Battery battery;
+      DataManager::Battery battery;
     } as;
+  } Message;
 
-} Message;
+  void init();
 
-}
+  void loop();
 
-extern QueueHandle_t rcSendQueue;
+  void receiveMessage(const Message &message);
 
-void taskReceiveFromRC(void *pvParameters);
-void taskSendToRC(void *pvParameters);
+  // private:
+
+  /* RC Channels Event Callback. */
+  void onLinkStatisticsUpdate(link_statistics_t linkStats);
+
+  void onReceiveChannels(const uint16_t channels[16]);
+
+  void onFailsafe(bool failsafe);
+  void onFailsafeActivated();
+  void onFailsafeCleared();
+
+  
+
+};

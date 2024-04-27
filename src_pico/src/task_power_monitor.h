@@ -1,30 +1,43 @@
 #pragma once
 
 #include "task_data_manager.h"
+#include <canard.h>
+#include <uavcan.equipment.power.BatteryInfo.h>
 
 namespace TaskPowerMonitor
 {
-    typedef enum
-    {
-        CAN_MESSAGE,
-        SET_LOW_VOLTAGE_THRESHOLD,
-        SET_CRITICAL_VOLTAGE_THRESHOLD,
-        SET_BATTERY_COUNT,
-    } MessageType;
+  // public:
+  typedef enum
+  {
+    CAN_MESSAGE,
+    SET_LOW_VOLTAGE_THRESHOLD,
+    SET_CRITICAL_VOLTAGE_THRESHOLD,
+    SET_BATTERY_COUNT,
+  } MessageType;
 
-    typedef struct
+  typedef struct
+  {
+    MessageType type;
+    union
     {
-        MessageType type;
-        union
-        {
-            TaskMessage::CanMessage canMessage;
-            float voltageThreshold;
-            int batteryCount;
-        } as;
+      DataManager::CanMessage canMessage;
+      float voltageThreshold;
+      int batteryCount;
+    } as;
 
-    } Message;
+  } Message;
+
+  void init();
+
+  void receiveMessage(const Message &message);
+
+  // private:
+  void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer);
+
+  bool shouldAcceptTransfer(const CanardInstance *ins, uint64_t *out_data_type_signature, uint16_t data_type_id,
+                            CanardTransferType transfer_type, uint8_t source_node_id);
+
+  void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+
+  
 }
-
-extern QueueHandle_t powerMonitorQueue;
-
-void taskPowerMonitor(void *pvParameters);

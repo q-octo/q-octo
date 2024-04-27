@@ -23,6 +23,13 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="EmbeddedSvdWindowState">
+    <option name="loadedFiles">
+      <list>
+        <option value="$USER_HOME$/.platformio/platforms/raspberrypi@src-7170295abe15989fa583476f418105e4/misc/svd/rp2040.svd" />
+      </list>
+    </option>
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="pico" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -59,15 +66,18 @@
       </map>
     </option>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2024" />
     <option name="minorVersion" value="1" />
     <option name="productBranch" value="Classic" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2fbu2J1x9yTvxaAizKiL48o5MoW" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -76,12 +86,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "PlatformIO.PlatformIO.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "watch-the-dog",
     "last_opened_file_path": "/Users/britannio/Software/projects/bio-inspired-robotics/src_pico/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -92,8 +103,6 @@
   },
   "keyToStringList": {
     "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
       "repository"
     ]
   }
@@ -124,11 +133,24 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1714081889584</updated>
-      <workItem from="1714081890737" duration="12768000" />
+      <workItem from="1714081890737" duration="26632000" />
     </task>
+    <task id="LOCAL-00001" summary="disable tasks when config says so">
+      <option name="closed" value="true" />
+      <created>1714217998335</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1714217998335</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="disable tasks when config says so" />
+    <option name="LAST_COMMIT_MESSAGE" value="disable tasks when config says so" />
   </component>
 </project>

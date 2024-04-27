@@ -4,11 +4,9 @@
 #define PIN_UART_TX 0
 #define PIN_UART_RX 1
 
-QOctoSerial::QOctoSerial()
+void QOctoSerial::init()
 {
-}
-
-void QOctoSerial::init(){
+    
     Serial1.setPinout(PIN_UART_TX, PIN_UART_RX);
     Serial1.begin(115200);
 
@@ -28,19 +26,10 @@ void QOctoSerial::loop()
     // Parse the serial data
     if (Serial1.available() > 0)
     {
-        Serial.println("Entered if");
-        // TODO(niall), read a single byte, this should specify the length of the message.
-        // Then read up to that many bytes and fire a callback.
+        Serial.println("Hey mom, wegot some bytes");
         // One callback for state updates, one for enabling/disabling the web 
         // server (bool enable parameter).
-        int len = Serial1.readBytes(serialBuffer, sizeof(serialBuffer));
-
-        // Print the output to the serial monitor
-        for (int i = 0; i < len; i++)
-        {
-            Serial.print(serialBuffer[i]);
-        }
-        Serial.println();
+        // int len = Serial1.readBytes(serialBuffer, sizeof(serialBuffer));
     }
 
 }

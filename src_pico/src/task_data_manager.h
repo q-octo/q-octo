@@ -1,14 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
-#include <FreeRTOS.h>
-#include <queue.h>
-#include <task.h>
 
-namespace TaskMessage
-{
-  typedef enum
-  {
+namespace DataManager {
+// public:
+  typedef enum {
     STATE_MOTORS, // taskMotors
     STATE_RC,     // taskReceiveFromRC
     ENABLE_WEB_SERVER,
@@ -35,17 +31,14 @@ namespace TaskMessage
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
   } Type;
 
-  typedef struct
-  {
-    struct
-    {
+  typedef struct {
+    struct {
       uint16_t temperature;
       float RPM;
       float torque;
       float position;
     } left;
-    struct
-    {
+    struct {
       uint16_t temperature;
       float RPM;
       float torque;
@@ -54,53 +47,47 @@ namespace TaskMessage
 
   } Motors;
 
-  typedef struct
-  {
+  typedef struct {
     float voltage;   // Volts
     float current;   // Amperes
     uint32_t fuel;   // mAh
     uint8_t percent; // 0-100
   } Battery;
 
-  typedef struct
-  {
+  typedef struct {
     uint8_t rssi;
     uint8_t linkQuality;
     int8_t signalNoiseRatio;
     uint16_t tx_power;
   } RC;
 
-  typedef struct
-  {
+  typedef struct {
     bool diagnosticsMode;
   } Diagnostics;
 
-  typedef struct
-  {
+  typedef struct {
     float rpmL;
     float rpmR;
   } SetMotorSpeedIndividual;
 
-  typedef struct
-  {
+  typedef struct {
     float rpm;
     float direction;
   } SetMotorSpeedCombined;
 
-  typedef struct
-  {
+  typedef struct {
     uint32_t id;
     uint8_t *data;
     uint8_t len;
   } CanMessage;
 
-  typedef enum { A,B } DisplayButton;
+  typedef enum {
+    A, B
+  } DisplayButton;
 
-  typedef struct
-  {
+  typedef struct  {
     Type type;
-    union
-    {
+    union {
       Motors motors;
       Battery battery;
       RC rc;
@@ -114,8 +101,7 @@ namespace TaskMessage
     } as;
   } Message;
 
-  typedef struct
-  {
+  typedef struct {
     Motors motors;
     Battery battery;
     RC rc;
@@ -126,8 +112,12 @@ namespace TaskMessage
     bool wheelsFolded;
   } State;
 
+  void receiveMessage(const Message &message);
+
+// private:
+  void broadcastStateUpdate();
+
+  void setWebServerEnabled(bool enabled);
+
+  
 }
-
-extern QueueHandle_t dataManagerQueue;
-
-void taskDataManager(void *pvParameters);

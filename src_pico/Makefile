@@ -39,7 +39,7 @@ $(FBS_TS_OUT_FILES): $(FBS_FILES)
 # Rule to convert .fbs to python	
 python: $(FBS_PYTHON_OUT_FILES)
 $(FBS_PYTHON_OUT_FILES): $(FBS_FILES)
-	rm -rf $(FBS_PYTHON_OUT_DIR)/*
+	rm -rf $(FBS_PYTHON_OUT_DIR)/fbs/*
 	$(FLATC) --gen-object-api -o $(FBS_PYTHON_OUT_DIR) --python $(FBS_FILES)
 
 # Rule to convert .fbs to .dart
