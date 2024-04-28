@@ -5,14 +5,7 @@
 #define MOTOR_CURRENT_LIMIT 5.0f
 #define STATUS_BROADCAST_FREQUENCY 20 // ms
 
-bool motorsEnabled = true;
-uint32_t lastStatusRequestMs = 0;
-uint32_t lastStatusBroadcastMs = 0;
 
-XiaomiCyberGearDriver cybergearL =
-        XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
-XiaomiCyberGearDriver cybergearR =
-        XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
 
 void TaskControlMotors::init() {
   if (!CFG_ENABLE_MOTORS) {

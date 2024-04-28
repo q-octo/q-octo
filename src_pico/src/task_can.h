@@ -2,13 +2,12 @@
 
 #include "Arduino.h"
 
-namespace TaskCAN
+class TaskCAN
 {
-
-  // public:
-  void init();
-  void loop();
-  // private:
-  bool isPowerMonitorPacket(uint32_t packetId);
-  void onReceiveCanPacket(uint8_t packetSize, uint32_t packetId, uint8_t *packetData, bool extended);
-}
+public:
+  static void init();
+  static void loop();
+private:
+  static bool isPowerMonitorPacket(uint32_t packetId);
+  static void onReceiveCanPacket(uint8_t packetSize, uint32_t packetId, uint8_t *packetData, bool extended);
+};

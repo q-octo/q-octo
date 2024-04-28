@@ -15,15 +15,16 @@
 
 using namespace fbs;
 
-namespace Companion
+class Companion
 {
-  // public:
+public:
   enum MessageType
   {
     ENABLE_WEB_SERVER,
     DISABLE_WEB_SERVER,
     STATE_UPDATE
   };
+
   typedef struct
   {
     MessageType type;
@@ -33,19 +34,23 @@ namespace Companion
     } as;
   } Message;
 
-  void init();
-  void receiveMessage(const Message &message);
-  void loop();
+  static void init();
+  static void receiveMessage(const Message &message);
+  static void loop();
 
+private:
+  static void serialiseState(const DataManager::State &state);
+  static void sendStateToCompanion(const DataManager::State &state);
+  static void handleCompanionTx(const CompanionTx &companionTx);
+  static void handleUpdateMessage(const Update &update);
+  static void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
+  static void sendTaskMessage(const DataManager::Message &message);
+  static void parseIncomingSerialData();
+  static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
 
-  // private:
-  void serialiseState(const DataManager::State &state);
-  void sendStateToCompanion(const DataManager::State &state);
-  void handleCompanionTx(const CompanionTx &companionTx);
-  void handleUpdateMessage(const Update &update);
-  void handleButtonPressedMessage(const ButtonPressed &buttonPressed);
-  void sendTaskMessage(const DataManager::Message &message);
-  void parseIncomingSerialData();
-  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-
-}
+  static inline SerialPIO companionSerial =
+          SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 32);
+  // 1024 is the default size, but it will grow automatically.
+  static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
+  static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
+};

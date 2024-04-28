@@ -1,54 +1,14 @@
 #include "config.h"
 #include <Arduino.h> // Always include this first
 #include "task_rc.h"
-#include "storage.h"
 
 #define DEBUG_LOG_RC_CHANNELS 1
 #define DEBUG_LOG_RC_LINK_STATS 1
 #define BROADCAST_FREQUENCY 500 // ms
 
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
-namespace TaskRC {
-
-  DataManager::Message taskMessage;
-  /* A flag to hold the fail-safe status. */
-  bool isFailsafeActive = false;
-
-  /* RC Channels data. */
-  int rcChannelCount = 8;
-  // 16 channels
-  const char *rcChannelNames[] = {
-          "A",
-          "E",
-          "T",
-          "R",
-          "Aux1",
-          "Aux2",
-          "Aux3",
-          "Aux4",
-
-          "Aux5", // Failsafe Channel
-          "Aux6",
-          "Aux7",
-          "Aux8",
-          "Aux9",
-          "Aux10",
-          "Aux11",
-          "Aux12"};
-
-  uint32_t lastRcChannelsLogMs = 0;
-  uint32_t lastRcLinkStatsLogMs = 0;
-  uint32_t lastBroadcastMs = 0;
-  float lastRPM = 0;
-
-  Storage::State &state = Storage::getState();
-
-  void setThresholds();
-
-}
 #define RC_CHANNELS_LOG_FREQUENCY 2000   // ms
 #define RC_LINK_STATS_LOG_FREQUENCY 2000 // ms
-//
 
 void TaskRC::setThresholds() {
   crsf_set_link_quality_threshold(state.linkQualityThreshold);

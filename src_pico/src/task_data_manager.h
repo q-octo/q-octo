@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 
-namespace DataManager {
-// public:
+class DataManager {
+public:
   typedef enum {
     STATE_MOTORS, // taskMotors
     STATE_RC,     // taskReceiveFromRC
@@ -83,7 +83,7 @@ namespace DataManager {
     A, B
   } DisplayButton;
 
-  typedef struct  {
+  typedef struct {
     Type type;
     union {
       Motors motors;
@@ -106,12 +106,12 @@ namespace DataManager {
     bool webServerEnabled;
   } State;
 
-  void receiveMessage(const Message &message);
+  static void receiveMessage(const Message &message);
 
-// private:
-  void broadcastStateUpdate();
+private:
+  static void broadcastStateUpdate();
 
-  void setWebServerEnabled(bool enabled);
+  static void setWebServerEnabled(bool enabled);
 
-  
-}
+
+};
