@@ -48,6 +48,7 @@ void TaskRC::receiveMessage(const Message &message) {
       break;
     case STATE_UPDATE:
       setThresholds();
+      break;
     default:
       Serial.println("[ERROR] unknown message type");
       break;

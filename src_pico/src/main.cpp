@@ -30,14 +30,17 @@ void initTasks();
 //                                                  {eSuspended, "Suspended"},
 //                                                  {eDeleted,   "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
+uint32_t lastBroadcastMotorStatusMs = 0;
 
 void setup() {
   Serial.begin(115200);
-  // Wait for serial connection to be established
-  while (!Serial);
+  if (CFG_WAIT_FOR_USB_SERIAL) {
+    // Wait for serial connection to be established
+    while (!Serial);
+  }
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
-  
+
   Storage::init(); // Intentionally initialised first
   TaskCAN::init();
   TaskRC::init();
@@ -51,8 +54,8 @@ void setup() {
 
 // Handled by FreeRTOS
 void loop() {
+  const uint32_t currentMillis = millis();
   if (CFG_DEBUG_LIST_TASKS) {
-    const uint32_t currentMillis = millis();
     if (currentMillis - lastDebugListTasksMs >= 5000) {
       lastDebugListTasksMs = currentMillis;
       printTaskStatus();
@@ -61,8 +64,10 @@ void loop() {
 
   TaskCAN::loop();
   TaskRC::loop();
-  // TODO this should run slower
-  TaskControlMotors::broadcastStatusUpdate();
+  if (currentMillis - lastBroadcastMotorStatusMs >= 3000) {
+    lastBroadcastMotorStatusMs = currentMillis;
+    TaskControlMotors::broadcastStatusUpdate();
+  }
   Companion::loop();
   Computer::loop();
 
