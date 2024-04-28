@@ -49,7 +49,7 @@ private:
   static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
 
   static inline SerialPIO companionSerial =
-          SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 32);
+          SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 1024);
   // 1024 is the default size, but it will grow automatically.
   static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
   static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
