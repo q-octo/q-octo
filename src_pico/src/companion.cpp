@@ -3,16 +3,6 @@
 #include "config.h"
 #include "storage.h"
 
-namespace Companion {
-  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-
-  SerialPIO companionSerial =
-          SerialPIO(CFG_COMPANION_UART_TX, CFG_COMPANION_UART_RX, 32);
-  // 1024 is the default size, but it will grow automatically.
-  flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
-  FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
-}
-
 void Companion::init() {
   if (!CFG_ENABLE_COMPANION) {
     return;
@@ -95,7 +85,7 @@ void Companion::handleUpdateMessage(const Update &update) {
 
       Storage::State &state = Storage::getState();
       state.lowVoltageThreshold = updateLowVoltageThreshold->low_voltage_threshold();
-      Storage::save(); 
+      Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold: {

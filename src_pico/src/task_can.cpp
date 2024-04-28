@@ -15,9 +15,9 @@ void TaskCAN::init() {
 }
 
 void TaskCAN::loop() {
-if (!CFG_ENABLE_CAN) {
-  return;
-}
+  if (!CFG_ENABLE_CAN) {
+    return;
+  }
   CanCommunication::checkForPacket();
 }
 

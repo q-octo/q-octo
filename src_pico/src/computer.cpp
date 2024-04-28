@@ -2,17 +2,6 @@
 #include "computer.h"
 #include "config.h"
 
-namespace Computer {
-
-  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-
-  SerialUART computerSerial = Serial2;
-  // 1024 is the default size, but it will grow automatically.
-  flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
-  FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(computerSerial, verifyIncomingFlatbuffer);
-
-}
-
 void Computer::init() {
   if (!CFG_ENABLE_ONBOARD_COMPUTER) {
     return;

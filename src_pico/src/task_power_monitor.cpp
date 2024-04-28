@@ -2,12 +2,6 @@
 #include "task_power_monitor.h"
 #include "storage.h"
 
-namespace TaskPowerMonitor {
-  CanardInstance canard;
-  uint8_t memory_pool[1024];
-  Storage::State &state = Storage::getState();
-}
-
 void TaskPowerMonitor::init() {
   if (!CFG_ENABLE_POWER_MONITOR) {
     return;
