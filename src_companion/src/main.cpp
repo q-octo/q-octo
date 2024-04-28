@@ -13,7 +13,6 @@ void toggleXButton();
 // Callbacks can be added to these constructors if necessary.
 Display display(toggleAButton, toggleBButton, toggleXButton);
 QOctoWebServer webServer;
-QOctoSerial serial;
 
 void setup()
 {
@@ -33,7 +32,7 @@ void loop()
 {
   display.loop();
   webServer.loop();
-  serial.loop();
+  QOctoSerial::loop();
 }
 
 void toggleAButton()

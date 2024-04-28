@@ -2,8 +2,8 @@
 #include <Arduino.h>
 #include "storage.h"
 
-//#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
-//#include <task.h>     // Enables FreeRTOS tasks
+// #include <FreeRTOS.h> // Enables FreeRTOS and multicore support
+// #include <task.h>     // Enables FreeRTOS tasks
 
 #include "task_motors.h"
 #include "task_rc.h"
@@ -22,13 +22,13 @@ void printHeapStats();
 
 void initTasks();
 
-//TaskHandle_t watchdogHandle = nullptr;
+// TaskHandle_t watchdogHandle = nullptr;
 
-//std::map<eTaskState, const char *> eTaskStateName{{eReady,     "Ready"},
-//                                                  {eRunning,   "Running"},
-//                                                  {eBlocked,   "Blocked"},
-//                                                  {eSuspended, "Suspended"},
-//                                                  {eDeleted,   "Deleted"}};
+// std::map<eTaskState, const char *> eTaskStateName{{eReady,     "Ready"},
+//                                                   {eRunning,   "Running"},
+//                                                   {eBlocked,   "Blocked"},
+//                                                   {eSuspended, "Suspended"},
+//                                                   {eDeleted,   "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
 uint32_t lastBroadcastMotorStatusMs = 0;
 
@@ -75,9 +75,8 @@ void loop() {
   Watchdog::loop();
   // It appears that a task labelled CORE0 runs this loop in a task
   // So if this loop never blocks, no other task on core 0 will run!
-//  vTaskDelay(pdMS_TO_TICKS(1));
+  //  vTaskDelay(pdMS_TO_TICKS(1));
 }
-
 
 void initTasks() {
   // Setup FreeRTOS tasks
@@ -85,14 +84,13 @@ void initTasks() {
   // overflow
 
   // We likely only needed this for the controlMotor task?
-//  const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
+  //  const uint32_t stackSize = configMINIMAL_STACK_SIZE * 2;
 
   // Remaining 'tasks'
   // wifi switch, motor off switch, voice module, flight controller
 
-
-//  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 4, &watchdogHandle);
-//  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
+  //  xTaskCreate(taskWatchdog, "watchdog", stackSize, nullptr, 4, &watchdogHandle);
+  //  vTaskCoreAffinitySet(watchdogHandle, CORE_0);
 }
 
 void printTaskStatus() {

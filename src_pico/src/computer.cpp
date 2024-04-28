@@ -7,6 +7,7 @@ void Computer::init() {
     return;
   }
 
+  computerSerial.setFIFOSize(1024);
   computerSerial.setPinout(CFG_ONBOARD_COMPUTER_UART_TX, CFG_ONBOARD_COMPUTER_UART_RX);
   computerSerial.begin(115200);
 }
