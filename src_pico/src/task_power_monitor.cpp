@@ -70,6 +70,41 @@ bool TaskPowerMonitor::shouldAcceptTransfer(const CanardInstance *ins,
   return true;
 }
 
+
+
+/// @brief Converts battery voltage to a percentage.
+uint8_t TaskPowerMonitor::voltageToBatteryPercent(float voltage) {
+  // Essentially, at full charge, we'll be over 18V but the drop will be sharp.
+  // So we could reserve the top 5% for the initial drop.
+
+  const float stableUpperBound = 18.0f;
+  
+  if (voltage > stableUpperBound) {
+    // We will actually start at ~21V when fully charged. Reserve the top 5%
+    // for this case.
+    
+    const float range = 21.0f - stableUpperBound;
+    const float remainingVoltage = voltage - stableUpperBound;
+    const float percent = ((remainingVoltage / range) * 5.0f) + 95.0f;
+  }
+
+
+  // Min voltage is 17V, max is 18v.
+  auto &state = Storage::getState();
+  
+  const float range = stableUpperBound - state.criticalVoltageThreshold;
+  const float remainingVoltage = voltage - state.criticalVoltageThreshold;
+  if (remainingVoltage <= 0) {
+    return 0;
+  }
+
+  const float percent = (remainingVoltage / range) * 95.0f;
+  if (percent > 95) {
+    return 95;
+  }
+  return static_cast<uint8_t>(percent);
+}
+
 void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer) {
   uavcan_equipment_power_BatteryInfo msg{};
   if (uavcan_equipment_power_BatteryInfo_decode(transfer, &msg)) {
@@ -94,6 +129,7 @@ void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTrans
     Serial.println("[WARN] Battery voltage low, disabling motors");
     taskMessage.type = DataManager::Type::BATT_VOLTAGE_LOW;
   } else {
+    const uint8_t batteryPercent = voltageToBatteryPercent(msg.voltage);
     taskMessage = {
             .type = DataManager::Type::BATT_OK,
             .as = {
@@ -101,7 +137,7 @@ void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTrans
                             .voltage = msg.voltage,
                             .current = msg.current,
                             .fuel = 4 * 4000, // 4 cells * 4000mAh
-                            .percent = 100    // TODO estimate percentage
+                            .percent = batteryPercent,
                     },
             },
     };

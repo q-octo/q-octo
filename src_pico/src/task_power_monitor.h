@@ -35,6 +35,6 @@ namespace TaskPowerMonitor
                             CanardTransferType transfer_type, uint8_t source_node_id);
 
   void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
-
+  uint8_t voltageToBatteryPercent(float voltage);
   
 }
