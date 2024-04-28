@@ -9,6 +9,7 @@ namespace TaskRC
   typedef enum
   {
     BATTERY,
+    STATE_UPDATE,
   } MessageType;
 
   typedef struct
@@ -17,6 +18,7 @@ namespace TaskRC
     union
     {
       DataManager::Battery battery;
+      DataManager::State state;
     } as;
   } Message;
 
@@ -25,6 +27,7 @@ namespace TaskRC
   void loop();
 
   void receiveMessage(const Message &message);
+
 
   // private:
 
@@ -36,6 +39,7 @@ namespace TaskRC
   void onFailsafe(bool failsafe);
   void onFailsafeActivated();
   void onFailsafeCleared();
+  
 
   
 

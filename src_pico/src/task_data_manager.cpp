@@ -5,6 +5,7 @@
 #include "task_rc.h"
 #include "companion.h"
 #include "computer.h"
+#include "storage.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -16,10 +17,13 @@ Likewise, tasks that we forward messages to should have a higher priority than
 this task so that their queue does not overflow.
 */
 
-DataManager::State state{};
-Companion::Message companionMessage{};
-Computer::Message computerMessage{};
-
+namespace DataManager
+{
+  DataManager::State state{};
+  Companion::Message companionMessage{};
+  Computer::Message computerMessage{};
+  TaskRC::Message rcMessage{};
+}
 void DataManager::broadcastStateUpdate()
 {
   companionMessage.type = Companion::MessageType::STATE_UPDATE;
@@ -28,6 +32,9 @@ void DataManager::broadcastStateUpdate()
   computerMessage.type = Computer::MessageType::STATE_UPDATE;
   computerMessage.as = {.state = state};
   Computer::receiveMessage(computerMessage);
+  rcMessage.type = TaskRC::MessageType::STATE_UPDATE;
+  rcMessage.as = {.state = state};
+  TaskRC::receiveMessage(rcMessage);
 }
 
 void DataManager::setWebServerEnabled(bool enabled)
@@ -40,7 +47,6 @@ void DataManager::setWebServerEnabled(bool enabled)
 
 void DataManager::receiveMessage(const DataManager::Message &message)
 {
-  static TaskRC::Message rcMessage;
   static TaskControlMotors::Message controlMotorsMessage;
   static TaskPowerMonitor::Message powerMonitorMessage;
 
@@ -122,27 +128,6 @@ void DataManager::receiveMessage(const DataManager::Message &message)
     TaskControlMotors::receiveMessage(controlMotorsMessage);
     exit(1);
     break;
-  case SET_LOW_VOLTAGE_THRESHOLD:
-    state.lowVoltageThreshold = message.as.voltageThreshold;
-    powerMonitorMessage.type = TaskPowerMonitor::MessageType::SET_LOW_VOLTAGE_THRESHOLD;
-    powerMonitorMessage.as = {.voltageThreshold = message.as.voltageThreshold};
-    TaskPowerMonitor::receiveMessage(powerMonitorMessage);
-    broadcastStateUpdate();
-    break;
-  case SET_CRITICAL_VOLTAGE_THRESHOLD:
-    state.criticalVoltageThreshold = message.as.voltageThreshold;
-    powerMonitorMessage.type = TaskPowerMonitor::MessageType::SET_CRITICAL_VOLTAGE_THRESHOLD;
-    powerMonitorMessage.as = {.voltageThreshold = message.as.voltageThreshold};
-    TaskPowerMonitor::receiveMessage(powerMonitorMessage);
-    broadcastStateUpdate();
-    break;
-  case SET_BATTERY_COUNT:
-    state.batteryCount = message.as.batteryCount;
-    powerMonitorMessage.type = TaskPowerMonitor::MessageType::SET_BATTERY_COUNT;
-    powerMonitorMessage.as = {.batteryCount = message.as.batteryCount};
-    TaskPowerMonitor::receiveMessage(powerMonitorMessage);
-    broadcastStateUpdate();
-    break;
   case FOLD_WHEELS:
     controlMotorsMessage.type = TaskControlMotors::MessageType::FOLD_WHEELS;
     TaskControlMotors::receiveMessage(controlMotorsMessage);
@@ -151,6 +136,9 @@ void DataManager::receiveMessage(const DataManager::Message &message)
     computerMessage.type = Computer::MessageType::DISPLAY_BUTTON;
     computerMessage.as = {.displayButton = message.as.displayButton};
     Computer::receiveMessage(computerMessage);
+  case STORAGE_UPDATE:
+    broadcastStateUpdate();
+    break;
   default:
     Serial.println("[ERROR] Unknown message type");
   }

@@ -1,11 +1,12 @@
 #include "config.h"
 #include "task_power_monitor.h"
+#include "storage.h"
 
-CanardInstance canard;
-uint8_t memory_pool[1024];
-float motorShutdownVoltage = 17.5f;  // 3.5V * 5
-float systemShutdownVoltage = 17.0f; // 3.4V * 5
-int batteryCount = 4;
+namespace TaskPowerMonitor {
+  CanardInstance canard;
+  uint8_t memory_pool[1024];
+  Storage::State &state = Storage::getState();
+}
 
 void TaskPowerMonitor::init() {
   if (!CFG_ENABLE_POWER_MONITOR) {
@@ -21,14 +22,12 @@ void TaskPowerMonitor::init() {
   Serial.println("Power monitor initialised");
 }
 
-void TaskPowerMonitor::receiveMessage(const TaskPowerMonitor::Message &message) {
+void TaskPowerMonitor::receiveMessage(const Message &message) {
   if (!CFG_ENABLE_POWER_MONITOR) {
     return;
   }
-
   switch (message.type) {
     case TaskPowerMonitor::MessageType::CAN_MESSAGE: {
-
       // Check if the message is from the power monitor
       // Check the message type
       CanardCANFrame rx_frame;
@@ -39,18 +38,6 @@ void TaskPowerMonitor::receiveMessage(const TaskPowerMonitor::Message &message) 
       rx_frame.iface_id = 0;
       memcpy(rx_frame.data, msg.data, msg.len);
       canardHandleRxFrame(&canard, &rx_frame, micros());
-      break;
-    }
-    case TaskPowerMonitor::MessageType::SET_LOW_VOLTAGE_THRESHOLD: {
-      motorShutdownVoltage = message.as.voltageThreshold;
-      break;
-    }
-    case TaskPowerMonitor::MessageType::SET_CRITICAL_VOLTAGE_THRESHOLD: {
-      systemShutdownVoltage = message.as.voltageThreshold;
-      break;
-    }
-    case TaskPowerMonitor::SET_BATTERY_COUNT: {
-      batteryCount = message.as.batteryCount;
       break;
     }
   }
@@ -100,10 +87,10 @@ void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTrans
 
   // TODO check every x ms consecutively in case we get a temporary voltage drop
 
-  if (msg.voltage <= systemShutdownVoltage) {
+  if (msg.voltage <= state.criticalVoltageThreshold) {
     Serial.println("[WARN] Battery voltage critical, shutting down");
     taskMessage.type = DataManager::Type::BATT_VOLTAGE_CRITICAL;
-  } else if (msg.voltage <= motorShutdownVoltage) {
+  } else if (msg.voltage <= state.lowVoltageThreshold) {
     Serial.println("[WARN] Battery voltage low, disabling motors");
     taskMessage.type = DataManager::Type::BATT_VOLTAGE_LOW;
   } else {
