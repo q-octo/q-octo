@@ -13,7 +13,6 @@ void toggleXButton();
 // Callbacks can be added to these constructors if necessary.
 Display display(toggleAButton, toggleBButton, toggleXButton);
 QOctoWebServer webServer;
-QOctoSerial serial;
 
 void setup()
 {
@@ -25,7 +24,6 @@ void setup()
 #endif
 
   // Don't use constructor for this bit....
-  serial.init();
 
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
@@ -36,7 +34,7 @@ void loop()
 {
   display.loop();
   webServer.loop();
-  serial.loop();
+  QOctoSerial::loop();
 }
 
 void toggleAButton()

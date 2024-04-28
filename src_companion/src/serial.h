@@ -1,11 +1,22 @@
 #pragma once
 
+#include "flatbuffers/flatbuffers.h"
+#include "flatbuffer_serial_parser.h"
+#include "companion_rx_generated.h"
+#include "companion_tx_generated.h"
+
+using namespace fbs;
+
 class QOctoSerial
 {
 public:
     static void init();
-    void loop();
+    static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
+    static void loop();
+    static void parseIncomingMessage();
 
 private:
-    uint8_t serialBuffer[255];
+    static inline uint8_t serialBuffer[255];
+    static inline SerialUART fbSerial = Serial1;
+    static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(fbSerial, verifyIncomingFlatbuffer);
 };
