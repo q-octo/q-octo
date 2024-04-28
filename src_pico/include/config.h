@@ -7,6 +7,7 @@ static const int CFG_ENABLE_RC = 0;
 static const int CFG_ENABLE_POWER_MONITOR = 0;
 static const int CFG_ENABLE_COMPANION = 1;
 static const int CFG_ENABLE_ONBOARD_COMPUTER = 0;
+static const int CFG_WAIT_FOR_USB_SERIAL = 0;
 
 static const int CFG_DEBUG_LIST_TASKS = 0;
 
