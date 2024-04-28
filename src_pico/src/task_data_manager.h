@@ -24,11 +24,9 @@ namespace DataManager {
     BATT_OK,                        // taskPowerMonitor
     BATT_VOLTAGE_LOW,               // taskPowerMonitor
     BATT_VOLTAGE_CRITICAL,          // taskPowerMonitor
-    SET_LOW_VOLTAGE_THRESHOLD,      // web server
-    SET_CRITICAL_VOLTAGE_THRESHOLD, // web server
-    SET_BATTERY_COUNT,              // web server
     FOLD_WHEELS,                    // web server, taskReceiveFromRC
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
+    STORAGE_UPDATE,
   } Type;
 
   typedef struct {
@@ -105,11 +103,7 @@ namespace DataManager {
     Motors motors;
     Battery battery;
     RC rc;
-    float lowVoltageThreshold;
-    float criticalVoltageThreshold;
     bool webServerEnabled;
-    int batteryCount;
-    bool wheelsFolded;
   } State;
 
   void receiveMessage(const Message &message);

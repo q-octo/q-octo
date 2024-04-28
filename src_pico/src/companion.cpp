@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "companion.h"
 #include "config.h"
+#include "storage.h"
 
 namespace Companion {
   bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
@@ -83,58 +84,54 @@ void Companion::handleUpdateMessage(const Update &update) {
       break;
     case UpdateUnion::UpdateUnion_UpdateBatteries: {
       auto updateBatteries = update.update_as_UpdateBatteries();
-      taskMessage = {
-              .type = DataManager::Type::SET_BATTERY_COUNT,
-              .as = {.batteryCount = updateBatteries->batteries()},
-      };
-      sendTaskMessage(taskMessage);
+      Storage::State &state = Storage::getState();
+      state.batteryCount = updateBatteries->batteries();
+      Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateLowVoltageThreshold: {
       auto updateLowVoltageThreshold =
               update.update_as_UpdateLowVoltageThreshold();
-      taskMessage = {
-              .type = DataManager::Type::SET_LOW_VOLTAGE_THRESHOLD,
-              .as =
-                      {
-                              .voltageThreshold =
-                              updateLowVoltageThreshold->low_voltage_threshold(),
-                      },
-      };
-      sendTaskMessage(taskMessage);
+
+      Storage::State &state = Storage::getState();
+      state.lowVoltageThreshold = updateLowVoltageThreshold->low_voltage_threshold();
+      Storage::save(); 
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold: {
+
       auto updateCriticalVoltageThreshold =
               update.update_as_UpdateCriticalVoltageThreshold();
-      taskMessage = {
-              .type = DataManager::Type::SET_CRITICAL_VOLTAGE_THRESHOLD,
-              .as =
-                      {
-                              .voltageThreshold = updateCriticalVoltageThreshold
-                                      ->critical_voltage_threshold(),
-                      },
-      };
-      sendTaskMessage(taskMessage);
+      Storage::State &state = Storage::getState();
+      state.criticalVoltageThreshold = updateCriticalVoltageThreshold->critical_voltage_threshold();
+      Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateReferenceWheelAngle: {
-      auto updateReferenceWheelAngle =
-              update.update_as_UpdateReferenceWheelAngle();
-      // TODO implement
-      // robot.reference_wheel_angle =
-      // updateReferenceWheelAngle->reference_wheel_angle();
+      Storage::State &state = Storage::getState();
+      state.leftMotorFoldAngle = update.update_as_UpdateReferenceWheelAngle()->left_motor_fold_angle();
+      state.rightMotorFoldAngle = update.update_as_UpdateReferenceWheelAngle()->right_motor_fold_angle();
+      Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateFoldWheels: {
-      // robot.wheels_folded = true;
+      // TODO implement wheel folding
       break;
     }
-    case UpdateUnion::UpdateUnion_UpdateRssiThreshold:
+    case UpdateUnion::UpdateUnion_UpdateRssiThreshold: {
+      Storage::State &state = Storage::getState();
+      state.rssiThreshold = update.update_as_UpdateRssiThreshold()->rssi_threshold();
+      Storage::save();
       break;
+    }
+    case UpdateUnion::UpdateUnion_UpdateLinkQualityThreshold: {
+      Storage::State &state = Storage::getState();
+      state.linkQualityThreshold = update.update_as_UpdateLinkQualityThreshold()->link_quality_threshold();
+      Storage::save();
+      break;
+    }
     case UpdateUnion::UpdateUnion_UpdateEnableRover:
-      break;
-    case UpdateUnion::UpdateUnion_UpdateLinkQualityThreshold:
+      // TODO implement rover enable/disable
       break;
   }
 }

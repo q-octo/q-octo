@@ -1,5 +1,6 @@
 #include "config.h"
 #include <Arduino.h>
+#include "storage.h"
 
 //#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
 //#include <task.h>     // Enables FreeRTOS tasks
@@ -36,6 +37,8 @@ void setup() {
   while (!Serial);
   delay(1000); // Wait for a second
   Serial.println("Live on core 0");
+  
+  Storage::init(); // Intentionally initialised first
   TaskCAN::init();
   TaskRC::init();
   TaskPowerMonitor::init();
