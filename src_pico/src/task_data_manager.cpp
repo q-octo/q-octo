@@ -95,6 +95,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       controlMotorsMessage.type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_L;
       controlMotorsMessage.as = {.canMessage = message.as.canMessage};
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
     case CAN_MESSAGE_MOTOR_R:
       controlMotorsMessage.type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_R;
       controlMotorsMessage.as = {.canMessage = message.as.canMessage};
@@ -120,6 +121,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       // TODO Update status on web dashboard & display
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
     case BATT_VOLTAGE_CRITICAL:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
@@ -133,6 +135,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       computerMessage.type = Computer::MessageType::DISPLAY_BUTTON;
       computerMessage.as = {.displayButton = message.as.displayButton};
       Computer::receiveMessage(computerMessage);
+      break;
     case STORAGE_UPDATE:
       broadcastStateUpdate();
       break;
