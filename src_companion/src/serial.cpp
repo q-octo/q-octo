@@ -4,39 +4,28 @@
 #define PIN_UART_TX 0
 #define PIN_UART_RX 1
 
-void QOctoSerial::init()
-{
-    Serial1.setPinout(PIN_UART_TX, PIN_UART_RX);
-    Serial1.setFIFOSize(2048);
-    Serial1.begin(115200);
+void QOctoSerial::init(MessageCallback callback) {
+  messageCallback = callback;
+  Serial1.setPinout(PIN_UART_TX, PIN_UART_RX);
+  // Certainly needs to be larger than a single message ~108 bytes.
+  // If messages are received faster than we process them then this will inevitably fill up and bytes will be lost.
+  Serial1.setFIFOSize(1024);
+  Serial1.begin(115200);
 }
 
-void QOctoSerial::loop()
-{
-    if (parser.parseMessage())
-    {
-        Serial.println("We got a message");
+void QOctoSerial::loop() {
+  if (parser.parseMessage()) {
+    CompanionRxT message;
+    GetCompanionRx(parser.buffer)->UnPackTo(&message);
+    if (messageCallback == nullptr) {
+      Serial.println("[ERROR] QOctoSerial not initialised with a callback");
+      return;
     }
-    // // Parse the serial data
-    // if (Serial1.available() > 0)
-    // {
-
-    //     Serial.println("Hey mom, we got " + String(Serial1.available()) + " bytes");
-    //     while (Serial1.available() > 0)
-    //     {
-    //         char c = Serial1.read();
-    //         // Serial.print(c);
-    //     }
-    //     // One callback for state updates, one for enabling/disabling the web
-    //     // server (bool enable parameter).
-    //     // int len = Serial1.readBytes(serialBuffer, sizeof(serialBuffer));
-    // }
-
-    // // Send pending data here
+    messageCallback(message);
+  }
 }
 
-bool QOctoSerial::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier)
-{
-    return SizePrefixedCompanionRxBufferHasIdentifier(parser.buffer) &&
-           VerifySizePrefixedCompanionRxBuffer(verifier);
+bool QOctoSerial::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier) {
+  return SizePrefixedCompanionRxBufferHasIdentifier(parser.buffer) &&
+         VerifySizePrefixedCompanionRxBuffer(verifier);
 }

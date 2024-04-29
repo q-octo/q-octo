@@ -10,11 +10,12 @@ using namespace fbs;
 class QOctoSerial
 {
 public:
-    static void init();
+    typedef void (*MessageCallback)(const CompanionRxT &message);
+    static void init(MessageCallback callback);
     static void loop();
 
 private:
     static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-    static inline uint8_t serialBuffer[255];
     static inline FlatbufferSerialParser parser = FlatbufferSerialParser(Serial1, verifyIncomingFlatbuffer);
+    static inline MessageCallback messageCallback;
 };
