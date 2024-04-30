@@ -1,25 +1,19 @@
 #pragma once
 
 #include "task_data_manager.h"
+#include "storage.h"
 #include <canard.h>
 #include <uavcan.equipment.power.BatteryInfo.h>
 
-namespace TaskPowerMonitor
-{
-  // public:
-  typedef enum
-  {
+class TaskPowerMonitor {
+public:
+  typedef enum {
     CAN_MESSAGE,
-    SET_LOW_VOLTAGE_THRESHOLD,
-    SET_CRITICAL_VOLTAGE_THRESHOLD,
-    SET_BATTERY_COUNT,
   } MessageType;
 
-  typedef struct
-  {
+  typedef struct {
     MessageType type;
-    union
-    {
+    union {
       DataManager::CanMessage canMessage;
       float voltageThreshold;
       int batteryCount;
@@ -27,17 +21,24 @@ namespace TaskPowerMonitor
 
   } Message;
 
-  void init();
+  static void init();
 
-  void receiveMessage(const Message &message);
+  static void receiveMessage(const Message &message);
 
-  // private:
-  void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer);
+private:
 
-  bool shouldAcceptTransfer(const CanardInstance *ins, uint64_t *out_data_type_signature, uint16_t data_type_id,
-                            CanardTransferType transfer_type, uint8_t source_node_id);
+  static void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer);
 
-  void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+  static bool shouldAcceptTransfer(const CanardInstance *ins, uint64_t *out_data_type_signature, uint16_t data_type_id,
+                                   CanardTransferType transfer_type, uint8_t source_node_id);
 
-  
-}
+  static void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+
+  static uint8_t voltageToBatteryPercent(float voltage);
+
+
+  static inline CanardInstance canard;
+  static inline uint8_t memory_pool[1024];
+  static inline Storage::State &state = Storage::getState();
+
+};

@@ -8,31 +8,7 @@ namespace fbs;
 
 file_identifier "OCRX";
 
-table CrsfTelemetry {
-  /// Signal strength indicator
-  rssi: ubyte;         
-  /// Link quality
-  link_quality: ubyte; 
-  /// Signal to noise ratio
-  snr: byte;           
-  /// Transmission power
-  tx_power: ushort;
-}
-
-struct CrsfChannels {
-  data: [ushort:16];
-}
-
-table CrsfData {
-  channels: CrsfChannels;
-  /// Telemetry data associated with the RC frame
-  telemetry: CrsfTelemetry;
-  /// Failsafe flag with a default value of true
-  failsafe:bool = true;
-}
-
 union OnboardComputerRxUnion {
-    CrsfData,
     Robot, // from robot_state.fbs,
     ButtonPressed, // from companion_tx.fbs
 }

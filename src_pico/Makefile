@@ -47,5 +47,7 @@ dart: $(FBS_DART_OUT_FILES)
 $(FBS_DART_OUT_FILES): $(FBS_FILES)
 	$(FLATC) --gen-object-api -o $(FBS_PICO1_OUT_DIR) --dart $<
 
+fastclean:
+	rm -rf $(FBS_PICO1_OUT_DIR)/*_generated.h $(FBS_PICO2_OUT_DIR)/*_generated.h $(FBS_TS_OUT_DIR)/**
 clean:
 	rm -rf $(FLATC) $(FBS_PICO1_OUT_DIR)/*_generated.h $(FBS_PICO2_OUT_DIR)/*_generated.h $(FBS_TS_OUT_DIR)/**

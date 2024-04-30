@@ -12,9 +12,9 @@
 
 using namespace fbs;
 
-namespace Computer
+class Computer
 {
-  // public:
+public:
   enum MessageType
   {
     STATE_UPDATE,
@@ -31,19 +31,22 @@ namespace Computer
     } as;
   } Message;
 
-  void receiveMessage(const Message &message);
-  void init();
-  void loop();
+  static void receiveMessage(const Message &message);
+  static void init();
+  static void loop();
 
 
-  // private:
-  void serialiseState(const DataManager::State &state);
-  void sendStateToComputer(const DataManager::State &state);
-  void handleComputerTx(const OnboardComputerTx &computerTx);
-  void sendTaskMessage(const DataManager::Message &message);
-  void sendDisplayButtonToComputer(const DataManager::DisplayButton &displayButton);
-  void parseIncomingSerialData();
-  bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
-  Button serialiseDisplayButton(const DataManager::DisplayButton &displayButton);
-
-}
+private:
+  static void serialiseState(const DataManager::State &state);
+  static void sendStateToComputer(const DataManager::State &state);
+  static void handleComputerTx(const OnboardComputerTx &computerTx);
+  static void sendTaskMessage(const DataManager::Message &message);
+  static void sendDisplayButtonToComputer(const DataManager::DisplayButton &displayButton);
+  static void parseIncomingSerialData();
+  static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
+  static inline Button serialiseDisplayButton(const DataManager::DisplayButton &displayButton);
+  static inline SerialUART computerSerial = Serial2;
+  // 1024 is the default size, but it will grow automatically.
+  static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
+  static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(computerSerial, verifyIncomingFlatbuffer);
+};

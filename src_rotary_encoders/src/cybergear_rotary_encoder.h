@@ -7,10 +7,10 @@ typedef void (*TransmitCanCallback)(uint32_t packetId, uint8_t *packetData);
 
 typedef struct {
     // TODO double check the data types
-    int32_t position;
+    float position;
     // -2048 to 2047
-    int16_t speed;
-    uint16_t torque;
+    float speed;
+    float torque;
 
 } RotaryEncoderResponse;
 

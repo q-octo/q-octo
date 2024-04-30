@@ -8,12 +8,10 @@ const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
 const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
 const uint8_t MASTER_CAN_ID = 0x00;
 
-namespace TaskControlMotors
-{
+class TaskControlMotors {
 
-  // public:
-  typedef enum
-  {
+public:
+  typedef enum {
     ENABLE,
     DISABLE,
     SET_SPEED_COMBINED,
@@ -23,27 +21,35 @@ namespace TaskControlMotors
     FOLD_WHEELS,
   } MessageType;
 
-  typedef struct
-  {
+  typedef struct {
     MessageType type;
-    union
-    {
+    union {
       DataManager::SetMotorSpeedIndividual speedIndividual;
       DataManager::SetMotorSpeedCombined speedCombined;
       DataManager::CanMessage canMessage;
     } as;
   } Message;
 
-  void init();
+  static void init();
 
-  void receiveMessage(const Message &message);
+  static void receiveMessage(const Message &message);
 
-  void broadcastStatusUpdate();
-  // private:
+  static void broadcastStatusUpdate();
 
-  void setSpeedIndividual(float speedL, float speedR);
+private:
 
-  void initMotors();
+  static void setSpeedIndividual(float speedL, float speedR);
 
-  void debugPrintMotorStatus(); 
+  static void initMotors();
+
+  static void debugPrintMotorStatus();
+
+  static inline bool motorsEnabled = true;
+  static inline uint32_t lastStatusRequestMs = 0;
+  static inline uint32_t lastStatusBroadcastMs = 0;
+
+  static inline XiaomiCyberGearDriver cybergearL =
+          XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);
+  static inline XiaomiCyberGearDriver cybergearR =
+          XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_R, MASTER_CAN_ID);
 };

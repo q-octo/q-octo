@@ -7,48 +7,20 @@
 #define BROADCAST_FREQUENCY 500 // ms
 
 #define mapRange(a1, a2, b1, b2, s) (b1 + (s - a1) * (b2 - b1) / (a2 - a1))
-
-DataManager::Message taskMessage;
-/* A flag to hold the fail-safe status. */
-bool isFailsafeActive = false;
-
-/* RC Channels data. */
-int rcChannelCount = 8;
-// 16 channels
-const char *rcChannelNames[] = {
-        "A",
-        "E",
-        "T",
-        "R",
-        "Aux1",
-        "Aux2",
-        "Aux3",
-        "Aux4",
-
-        "Aux5", // Failsafe Channel
-        "Aux6",
-        "Aux7",
-        "Aux8",
-        "Aux9",
-        "Aux10",
-        "Aux11",
-        "Aux12"};
-
-uint32_t lastRcChannelsLogMs = 0;
-uint32_t lastRcLinkStatsLogMs = 0;
-uint32_t lastBroadcastMs = 0;
-float lastRPM = 0;
-
 #define RC_CHANNELS_LOG_FREQUENCY 2000   // ms
 #define RC_LINK_STATS_LOG_FREQUENCY 2000 // ms
+
+void TaskRC::setThresholds() {
+  crsf_set_link_quality_threshold(state.linkQualityThreshold);
+  crsf_set_rssi_threshold(state.rssiThreshold);
+}
 
 void TaskRC::init() {
   if (!CFG_ENABLE_RC) {
     return;
   }
 
-  crsf_set_link_quality_threshold(70);
-  crsf_set_rssi_threshold(105);
+  setThresholds();
   crsf_set_on_link_statistics(onLinkStatisticsUpdate);
   crsf_set_on_rc_channels(onReceiveChannels);
   crsf_set_on_failsafe(onFailsafe);
@@ -62,17 +34,35 @@ void TaskRC::loop() {
     return;
   }
   crsf_process_frames();
+  const uint32_t currentMillis = millis();
+  if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
+    lastBroadcastMs = currentMillis;
+    lastLinkStats = lastLinkStats;
+    DataManager::RC rc = {
+            .rssi = lastLinkStats.rssi,
+            .linkQuality = lastLinkStats.link_quality,
+            .signalNoiseRatio = lastLinkStats.snr,
+            .tx_power = lastLinkStats.tx_power,
+            .failsafe = isFailsafeActive,
+    };
+    memcpy(rc.channels, lastChannels, sizeof(lastChannels));
+    taskMessage = {.type = DataManager::Type::STATE_RC, .as = {.rc = rc}};
+    DataManager::receiveMessage(taskMessage);
+  }
 }
 
 void TaskRC::receiveMessage(const Message &message) {
 
   switch (message.type) {
-    case TaskRC::BATTERY:
+    case BATTERY:
       crsf_telem_set_battery_data(
               message.as.battery.voltage * 10,
               message.as.battery.current * 10,
               message.as.battery.fuel,
-              42);
+              message.as.battery.percent);
+      break;
+    case STATE_UPDATE:
+      setThresholds();
       break;
     default:
       Serial.println("[ERROR] unknown message type");
@@ -96,25 +86,10 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
     Serial.println(linkStatistics.tx_power);
   }
 #endif
-
-  if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
-    lastBroadcastMs = currentMillis;
-    taskMessage = {
-            .type = DataManager::Type::STATE_RC,
-            .as = {
-                    .rc = {
-                            .rssi = linkStatistics.rssi,
-                            .linkQuality = linkStatistics.link_quality,
-                            .signalNoiseRatio = linkStatistics.snr,
-                            .tx_power = linkStatistics.tx_power,
-                    },
-            },
-    };
-    DataManager::receiveMessage(taskMessage);
-  }
 }
 
 void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
+  memcpy(lastChannels, channels, sizeof(lastChannels));
 #if DEBUG_LOG_RC_CHANNELS
   const uint32_t currentMillis = millis();
   if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive) {

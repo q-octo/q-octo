@@ -7,19 +7,21 @@
 #define WAIT_FOR_USB_SERIAL 1
 
 void toggleAButton();
+
 void toggleBButton();
+
 void toggleXButton();
+
+void onReceiveSerialMessage(const CompanionRxT &message);
 
 // Callbacks can be added to these constructors if necessary.
 Display display(toggleAButton, toggleBButton, toggleXButton);
 QOctoWebServer webServer;
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 #if WAIT_FOR_USB_SERIAL
-  while (!Serial)
-  {
+  while (!Serial) {
   }
 #endif
 
@@ -27,27 +29,44 @@ void setup()
 
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
-  QOctoSerial::init();
+  QOctoSerial::init(onReceiveSerialMessage);
 }
 
-void loop()
-{
+void loop() {
   display.loop();
   webServer.loop();
   QOctoSerial::loop();
 }
 
-void toggleAButton()
-{
+void onReceiveSerialMessage(const CompanionRxT &message) {
+  Serial.println("We got a message");
+  auto msg = message.message;
+  switch (msg.type) {
+    case CompanionRxUnion_NONE:
+      break;
+    case CompanionRxUnion_SetWebServerEnabled:
+      if (msg.AsSetWebServerEnabled()->enabled) {
+        webServer.start();
+      } else {
+        webServer.stop();
+      }
+      break;
+    case CompanionRxUnion_Robot:
+      display.updateState(*msg.AsRobot());
+      webServer.updateState(*msg.AsRobot());
+      break;
+  }
+
+}
+
+void toggleAButton() {
   Serial.println("A button pressed");
 }
 
-void toggleBButton()
-{
+void toggleBButton() {
   Serial.println("B button pressed");
 }
 
-void toggleXButton()
-{
+void toggleXButton() {
   Serial.println("X button pressed");
 }

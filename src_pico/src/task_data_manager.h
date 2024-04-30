@@ -1,9 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
+#include <string>
 
-namespace DataManager {
-// public:
+class DataManager {
+public:
   typedef enum {
     STATE_MOTORS, // taskMotors
     STATE_RC,     // taskReceiveFromRC
@@ -24,11 +25,10 @@ namespace DataManager {
     BATT_OK,                        // taskPowerMonitor
     BATT_VOLTAGE_LOW,               // taskPowerMonitor
     BATT_VOLTAGE_CRITICAL,          // taskPowerMonitor
-    SET_LOW_VOLTAGE_THRESHOLD,      // web server
-    SET_CRITICAL_VOLTAGE_THRESHOLD, // web server
-    SET_BATTERY_COUNT,              // web server
     FOLD_WHEELS,                    // web server, taskReceiveFromRC
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
+    STORAGE_UPDATE,
+    DISPLAY_MESSAGES,
   } Type;
 
   typedef struct {
@@ -59,6 +59,8 @@ namespace DataManager {
     uint8_t linkQuality;
     int8_t signalNoiseRatio;
     uint16_t tx_power;
+    uint16_t channels[16];
+    bool failsafe;
   } RC;
 
   typedef struct {
@@ -85,7 +87,17 @@ namespace DataManager {
     A, B
   } DisplayButton;
 
-  typedef struct  {
+  typedef struct {
+    std::string* message1;
+    std::string* message2;
+    std::string* message3;
+    std::string* message4;
+    std::string* message5;
+    std::string* message6;
+    std::string* message7;
+  } DisplayMessages;
+
+  typedef struct {
     Type type;
     union {
       Motors motors;
@@ -98,6 +110,7 @@ namespace DataManager {
       float voltageThreshold;
       int batteryCount;
       DisplayButton displayButton;
+      DisplayMessages displayMessages;
     } as;
   } Message;
 
@@ -105,19 +118,16 @@ namespace DataManager {
     Motors motors;
     Battery battery;
     RC rc;
-    float lowVoltageThreshold;
-    float criticalVoltageThreshold;
     bool webServerEnabled;
-    int batteryCount;
-    bool wheelsFolded;
+    DisplayMessages displayMessages;
   } State;
 
-  void receiveMessage(const Message &message);
+  static void receiveMessage(const Message &message);
 
-// private:
-  void broadcastStateUpdate();
+private:
+  static void broadcastStateUpdate();
 
-  void setWebServerEnabled(bool enabled);
+  static void setWebServerEnabled(bool enabled);
 
-  
-}
+
+};
