@@ -12,6 +12,7 @@
 #include "computer.h"
 #include "task_can.h"
 #include "task_power_monitor.h"
+#include "buttons.h"
 
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -49,6 +50,7 @@ void setup() {
   Companion::init();
   Computer::init();
   Watchdog::init();
+  Buttons::init();
   initTasks();
 }
 
@@ -70,6 +72,7 @@ void loop() {
   }
   Companion::loop();
   Computer::loop();
+  Buttons::loop();
 
   Watchdog::taskCompleted(Watchdog::Task::FAST_LOOP);
   Watchdog::loop();
