@@ -29,6 +29,8 @@ public:
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
     STORAGE_UPDATE,
     DISPLAY_MESSAGES,
+    BUTTON_DOWN,
+    BUTTON_UP,
   } Type;
 
   typedef struct {
@@ -97,6 +99,11 @@ public:
     std::string* message7;
   } DisplayMessages;
 
+  typedef enum {
+    WEB_SERVER,
+    MOTORS,
+  } PhysicalButton;
+
   typedef struct {
     Type type;
     union {
@@ -111,6 +118,7 @@ public:
       int batteryCount;
       DisplayButton displayButton;
       DisplayMessages displayMessages;
+      PhysicalButton  physicalButton;
     } as;
   } Message;
 

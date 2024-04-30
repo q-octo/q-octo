@@ -136,6 +136,10 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       computerMessage.as = {.displayButton = message.as.displayButton};
       Computer::receiveMessage(computerMessage);
       break;
+    case BUTTON_DOWN:
+      break;
+    case BUTTON_UP:
+      break;
     case STORAGE_UPDATE:
       broadcastStateUpdate();
       break;
