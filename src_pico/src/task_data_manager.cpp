@@ -5,6 +5,7 @@
 #include "task_rc.h"
 #include "companion.h"
 #include "computer.h"
+#include "system_status.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -48,6 +49,8 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
   static TaskControlMotors::Message controlMotorsMessage;
   static TaskPowerMonitor::Message powerMonitorMessage;
 
+  SystemStatus::receiveDataManagerMessage(message);
+
   switch (message.type) {
     case STATE_MOTORS:
       state.motors = message.as.motors;
@@ -84,12 +87,12 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case TX_LOST:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
-      // TODO update display status to NO_TX
+      broadcastStateUpdate();
       break;
     case TX_RESTORED:
       controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
-      // Update display status
+      broadcastStateUpdate();
       break;
     case CAN_MESSAGE_MOTOR_L:
       controlMotorsMessage.type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_L;
@@ -118,9 +121,9 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_VOLTAGE_LOW:
       // Disable motors
-      // TODO Update status on web dashboard & display
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      broadcastStateUpdate();
       break;
     case BATT_VOLTAGE_CRITICAL:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;

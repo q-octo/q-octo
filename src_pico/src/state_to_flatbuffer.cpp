@@ -1,12 +1,31 @@
 
 #include "state_to_flatbuffer.h"
 #include "storage.h"
+#include "system_status.h"
+
+
+Status serialiseSystemStatus(const DataManager::Status &systemStatus) {
+  switch (systemStatus) {
+    case DataManager::OK:
+      return Status_OK;
+    case DataManager::LOW_BATTERY:
+      return Status_BAT;
+    case DataManager::NO_TX_SIGNAL:
+      return Status_NOTX;
+    case DataManager::MOTOR_ERROR:
+    case DataManager::DISARMED:
+      // TODO update schema to handle these cases
+      return Status_OK;
+      break;
+  }
+}
 
 void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   const Storage::State &storageState = Storage::getState();
   robot.batteries = storageState.batteryCount;
+  // TODO get control source
   robot.control_source = ControlSource_RC;
-  robot.status = Status_OK;
+  robot.status = serialiseSystemStatus(SystemStatus::getStatus());
 
   robot.voltage = robotState.battery.voltage;
   robot.current = robotState.battery.current;
