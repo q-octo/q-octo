@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "serial.h"
 
-
 #define PIN_UART_TX 0
 #define PIN_UART_RX 1
 

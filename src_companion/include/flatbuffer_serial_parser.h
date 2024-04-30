@@ -22,12 +22,15 @@ public:
 
     if (bytesInSerialFifo) {
       // print message length
+      Serial.print("Incoming message length: ");
+      Serial.println(bytesInSerialFifo);
     }
 
     while (serial.available()) {
       if (offset >= sizeof(buffer)) {
         Serial.println("[ERROR] Buffer overflow.");
         dropRemainingBytes();
+        return false;
       }
 
       buffer[offset++] = serial.read();

@@ -25,8 +25,6 @@ void setup() {
   }
 #endif
 
-  // Don't use constructor for this bit....
-
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
   QOctoSerial::init(onReceiveSerialMessage);
