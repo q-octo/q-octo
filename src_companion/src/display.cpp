@@ -27,7 +27,7 @@ void Display::loop()
   }
 
   // Repaint the screen every 32ms (30fps)
-  if (currentMillis - lastRepaintMillis >= 32)
+  if (currentMillis - lastRepaintMillis >= 64)
   {
     lastRepaintMillis = currentMillis;
     repaintDisplay();
@@ -38,6 +38,7 @@ void Display::loop()
     if (button_y.read())
     {
       nextPage();
+      Serial.println("Button Y pressed");
     }
 }
 
@@ -46,38 +47,6 @@ void Display::blinkLED()
   led.set_rgb(76, 176, 80); // Green
   led.set_brightness(ledState ? 0 : 100);
   ledState = !ledState;
-}
-
-void Display::paintStack(std::vector<std::string> items) {
-    const int displayWidth = 240;
-    const int displayHeight = 135;
-    graphics.set_font("bitmap8");
-    const int maxMessages = 7;
-    int numMessages = std::min((int)items.size(), maxMessages);
-    int boxHeight = displayHeight / numMessages;
-    int paddingL = 2;
-
-    SET_PEN_WHITE();
-    graphics.rectangle(Rect(0, 0, displayWidth, displayHeight)); // Set whole background white
-
-    SET_PEN_BLACK();
-    for (int i = 0; i < numMessages; i++) {
-        // Calculate the y position of the top of this message box
-        int boxTop = i * boxHeight;
-
-        // Draw dividing line (if not the first box)
-        if (i > 0) {
-            graphics.line(Point(0, boxTop), Point(displayWidth, boxTop));
-        }
-
-        // Calculate centering of the text within the box
-        const char* text = items[i].c_str();
-        int textWidth = graphics.measure_text(text, 2, 1, false);
-        int textX = paddingL; // (displayWidth - textWidth) / 2;
-        int textY = boxTop + (boxHeight - 14) / 2; // Assuming font height is 14px
-
-        graphics.text(text, Point(textX, textY), displayWidth);
-    }
 }
 
 void Display::paintPage1()
@@ -101,16 +70,15 @@ void Display::paintPage1()
     graphics.rectangle(topBar);
     topBar.deflate(2);
 
+    oss.str("");
+    oss << EnumNamesControlSource()[state.control_source];
     SET_PEN_BLACK()
-    graphics.text("ONBCOM", Point(topBar.x, topBar.y), topBar.w);
+    graphics.text(oss.str(), Point(topBar.x, topBar.y), topBar.w);
 
     // TODO: Make this color conditional on wifi on/off
     graphics.text("WIFI:", Point(topBar.x + 110, topBar.y), topBar.w);
-
     int wifiwidth = graphics.measure_text("WIFI:", 2, 1, false);
-
     SET_PEN_GREEN();
-
     graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
 
 
@@ -123,30 +91,26 @@ void Display::paintPage1()
     // Measure length of text first
     const char *status;
 
+    status = EnumNamesStatus()[state.status];
+
     switch (state.status) {
         case Status_OK:
-            SET_PEN_GREEN()
-            status = "OK";
+            SET_PEN_GREEN();
             break;
         case Status_INIT:
             SET_PEN_ORANGE()
-            status = "INIT";
             break;
         case Status_NOTX:
             SET_PEN_RED()
-            status = "NOTX";
             break;
         case Status_BAT:
             SET_PEN_RED()
-            status = "BAT";
             break;
         case Status_TEMP:
             SET_PEN_ORANGE()
-            status = "TEMP";
             break;
         case Status_OFF:
             SET_PEN_RED()
-            status = "OFF";
             break;
     }
 
@@ -165,9 +129,16 @@ void Display::paintPage1()
     graphics.rectangle(middle2);
     middle2.deflate(2);
 
-    SET_PEN_GREEN()
+    if (state.fuel < 0.1) {
+        SET_PEN_RED()
+    } else if (state.fuel < 0.2) {
+        SET_PEN_ORANGE()
+    } else {
+        SET_PEN_GREEN()
+    }
+
     int padding = 2;
-    graphics.rectangle(Rect(0 + padding, 61 + padding, (int)((240-padding) * 0.84), 20 - padding * 2));
+    graphics.rectangle(Rect(0 + padding, 61 + padding, (int)((240-padding) * state.fuel), 20 - padding * 2));
 
 
     // Bottom1 - Voltage and number of batteries
@@ -241,28 +212,135 @@ void Display::paintPage1()
     oss << state.fuel * 100 << "%";
 
     graphics.text(oss.str(), Point(bottom2.x + 160, bottom2.y), bottom2.w);
-
-    // now we've done our drawing let's update the screen
 }
 
 void Display::paintPage2() {
     // Set white background
-
     SET_PEN_WHITE()
-    paintStack({"RSSI -77dB L:64% SNR 10",
-                      "M_l: 22°C 20RAD/S 180°",
-                      "M_r: 22°C 20RAD/S 180°",
-                      "1-4: 1500 1500 1500 1500",
-                        "5-8: 1500 1500 1500 1500",
-                        "9-12: 1500 1500 1500 1500",
-                        "13-16: 1500 1500 1500 1500",
-                    });
+    graphics.clear();
+
+    // Line1 - RSSI and Link Quality
+    SET_PEN_BLACK()
+
+    int xPosition = 10;
+    int yPosition = 0;
+
+    // Line1 - RSSI and Link Quality
+    float rssi = state.rssi_threshold;
+    float link = state.link_quality_threshold;
+
+    graphics.text("RSSI:", Point(xPosition, yPosition), 220);
+    xPosition += 50;
+    graphics.text(std::to_string((int)rssi), Point(xPosition, yPosition), 220);
+    xPosition += 50;
+    graphics.text("L:", Point(xPosition, yPosition), 220);
+    xPosition += 20;
+    graphics.text(std::to_string((int)link), Point(xPosition, yPosition), 220);
+
+    // Line2 - Motor1
+    float temp1 = state.motors->motor1->temperature;
+    float rps1 = state.motors->motor1->rps;
+    float angle1 = state.motors->motor1->angle;
+
+    xPosition = 10;
+    yPosition = 25;
+
+    graphics.text("M_l:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)temp1), Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text("RPS:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)rps1), Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text("A:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)angle1), Point(xPosition, yPosition), 220);
+
+    // Line3 - Motor2
+    float temp2 = state.motors->motor2->temperature;
+    float rps2 = state.motors->motor2->rps;
+    float angle2 = state.motors->motor2->angle;
+
+    xPosition = 10;
+    yPosition = 50;
+
+graphics.text("M_r:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)temp2), Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text("RPS:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)rps2), Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text("A:", Point(xPosition, yPosition), 220);
+    xPosition += 40;
+    graphics.text(std::to_string((int)angle2), Point(xPosition, yPosition), 220);
+
+//    // Lines 4-7 - Channels 1-16
+//    graphics.text("1-4: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
+//    //graphics.line(Point(0, 105), Point(240, 105));  // Draw line
+//
+//    graphics.text("5-8: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
+//    //graphics.line(Point(0, 130), Point(240, 130));  // Draw line
+//
+//    graphics.text("9-12: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
+//    //graphics.line(Point(0, 155), Point(240, 155));  // Draw line
+//
+//    graphics.text("13-16: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
+    //graphics.line(Point(0, 180), Point(240, 180));  // Draw line
+    Serial.println("Painted page 2");
 }
 
 void Display::paintPage3() {
     // Set white background
     SET_PEN_WHITE()
+    graphics.clear();
+
+    // Prepare to display messages
+    SET_PEN_BLACK()
+
+    // Each message is accessed individually from the struct
+    std::string message;
+    int yPos = 10; // Start position for the first message
+
+    message = "Msg1: " + std::string(state.display_messages->message1);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg2: " + std::string(state.display_messages->message2);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg3: " + std::string(state.display_messages->message3);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg4: " + std::string(state.display_messages->message4);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg5: " + std::string(state.display_messages->message5);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg6: " + std::string(state.display_messages->message6);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
+
+    message = "Msg7: " + std::string(state.display_messages->message7);
+    graphics.text(message, Point(10, yPos), 220);
+    yPos += 25;
+    // Optional last line if you want a separator after the last message
+    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
 }
+
 
 
 void Display::repaintDisplay()
@@ -275,9 +353,6 @@ void Display::repaintDisplay()
         break;
     case 1:
         paintPage2();
-        break;
-    case 2:
-        paintPage3();
         break;
     }
   st7789.update(&graphics);
