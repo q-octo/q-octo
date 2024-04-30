@@ -71,6 +71,11 @@ private:
     ButtonCallback button_a_callback;
     ButtonCallback button_b_callback;
     ButtonCallback button_x_callback;
+    int current_page = 0;
+    int max_pages = 3;
+
+    void nextPage() { current_page = (current_page + 1) % max_pages; }
+    void prevPage() { current_page = (current_page - 1 + max_pages) % max_pages; }
 
     RobotT state = RobotT();
 
