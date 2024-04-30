@@ -41,24 +41,52 @@ void Display::blinkLED()
   ledState = !ledState;
 }
 
-void Display::repaintDisplay()
+void Display::paintStack(std::vector<std::string> items) {
+    const int displayWidth = 240;
+    const int displayHeight = 135;
+    const int maxMessages = 7;
+    int numMessages = std::min((int)items.size(), maxMessages);
+    int boxHeight = displayHeight / numMessages;
+
+    SET_PEN_WHITE();
+    graphics.rectangle(Rect(0, 0, displayWidth, displayHeight)); // Set whole background white
+
+    SET_PEN_BLACK();
+    for (int i = 0; i < numMessages; i++) {
+        // Calculate the y position of the top of this message box
+        int boxTop = i * boxHeight;
+
+        // Draw dividing line (if not the first box)
+        if (i > 0) {
+            graphics.line(Point(0, boxTop), Point(displayWidth, boxTop));
+        }
+
+        // Calculate centering of the text within the box
+        const char* text = items[i].c_str();
+        int textWidth = graphics.measure_text(text, 2, 1, false);
+        int textX = 0; // (displayWidth - textWidth) / 2;
+        int textY = boxTop + (boxHeight - 14) / 2; // Assuming font height is 14px
+
+        graphics.text(text, Point(textX, textY), displayWidth);
+    }
+}
+
+void Display::paintPage1()
 {
+// An example of how to access state.
+    //  state.batteries;
 
-  // An example of how to access state.
-  //  state.batteries;
-  
-  // bitmap6, bitmap8, bitmap14_outline
+    // bitmap6, bitmap8, bitmap14_outline
 
-  // Set white background
-  SET_PEN_WHITE()
-  graphics.clear();
+    // Set white background
+    SET_PEN_WHITE()
 
-  // TODO: Top Bar - Control Source and WIFI
-  // Height 30px
+    // TODO: Top Bar - Control Source and WIFI
+    // Height 30px
     graphics.set_font("bitmap14_outline");
-  SET_PEN_GREEN()
+    SET_PEN_GREEN()
     Rect topBar(0, 0, 240, 30);
-  graphics.rectangle(topBar);
+    graphics.rectangle(topBar);
     topBar.deflate(2);
 
     SET_PEN_BLACK()
@@ -66,8 +94,8 @@ void Display::repaintDisplay()
     graphics.text("WIFI: OFF", Point(topBar.x + 100, topBar.y), topBar.w);
 
 
-  // TODO: Middle1 - Status Code in the center
-  // Height 31px
+    // TODO: Middle1 - Status Code in the center
+    // Height 31px
     graphics.set_font("bitmap14_outline");
     // sans, add s
     SET_PEN_RED()
@@ -83,8 +111,8 @@ void Display::repaintDisplay()
     int32_t textWidth = graphics.measure_text(status, 2, 1, false);
     graphics.text(status, Point(middle1.x + (middle1.w - textWidth) / 2, middle1.y), middle1.w);
 
-  // TODO: Middle2 - battery bar
-  // Height 20px
+    // TODO: Middle2 - battery bar
+    // Height 20px
     SET_PEN_BLACK()
     Rect middle2(0, 61, 240, 20);
     graphics.rectangle(middle2);
@@ -95,7 +123,7 @@ void Display::repaintDisplay()
     graphics.rectangle(Rect(0 + padding, 61 + padding, (int)((240-padding) * 0.84), 20 - padding * 2));
 
 
-  // TODO: Bottom1 - Voltage and number of batteries
+    // TODO: Bottom1 - Voltage and number of batteries
     graphics.set_font("bitmap8");
     // Height 27px
     SET_PEN_GREEN()
@@ -112,8 +140,8 @@ void Display::repaintDisplay()
 
     graphics.text("#4", Point(bottom1.x + 160, bottom1.y), bottom1.w);
 
-  // TODO: Bottom2 - Current and number of battery percentage
-  // Height 27px
+    // TODO: Bottom2 - Current and number of battery percentage
+    // Height 27px
     SET_PEN_RED()
     Rect bottom2(0, 108, 240, 27);
     graphics.rectangle(bottom2);
@@ -124,5 +152,29 @@ void Display::repaintDisplay()
     graphics.text("84%", Point(bottom2.x + 160, bottom2.y), bottom2.w);
 
     // now we've done our drawing let's update the screen
+}
+
+void Display::paintPage2() {
+    // Set white background
+    SET_PEN_WHITE()
+    paintStack({"RSSI -77dB L:64% SNR 10",
+                      "M_l: 22°C 20RAD/S 180°",
+                      "M_r: 22°C 20RAD/S 180°",
+                      "1-4: 1500 1500 1500 1500",
+                        "5-8: 1500 1500 1500 1500",
+                        "9-12: 1500 1500 1500 1500",
+                        "13-16: 1500 1500 1500 1500",
+                    });
+}
+
+void Display::paintPage3() {
+    // Set white background
+    SET_PEN_WHITE()
+}
+
+void Display::repaintDisplay()
+{
+    graphics.clear();
+    paintPage2();
   st7789.update(&graphics);
 }

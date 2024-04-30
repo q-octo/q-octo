@@ -51,6 +51,10 @@ public:
 
 private:
     void repaintDisplay();
+    void paintStack(std::vector<std::string> items);
+    void paintPage1();
+    void paintPage2();
+    void paintPage3();
     void blinkLED();
 
     ST7789 st7789;
