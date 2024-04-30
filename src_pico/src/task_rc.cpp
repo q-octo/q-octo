@@ -109,6 +109,7 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   }
 #endif
 
+  // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
   float rpm = mapRange(992, 2008, -10, 10, TICKS_TO_US(channels[0]));
   if (lastRPM != rpm) {

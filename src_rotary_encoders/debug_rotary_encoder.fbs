@@ -1,0 +1,151 @@
+// Define the schema for motor control commands
+
+namespace MotorControl;
+
+// XiaomiCyberGearDriver Commands
+table InitMotor {
+    mode: byte;
+}
+
+table EnableMotor {}
+
+table StopMotor {}
+
+table SetRunMode {
+    mode: byte;
+}
+
+table SendMotionControl {
+    position: float;
+    speed: float;
+    torque: float;
+    kp: float;
+    kd: float;
+}
+
+table SetLimitSpeed {
+    speed: float;
+}
+
+table SetLimitCurrent {
+    current: float;
+}
+
+table SetLimitTorque {
+    torque: float;
+}
+
+table SetCurrentKp {
+    kp: float;
+}
+
+table SetCurrentKi {
+    ki: float;
+}
+
+table SetCurrentFilterGain {
+    gain: float;
+}
+
+table SetCurrentRef {
+    current_ref: float;
+}
+
+table SetPositionKp {
+    kp: float;
+}
+
+table SetPositionRef {
+    position_ref: float;
+}
+
+table SetSpeedKp {
+    kp: float;
+}
+
+table SetSpeedKi {
+    ki: float;
+}
+
+table SetSpeedRef {
+    speed_ref: float;
+}
+
+union MotorCommands {
+    InitMotor,
+    EnableMotor,
+    StopMotor,
+    SetRunMode,
+    SendMotionControl,
+    SetLimitSpeed,
+    SetLimitCurrent,
+    SetLimitTorque,
+    SetCurrentKp,
+    SetCurrentKi,
+    SetCurrentFilterGain,
+    SetCurrentRef,
+    SetPositionKp,
+    SetPositionRef,
+    SetSpeedKp,
+    SetSpeedKi,
+    SetSpeedRef
+}
+
+table MotorCommand {
+    motor_id: byte;
+    command: MotorCommands;
+}
+
+// CybergearRotaryEncoder Commands
+table EnableExtendedMode {}
+
+table StartMotor {}
+
+// table StopMotor {}
+
+table TorqueControlMode {}
+
+table SpeedTorqueControlMode {}
+
+table PositionSpeedTorqueMode {}
+
+table SetMotorPositionToZero {}
+
+table MoveMotor {
+    position_degrees: int16;
+    speed: int16;
+    position_gain: uint16;
+    position_damping: uint16;
+    torque: uint16;
+}
+
+union EncoderCommands {
+    EnableExtendedMode,
+    StartMotor,
+    StopMotor,
+    TorqueControlMode,
+    SpeedTorqueControlMode,
+    PositionSpeedTorqueMode,
+    SetMotorPositionToZero,
+    MoveMotor
+}
+
+table EncoderCommand {
+    motor_id: byte;
+    command: EncoderCommands;
+}
+
+enum CommandType : byte {
+    MOTOR_COMMAND = 0,
+    ENCODER_COMMAND = 1
+}
+
+table Command {
+    type: CommandType;
+    motor_control: MotorCommand;
+    encoder_control: EncoderCommand;
+}
+
+// Root types for serialization
+root_type Command;
+// root_type EncoderCommand;

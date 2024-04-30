@@ -5,13 +5,8 @@
 #include "uavcan.protocol.dynamic_node_id.Allocation.h"
 #include "uavcan.protocol.NodeStatus.h"
 
-const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
-const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
-
-const uint8_t TEST_MOTOR_CAN_ID = CYBERGEAR_CAN_ID_L;
-
-static CanardInstance canard;
-static uint8_t memory_pool[1024];
+CanardInstance canard;
+uint8_t memory_pool[1024];
 uint8_t cached_node_id[16];
 uint8_t cached_node_id_offset = 0;
 
@@ -39,22 +34,21 @@ void setup() {
   delay(1000); // Wait for a second
   Serial.println("Live on core 0 ofc");
   CanCommunication::init(onReceiveCanPacket);
-  // Serial.println("Sending start motor message");
-  // startMotor();
-
-  // move(0, 0, 0, 0, 0);
-
-  // Power monitor:
   // Initialize the Canard library
+  // TODO this only works when the debugger is enabled, what
   canardInit(&canard,
              memory_pool,
              sizeof(memory_pool),
              onTransferReceived,
              shouldAcceptTransfer,
              nullptr);
+  // Serial.print("Canard init response: ");
+  // Serial.println(response);
+
+
+  
 
   canardSetLocalNodeID(&canard, 97);
-  Serial.println("Initialized Canard");
 }
 
 void loop() {
@@ -150,8 +144,8 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
   // } else {
   // Serial.println()
   // }
-  int16_t response = canardHandleRxFrame(&canard, &rx_frame, micros());
-  Serial.print("Canard response: ??");
+  int16_t response = canardHandleRxFrame(&canard, &rx_frame, to_us_since_boot(get_absolute_time()));
+  Serial.print("Canard response: ");
   Serial.println(response);
 }
 
@@ -168,7 +162,7 @@ void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer) {
           break;
         case UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID:
           // Handle DNA message
-          handleDynamicNodeIdAllocation(ins, transfer);
+          // handleDynamicNodeIdAllocation(ins, transfer);
           break;
         case UAVCAN_PROTOCOL_NODESTATUS_ID:
           break;
