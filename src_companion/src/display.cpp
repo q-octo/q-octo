@@ -114,22 +114,48 @@ void Display::paintPage1()
     graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
 
 
-    // TODO: Middle1 - Status Code in the center
+    // Middle1 - Status Code in the center
     // Height 31px
     graphics.set_font("bitmap14_outline");
 
-    // TODO: Make this color conditional on status
-    SET_PEN_GREEN()
+    // Center the text
+    // Text is 14px
+    // Measure length of text first
+    const char *status;
+
+    switch (state.status) {
+        case Status_OK:
+            SET_PEN_GREEN()
+            status = "OK";
+            break;
+        case Status_INIT:
+            SET_PEN_ORANGE()
+            status = "INIT";
+            break;
+        case Status_NOTX:
+            SET_PEN_RED()
+            status = "NOTX";
+            break;
+        case Status_BAT:
+            SET_PEN_RED()
+            status = "BAT";
+            break;
+        case Status_TEMP:
+            SET_PEN_ORANGE()
+            status = "TEMP";
+            break;
+        case Status_OFF:
+            SET_PEN_RED()
+            status = "OFF";
+            break;
+    }
+
     Rect middle1(0, 30, 240, 31);
     graphics.rectangle(middle1);
     middle1.deflate(2);
 
-    SET_PEN_WHITE()
-    // Center the text
-    // Text is 14px
-    // Measure length of text first
-    const char *status = "ALL SYSTEMS GO";
     int32_t textWidth = graphics.measure_text(status, 2, 1, false);
+    SET_PEN_WHITE()
     graphics.text(status, Point(middle1.x + (middle1.w - textWidth) / 2, middle1.y), middle1.w);
 
     // Middle2 - battery bar
@@ -221,6 +247,7 @@ void Display::paintPage1()
 
 void Display::paintPage2() {
     // Set white background
+
     SET_PEN_WHITE()
     paintStack({"RSSI -77dB L:64% SNR 10",
                       "M_l: 22°C 20RAD/S 180°",
