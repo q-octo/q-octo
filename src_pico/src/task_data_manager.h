@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <string>
 
 class DataManager {
 public:
@@ -27,6 +28,7 @@ public:
     FOLD_WHEELS,                    // web server, taskReceiveFromRC
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
     STORAGE_UPDATE,
+    DISPLAY_MESSAGES,
   } Type;
 
   typedef struct {
@@ -57,6 +59,8 @@ public:
     uint8_t linkQuality;
     int8_t signalNoiseRatio;
     uint16_t tx_power;
+    uint16_t channels[16];
+    bool failsafe;
   } RC;
 
   typedef struct {
@@ -84,6 +88,16 @@ public:
   } DisplayButton;
 
   typedef struct {
+    std::string* message1;
+    std::string* message2;
+    std::string* message3;
+    std::string* message4;
+    std::string* message5;
+    std::string* message6;
+    std::string* message7;
+  } DisplayMessages;
+
+  typedef struct {
     Type type;
     union {
       Motors motors;
@@ -96,6 +110,7 @@ public:
       float voltageThreshold;
       int batteryCount;
       DisplayButton displayButton;
+      DisplayMessages displayMessages;
     } as;
   } Message;
 
@@ -104,6 +119,7 @@ public:
     Battery battery;
     RC rc;
     bool webServerEnabled;
+    DisplayMessages displayMessages;
   } State;
 
   static void receiveMessage(const Message &message);

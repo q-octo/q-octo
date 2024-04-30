@@ -1,3 +1,4 @@
+include "robot_state.fbs";
 namespace fbs;
 
 // Source: Onboard Computer
@@ -24,10 +25,12 @@ table DriveRobot {
     config: DriveConfig;
 }
 
+
 union OnboardComputerTxUnion { 
     /// A frame to be sent to the transmitter.
     CrsfFrame,
     DriveRobot,
+    DisplayMessages
 }
 
 table OnboardComputerTx {

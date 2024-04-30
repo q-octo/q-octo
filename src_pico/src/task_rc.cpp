@@ -34,6 +34,21 @@ void TaskRC::loop() {
     return;
   }
   crsf_process_frames();
+  const uint32_t currentMillis = millis();
+  if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
+    lastBroadcastMs = currentMillis;
+    lastLinkStats = lastLinkStats;
+    DataManager::RC rc = {
+            .rssi = lastLinkStats.rssi,
+            .linkQuality = lastLinkStats.link_quality,
+            .signalNoiseRatio = lastLinkStats.snr,
+            .tx_power = lastLinkStats.tx_power,
+            .failsafe = isFailsafeActive,
+    };
+    memcpy(rc.channels, lastChannels, sizeof(lastChannels));
+    taskMessage = {.type = DataManager::Type::STATE_RC, .as = {.rc = rc}};
+    DataManager::receiveMessage(taskMessage);
+  }
 }
 
 void TaskRC::receiveMessage(const Message &message) {
@@ -71,25 +86,10 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
     Serial.println(linkStatistics.tx_power);
   }
 #endif
-
-  if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
-    lastBroadcastMs = currentMillis;
-    taskMessage = {
-            .type = DataManager::Type::STATE_RC,
-            .as = {
-                    .rc = {
-                            .rssi = linkStatistics.rssi,
-                            .linkQuality = linkStatistics.link_quality,
-                            .signalNoiseRatio = linkStatistics.snr,
-                            .tx_power = linkStatistics.tx_power,
-                    },
-            },
-    };
-    DataManager::receiveMessage(taskMessage);
-  }
 }
 
 void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
+  memcpy(lastChannels, channels, sizeof(lastChannels));
 #if DEBUG_LOG_RC_CHANNELS
   const uint32_t currentMillis = millis();
   if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive) {

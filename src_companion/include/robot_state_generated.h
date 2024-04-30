@@ -27,6 +27,16 @@ struct DisplayMessages;
 struct DisplayMessagesBuilder;
 struct DisplayMessagesT;
 
+struct CrsfTelemetry;
+struct CrsfTelemetryBuilder;
+struct CrsfTelemetryT;
+
+struct CrsfChannels;
+
+struct CrsfData;
+struct CrsfDataBuilder;
+struct CrsfDataT;
+
 struct Robot;
 struct RobotBuilder;
 struct RobotT;
@@ -108,6 +118,23 @@ inline const char *EnumNameStatus(Status e) {
   const size_t index = static_cast<size_t>(e);
   return EnumNamesStatus()[index];
 }
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) CrsfChannels FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint16_t data_[16];
+
+ public:
+  CrsfChannels()
+      : data_() {
+  }
+  CrsfChannels(::flatbuffers::span<const uint16_t, 16> _data) {
+    ::flatbuffers::CastToArray(data_).CopyFromSpan(_data);
+  }
+  const ::flatbuffers::Array<uint16_t, 16> *data() const {
+    return &::flatbuffers::CastToArray(data_);
+  }
+};
+FLATBUFFERS_STRUCT_END(CrsfChannels, 32);
 
 struct MotorT : public ::flatbuffers::NativeTable {
   typedef Motor TableType;
@@ -415,6 +442,176 @@ inline ::flatbuffers::Offset<DisplayMessages> CreateDisplayMessagesDirect(
 
 ::flatbuffers::Offset<DisplayMessages> CreateDisplayMessages(::flatbuffers::FlatBufferBuilder &_fbb, const DisplayMessagesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CrsfTelemetryT : public ::flatbuffers::NativeTable {
+  typedef CrsfTelemetry TableType;
+  uint8_t rssi = 0;
+  uint8_t link_quality = 0;
+  int8_t snr = 0;
+  uint16_t tx_power = 0;
+};
+
+struct CrsfTelemetry FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef CrsfTelemetryT NativeTableType;
+  typedef CrsfTelemetryBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_RSSI = 4,
+    VT_LINK_QUALITY = 6,
+    VT_SNR = 8,
+    VT_TX_POWER = 10
+  };
+  /// Signal strength indicator
+  uint8_t rssi() const {
+    return GetField<uint8_t>(VT_RSSI, 0);
+  }
+  /// Link quality
+  uint8_t link_quality() const {
+    return GetField<uint8_t>(VT_LINK_QUALITY, 0);
+  }
+  /// Signal to noise ratio
+  int8_t snr() const {
+    return GetField<int8_t>(VT_SNR, 0);
+  }
+  /// Transmission power
+  uint16_t tx_power() const {
+    return GetField<uint16_t>(VT_TX_POWER, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_RSSI, 1) &&
+           VerifyField<uint8_t>(verifier, VT_LINK_QUALITY, 1) &&
+           VerifyField<int8_t>(verifier, VT_SNR, 1) &&
+           VerifyField<uint16_t>(verifier, VT_TX_POWER, 2) &&
+           verifier.EndTable();
+  }
+  CrsfTelemetryT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CrsfTelemetryT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<CrsfTelemetry> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfTelemetryT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CrsfTelemetryBuilder {
+  typedef CrsfTelemetry Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_rssi(uint8_t rssi) {
+    fbb_.AddElement<uint8_t>(CrsfTelemetry::VT_RSSI, rssi, 0);
+  }
+  void add_link_quality(uint8_t link_quality) {
+    fbb_.AddElement<uint8_t>(CrsfTelemetry::VT_LINK_QUALITY, link_quality, 0);
+  }
+  void add_snr(int8_t snr) {
+    fbb_.AddElement<int8_t>(CrsfTelemetry::VT_SNR, snr, 0);
+  }
+  void add_tx_power(uint16_t tx_power) {
+    fbb_.AddElement<uint16_t>(CrsfTelemetry::VT_TX_POWER, tx_power, 0);
+  }
+  explicit CrsfTelemetryBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<CrsfTelemetry> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<CrsfTelemetry>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t rssi = 0,
+    uint8_t link_quality = 0,
+    int8_t snr = 0,
+    uint16_t tx_power = 0) {
+  CrsfTelemetryBuilder builder_(_fbb);
+  builder_.add_tx_power(tx_power);
+  builder_.add_snr(snr);
+  builder_.add_link_quality(link_quality);
+  builder_.add_rssi(rssi);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfTelemetryT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct CrsfDataT : public ::flatbuffers::NativeTable {
+  typedef CrsfData TableType;
+  std::unique_ptr<fbs::CrsfChannels> channels{};
+  std::unique_ptr<fbs::CrsfTelemetryT> telemetry{};
+  bool failsafe = true;
+  CrsfDataT() = default;
+  CrsfDataT(const CrsfDataT &o);
+  CrsfDataT(CrsfDataT&&) FLATBUFFERS_NOEXCEPT = default;
+  CrsfDataT &operator=(CrsfDataT o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct CrsfData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef CrsfDataT NativeTableType;
+  typedef CrsfDataBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_CHANNELS = 4,
+    VT_TELEMETRY = 6,
+    VT_FAILSAFE = 8
+  };
+  const fbs::CrsfChannels *channels() const {
+    return GetStruct<const fbs::CrsfChannels *>(VT_CHANNELS);
+  }
+  /// Telemetry data associated with the RC frame
+  const fbs::CrsfTelemetry *telemetry() const {
+    return GetPointer<const fbs::CrsfTelemetry *>(VT_TELEMETRY);
+  }
+  /// Failsafe flag with a default value of true
+  bool failsafe() const {
+    return GetField<uint8_t>(VT_FAILSAFE, 1) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<fbs::CrsfChannels>(verifier, VT_CHANNELS, 2) &&
+           VerifyOffset(verifier, VT_TELEMETRY) &&
+           verifier.VerifyTable(telemetry()) &&
+           VerifyField<uint8_t>(verifier, VT_FAILSAFE, 1) &&
+           verifier.EndTable();
+  }
+  CrsfDataT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CrsfDataT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<CrsfData> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfDataT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CrsfDataBuilder {
+  typedef CrsfData Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_channels(const fbs::CrsfChannels *channels) {
+    fbb_.AddStruct(CrsfData::VT_CHANNELS, channels);
+  }
+  void add_telemetry(::flatbuffers::Offset<fbs::CrsfTelemetry> telemetry) {
+    fbb_.AddOffset(CrsfData::VT_TELEMETRY, telemetry);
+  }
+  void add_failsafe(bool failsafe) {
+    fbb_.AddElement<uint8_t>(CrsfData::VT_FAILSAFE, static_cast<uint8_t>(failsafe), 1);
+  }
+  explicit CrsfDataBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<CrsfData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<CrsfData>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const fbs::CrsfChannels *channels = nullptr,
+    ::flatbuffers::Offset<fbs::CrsfTelemetry> telemetry = 0,
+    bool failsafe = true) {
+  CrsfDataBuilder builder_(_fbb);
+  builder_.add_telemetry(telemetry);
+  builder_.add_channels(channels);
+  builder_.add_failsafe(failsafe);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<CrsfData> CreateCrsfData(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfDataT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct RobotT : public ::flatbuffers::NativeTable {
   typedef Robot TableType;
   int32_t batteries = 4;
@@ -424,8 +621,7 @@ struct RobotT : public ::flatbuffers::NativeTable {
   float voltage = 0.0f;
   float current = 0.0f;
   float fuel = 0.0f;
-  float rssi = 0.0f;
-  int32_t link_quality = 0;
+  std::unique_ptr<fbs::CrsfDataT> crsf_data{};
   float max_speed = 0.0f;
   float low_voltage_threshold = 12.0f;
   float critical_voltage_threshold = 16.0f;
@@ -453,18 +649,17 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_VOLTAGE = 12,
     VT_CURRENT = 14,
     VT_FUEL = 16,
-    VT_RSSI = 18,
-    VT_LINK_QUALITY = 20,
-    VT_MAX_SPEED = 22,
-    VT_LOW_VOLTAGE_THRESHOLD = 24,
-    VT_CRITICAL_VOLTAGE_THRESHOLD = 26,
-    VT_RSSI_THRESHOLD = 28,
-    VT_LINK_QUALITY_THRESHOLD = 30,
-    VT_LEFT_MOTOR_FOLD_ANGLE = 32,
-    VT_RIGHT_MOTOR_FOLD_ANGLE = 34,
-    VT_MOTOR_ERROR_CODE = 36,
-    VT_ENABLE_ROVER = 38,
-    VT_DISPLAY_MESSAGES = 40
+    VT_CRSF_DATA = 18,
+    VT_MAX_SPEED = 20,
+    VT_LOW_VOLTAGE_THRESHOLD = 22,
+    VT_CRITICAL_VOLTAGE_THRESHOLD = 24,
+    VT_RSSI_THRESHOLD = 26,
+    VT_LINK_QUALITY_THRESHOLD = 28,
+    VT_LEFT_MOTOR_FOLD_ANGLE = 30,
+    VT_RIGHT_MOTOR_FOLD_ANGLE = 32,
+    VT_MOTOR_ERROR_CODE = 34,
+    VT_ENABLE_ROVER = 36,
+    VT_DISPLAY_MESSAGES = 38
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -487,11 +682,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float fuel() const {
     return GetField<float>(VT_FUEL, 0.0f);
   }
-  float rssi() const {
-    return GetField<float>(VT_RSSI, 0.0f);
-  }
-  int32_t link_quality() const {
-    return GetField<int32_t>(VT_LINK_QUALITY, 0);
+  const fbs::CrsfData *crsf_data() const {
+    return GetPointer<const fbs::CrsfData *>(VT_CRSF_DATA);
   }
   float max_speed() const {
     return GetField<float>(VT_MAX_SPEED, 0.0f);
@@ -533,8 +725,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_VOLTAGE, 4) &&
            VerifyField<float>(verifier, VT_CURRENT, 4) &&
            VerifyField<float>(verifier, VT_FUEL, 4) &&
-           VerifyField<float>(verifier, VT_RSSI, 4) &&
-           VerifyField<int32_t>(verifier, VT_LINK_QUALITY, 4) &&
+           VerifyOffset(verifier, VT_CRSF_DATA) &&
+           verifier.VerifyTable(crsf_data()) &&
            VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
            VerifyField<float>(verifier, VT_LOW_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
@@ -579,11 +771,8 @@ struct RobotBuilder {
   void add_fuel(float fuel) {
     fbb_.AddElement<float>(Robot::VT_FUEL, fuel, 0.0f);
   }
-  void add_rssi(float rssi) {
-    fbb_.AddElement<float>(Robot::VT_RSSI, rssi, 0.0f);
-  }
-  void add_link_quality(int32_t link_quality) {
-    fbb_.AddElement<int32_t>(Robot::VT_LINK_QUALITY, link_quality, 0);
+  void add_crsf_data(::flatbuffers::Offset<fbs::CrsfData> crsf_data) {
+    fbb_.AddOffset(Robot::VT_CRSF_DATA, crsf_data);
   }
   void add_max_speed(float max_speed) {
     fbb_.AddElement<float>(Robot::VT_MAX_SPEED, max_speed, 0.0f);
@@ -635,8 +824,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     float voltage = 0.0f,
     float current = 0.0f,
     float fuel = 0.0f,
-    float rssi = 0.0f,
-    int32_t link_quality = 0,
+    ::flatbuffers::Offset<fbs::CrsfData> crsf_data = 0,
     float max_speed = 0.0f,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
@@ -657,8 +845,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_critical_voltage_threshold(critical_voltage_threshold);
   builder_.add_low_voltage_threshold(low_voltage_threshold);
   builder_.add_max_speed(max_speed);
-  builder_.add_link_quality(link_quality);
-  builder_.add_rssi(rssi);
+  builder_.add_crsf_data(crsf_data);
   builder_.add_fuel(fuel);
   builder_.add_current(current);
   builder_.add_voltage(voltage);
@@ -679,8 +866,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     float voltage = 0.0f,
     float current = 0.0f,
     float fuel = 0.0f,
-    float rssi = 0.0f,
-    int32_t link_quality = 0,
+    ::flatbuffers::Offset<fbs::CrsfData> crsf_data = 0,
     float max_speed = 0.0f,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
@@ -701,8 +887,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       voltage,
       current,
       fuel,
-      rssi,
-      link_quality,
+      crsf_data,
       max_speed,
       low_voltage_threshold,
       critical_voltage_threshold,
@@ -836,6 +1021,86 @@ inline ::flatbuffers::Offset<DisplayMessages> CreateDisplayMessages(::flatbuffer
       _message7);
 }
 
+inline CrsfTelemetryT *CrsfTelemetry::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<CrsfTelemetryT>(new CrsfTelemetryT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CrsfTelemetry::UnPackTo(CrsfTelemetryT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = rssi(); _o->rssi = _e; }
+  { auto _e = link_quality(); _o->link_quality = _e; }
+  { auto _e = snr(); _o->snr = _e; }
+  { auto _e = tx_power(); _o->tx_power = _e; }
+}
+
+inline ::flatbuffers::Offset<CrsfTelemetry> CrsfTelemetry::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfTelemetryT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCrsfTelemetry(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfTelemetryT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const CrsfTelemetryT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _rssi = _o->rssi;
+  auto _link_quality = _o->link_quality;
+  auto _snr = _o->snr;
+  auto _tx_power = _o->tx_power;
+  return fbs::CreateCrsfTelemetry(
+      _fbb,
+      _rssi,
+      _link_quality,
+      _snr,
+      _tx_power);
+}
+
+inline CrsfDataT::CrsfDataT(const CrsfDataT &o)
+      : channels((o.channels) ? new fbs::CrsfChannels(*o.channels) : nullptr),
+        telemetry((o.telemetry) ? new fbs::CrsfTelemetryT(*o.telemetry) : nullptr),
+        failsafe(o.failsafe) {
+}
+
+inline CrsfDataT &CrsfDataT::operator=(CrsfDataT o) FLATBUFFERS_NOEXCEPT {
+  std::swap(channels, o.channels);
+  std::swap(telemetry, o.telemetry);
+  std::swap(failsafe, o.failsafe);
+  return *this;
+}
+
+inline CrsfDataT *CrsfData::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<CrsfDataT>(new CrsfDataT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CrsfData::UnPackTo(CrsfDataT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = channels(); if (_e) _o->channels = std::unique_ptr<fbs::CrsfChannels>(new fbs::CrsfChannels(*_e)); }
+  { auto _e = telemetry(); if (_e) { if(_o->telemetry) { _e->UnPackTo(_o->telemetry.get(), _resolver); } else { _o->telemetry = std::unique_ptr<fbs::CrsfTelemetryT>(_e->UnPack(_resolver)); } } else if (_o->telemetry) { _o->telemetry.reset(); } }
+  { auto _e = failsafe(); _o->failsafe = _e; }
+}
+
+inline ::flatbuffers::Offset<CrsfData> CrsfData::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfDataT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCrsfData(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfDataT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const CrsfDataT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _channels = _o->channels ? _o->channels.get() : nullptr;
+  auto _telemetry = _o->telemetry ? CreateCrsfTelemetry(_fbb, _o->telemetry.get(), _rehasher) : 0;
+  auto _failsafe = _o->failsafe;
+  return fbs::CreateCrsfData(
+      _fbb,
+      _channels,
+      _telemetry,
+      _failsafe);
+}
+
 inline RobotT::RobotT(const RobotT &o)
       : batteries(o.batteries),
         control_source(o.control_source),
@@ -844,8 +1109,7 @@ inline RobotT::RobotT(const RobotT &o)
         voltage(o.voltage),
         current(o.current),
         fuel(o.fuel),
-        rssi(o.rssi),
-        link_quality(o.link_quality),
+        crsf_data((o.crsf_data) ? new fbs::CrsfDataT(*o.crsf_data) : nullptr),
         max_speed(o.max_speed),
         low_voltage_threshold(o.low_voltage_threshold),
         critical_voltage_threshold(o.critical_voltage_threshold),
@@ -866,8 +1130,7 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(voltage, o.voltage);
   std::swap(current, o.current);
   std::swap(fuel, o.fuel);
-  std::swap(rssi, o.rssi);
-  std::swap(link_quality, o.link_quality);
+  std::swap(crsf_data, o.crsf_data);
   std::swap(max_speed, o.max_speed);
   std::swap(low_voltage_threshold, o.low_voltage_threshold);
   std::swap(critical_voltage_threshold, o.critical_voltage_threshold);
@@ -897,8 +1160,7 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = voltage(); _o->voltage = _e; }
   { auto _e = current(); _o->current = _e; }
   { auto _e = fuel(); _o->fuel = _e; }
-  { auto _e = rssi(); _o->rssi = _e; }
-  { auto _e = link_quality(); _o->link_quality = _e; }
+  { auto _e = crsf_data(); if (_e) { if(_o->crsf_data) { _e->UnPackTo(_o->crsf_data.get(), _resolver); } else { _o->crsf_data = std::unique_ptr<fbs::CrsfDataT>(_e->UnPack(_resolver)); } } else if (_o->crsf_data) { _o->crsf_data.reset(); } }
   { auto _e = max_speed(); _o->max_speed = _e; }
   { auto _e = low_voltage_threshold(); _o->low_voltage_threshold = _e; }
   { auto _e = critical_voltage_threshold(); _o->critical_voltage_threshold = _e; }
@@ -926,8 +1188,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _voltage = _o->voltage;
   auto _current = _o->current;
   auto _fuel = _o->fuel;
-  auto _rssi = _o->rssi;
-  auto _link_quality = _o->link_quality;
+  auto _crsf_data = _o->crsf_data ? CreateCrsfData(_fbb, _o->crsf_data.get(), _rehasher) : 0;
   auto _max_speed = _o->max_speed;
   auto _low_voltage_threshold = _o->low_voltage_threshold;
   auto _critical_voltage_threshold = _o->critical_voltage_threshold;
@@ -947,8 +1208,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _voltage,
       _current,
       _fuel,
-      _rssi,
-      _link_quality,
+      _crsf_data,
       _max_speed,
       _low_voltage_threshold,
       _critical_voltage_threshold,

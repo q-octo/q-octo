@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
               FLATBUFFERS_VERSION_REVISION == 25,
              "Non-compatible flatbuffers version included");
 
+#include "robot_state_generated.h"
+
 namespace fbs {
 
 struct CrsfFrame;
@@ -178,31 +180,34 @@ enum OnboardComputerTxUnion : uint8_t {
   /// A frame to be sent to the transmitter.
   OnboardComputerTxUnion_CrsfFrame = 1,
   OnboardComputerTxUnion_DriveRobot = 2,
+  OnboardComputerTxUnion_DisplayMessages = 3,
   OnboardComputerTxUnion_MIN = OnboardComputerTxUnion_NONE,
-  OnboardComputerTxUnion_MAX = OnboardComputerTxUnion_DriveRobot
+  OnboardComputerTxUnion_MAX = OnboardComputerTxUnion_DisplayMessages
 };
 
-inline const OnboardComputerTxUnion (&EnumValuesOnboardComputerTxUnion())[3] {
+inline const OnboardComputerTxUnion (&EnumValuesOnboardComputerTxUnion())[4] {
   static const OnboardComputerTxUnion values[] = {
     OnboardComputerTxUnion_NONE,
     OnboardComputerTxUnion_CrsfFrame,
-    OnboardComputerTxUnion_DriveRobot
+    OnboardComputerTxUnion_DriveRobot,
+    OnboardComputerTxUnion_DisplayMessages
   };
   return values;
 }
 
 inline const char * const *EnumNamesOnboardComputerTxUnion() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NONE",
     "CrsfFrame",
     "DriveRobot",
+    "DisplayMessages",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameOnboardComputerTxUnion(OnboardComputerTxUnion e) {
-  if (::flatbuffers::IsOutRange(e, OnboardComputerTxUnion_NONE, OnboardComputerTxUnion_DriveRobot)) return "";
+  if (::flatbuffers::IsOutRange(e, OnboardComputerTxUnion_NONE, OnboardComputerTxUnion_DisplayMessages)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesOnboardComputerTxUnion()[index];
 }
@@ -219,6 +224,10 @@ template<> struct OnboardComputerTxUnionTraits<fbs::DriveRobot> {
   static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DriveRobot;
 };
 
+template<> struct OnboardComputerTxUnionTraits<fbs::DisplayMessages> {
+  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DisplayMessages;
+};
+
 template<typename T> struct OnboardComputerTxUnionUnionTraits {
   static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_NONE;
 };
@@ -229,6 +238,10 @@ template<> struct OnboardComputerTxUnionUnionTraits<fbs::CrsfFrameT> {
 
 template<> struct OnboardComputerTxUnionUnionTraits<fbs::DriveRobotT> {
   static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DriveRobot;
+};
+
+template<> struct OnboardComputerTxUnionUnionTraits<fbs::DisplayMessagesT> {
+  static const OnboardComputerTxUnion enum_value = OnboardComputerTxUnion_DisplayMessages;
 };
 
 struct OnboardComputerTxUnionUnion {
@@ -276,6 +289,14 @@ struct OnboardComputerTxUnionUnion {
   const fbs::DriveRobotT *AsDriveRobot() const {
     return type == OnboardComputerTxUnion_DriveRobot ?
       reinterpret_cast<const fbs::DriveRobotT *>(value) : nullptr;
+  }
+  fbs::DisplayMessagesT *AsDisplayMessages() {
+    return type == OnboardComputerTxUnion_DisplayMessages ?
+      reinterpret_cast<fbs::DisplayMessagesT *>(value) : nullptr;
+  }
+  const fbs::DisplayMessagesT *AsDisplayMessages() const {
+    return type == OnboardComputerTxUnion_DisplayMessages ?
+      reinterpret_cast<const fbs::DisplayMessagesT *>(value) : nullptr;
   }
 };
 
@@ -600,6 +621,9 @@ struct OnboardComputerTx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   const fbs::DriveRobot *message_as_DriveRobot() const {
     return message_type() == fbs::OnboardComputerTxUnion_DriveRobot ? static_cast<const fbs::DriveRobot *>(message()) : nullptr;
   }
+  const fbs::DisplayMessages *message_as_DisplayMessages() const {
+    return message_type() == fbs::OnboardComputerTxUnion_DisplayMessages ? static_cast<const fbs::DisplayMessages *>(message()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_MESSAGE_TYPE, 1) &&
@@ -618,6 +642,10 @@ template<> inline const fbs::CrsfFrame *OnboardComputerTx::message_as<fbs::CrsfF
 
 template<> inline const fbs::DriveRobot *OnboardComputerTx::message_as<fbs::DriveRobot>() const {
   return message_as_DriveRobot();
+}
+
+template<> inline const fbs::DisplayMessages *OnboardComputerTx::message_as<fbs::DisplayMessages>() const {
+  return message_as_DisplayMessages();
 }
 
 struct OnboardComputerTxBuilder {
@@ -906,6 +934,10 @@ inline bool VerifyOnboardComputerTxUnion(::flatbuffers::Verifier &verifier, cons
       auto ptr = reinterpret_cast<const fbs::DriveRobot *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case OnboardComputerTxUnion_DisplayMessages: {
+      auto ptr = reinterpret_cast<const fbs::DisplayMessages *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -933,6 +965,10 @@ inline void *OnboardComputerTxUnionUnion::UnPack(const void *obj, OnboardCompute
       auto ptr = reinterpret_cast<const fbs::DriveRobot *>(obj);
       return ptr->UnPack(resolver);
     }
+    case OnboardComputerTxUnion_DisplayMessages: {
+      auto ptr = reinterpret_cast<const fbs::DisplayMessages *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -948,6 +984,10 @@ inline ::flatbuffers::Offset<void> OnboardComputerTxUnionUnion::Pack(::flatbuffe
       auto ptr = reinterpret_cast<const fbs::DriveRobotT *>(value);
       return CreateDriveRobot(_fbb, ptr, _rehasher).Union();
     }
+    case OnboardComputerTxUnion_DisplayMessages: {
+      auto ptr = reinterpret_cast<const fbs::DisplayMessagesT *>(value);
+      return CreateDisplayMessages(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -960,6 +1000,10 @@ inline OnboardComputerTxUnionUnion::OnboardComputerTxUnionUnion(const OnboardCom
     }
     case OnboardComputerTxUnion_DriveRobot: {
       value = new fbs::DriveRobotT(*reinterpret_cast<fbs::DriveRobotT *>(u.value));
+      break;
+    }
+    case OnboardComputerTxUnion_DisplayMessages: {
+      value = new fbs::DisplayMessagesT(*reinterpret_cast<fbs::DisplayMessagesT *>(u.value));
       break;
     }
     default:
@@ -976,6 +1020,11 @@ inline void OnboardComputerTxUnionUnion::Reset() {
     }
     case OnboardComputerTxUnion_DriveRobot: {
       auto ptr = reinterpret_cast<fbs::DriveRobotT *>(value);
+      delete ptr;
+      break;
+    }
+    case OnboardComputerTxUnion_DisplayMessages: {
+      auto ptr = reinterpret_cast<fbs::DisplayMessagesT *>(value);
       delete ptr;
       break;
     }

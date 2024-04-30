@@ -70,6 +70,8 @@ private:
   static inline uint32_t lastRcLinkStatsLogMs = 0;
   static inline uint32_t lastBroadcastMs = 0;
   static inline float lastRPM = 0;
+  static inline link_statistics_t lastLinkStats = {0};
+  static inline uint16_t lastChannels[16] = {0};
 
   static inline Storage::State &state = Storage::getState();
 
