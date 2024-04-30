@@ -48,139 +48,81 @@ void Display::repaintDisplay()
   //  state.batteries;
   
   // bitmap6, bitmap8, bitmap14_outline
-  graphics.set_font("bitmap8");
 
   // Set white background
   SET_PEN_WHITE()
   graphics.clear();
 
-  int32_t motorBoxWidth = 160;
-
-  // Left Motor
+  // TODO: Top Bar - Control Source and WIFI
+  // Height 30px
+    graphics.set_font("bitmap14_outline");
   SET_PEN_GREEN()
-  Rect leftMotorRect(0, 0, motorBoxWidth, 18);
-  // graphics.rectangle(leftMotorRect);
-  leftMotorRect.deflate(2);
-  SET_PEN_BLACK()
-  // Format string based on motorLtemperature, motorLRPM, motorLposition
+    Rect topBar(0, 0, 240, 30);
+  graphics.rectangle(topBar);
+    topBar.deflate(2);
 
-  std::ostringstream oss;
-  oss << "L " << motorLtemperature << "°C " << motorLRPM << "RPM " << motorLposition << "°";
-  graphics.text(oss.str(), Point(leftMotorRect.x, leftMotorRect.y),
-                leftMotorRect.w);
-
-  // Right Motor
-  SET_PEN_RED()
-  Rect rightMotorRect(0, 18, motorBoxWidth, 18);
-  // graphics.rectangle(rightMotorRect);
-  rightMotorRect.deflate(2);
-  SET_PEN_BLACK()
-
-  oss.str("");
-  oss << "R " << motorRtemperature << "°C " << motorRRPM << "RPM " << motorRposition << "°";
-  graphics.text(oss.str(), Point(rightMotorRect.x, rightMotorRect.y),
-                rightMotorRect.w);
-
-  // Vertical separator
-  SET_PEN_BLACK()
-  graphics.rectangle(Rect(motorBoxWidth, 0, 2, 36));
-
-  // WiFi Status
-  SET_PEN_ORANGE()
-  Rect wifiRect(motorBoxWidth + 2, 0, 240 - motorBoxWidth, 36);
-  // graphics.rectangle(wifiRect);
-  wifiRect.deflate(2);
-  if (button_x.read())
-  {
-    SET_PEN_RED()
-    graphics.text("WiFi  ON", Point(wifiRect.x, wifiRect.y), wifiRect.w);
-  }
-  else
-  {
     SET_PEN_BLACK()
-    graphics.text("WiFi OFF", Point(wifiRect.x, wifiRect.y), wifiRect.w);
-  }
+    graphics.text("FL_CON", Point(topBar.x, topBar.y), topBar.w);
+    graphics.text("WIFI: OFF", Point(topBar.x + 100, topBar.y), topBar.w);
 
-  // Horizontal separator
-  SET_PEN_BLACK()
-  graphics.rectangle(Rect(0, 36, 240, 1));
 
-  // Batteries, SRC, Status
-  SET_PEN_GREEN();
-  Rect brsPlaceholder(0, 37, 240, 20);
-  // graphics.rectangle(brsPlaceholder);
+  // TODO: Middle1 - Status Code in the center
+  // Height 31px
+    graphics.set_font("bitmap14_outline");
+    // sans, add s
+    SET_PEN_RED()
+    Rect middle1(0, 30, 240, 31);
+    graphics.rectangle(middle1);
+    middle1.deflate(2);
 
-  // Horizontal separator
-  SET_PEN_BLACK()
-  graphics.rectangle(Rect(0, 57, 240, 1));
+    SET_PEN_BLACK()
+    // Center the text
+    // Text is 14px
+    // Measure length of text first
+    const char *status = "ALL SYSTEMS GO";
+    int32_t textWidth = graphics.measure_text(status, 2, 1, false);
+    graphics.text(status, Point(middle1.x + (middle1.w - textWidth) / 2, middle1.y), middle1.w);
 
-  // Battery section
+  // TODO: Middle2 - battery bar
+  // Height 20px
+    SET_PEN_BLACK()
+    Rect middle2(0, 61, 240, 20);
+    graphics.rectangle(middle2);
+    middle2.deflate(2);
 
-  // Progress bar background
-  SET_PEN_BLACK()
-  // graphics.rec tangle(Rect(100, 58, 240 - 100, 135 - 58));
+    SET_PEN_GREEN()
+    int padding = 2;
+    graphics.rectangle(Rect(0 + padding, 61 + padding, (int)((240-padding) * 0.84), 20 - padding * 2));
 
-  // Fuel
-  SET_PEN_RED()
-  Rect batteryRect1(0, 58, 100, 18);
-  // graphics.rectangle(batteryRect1);
-  batteryRect1.deflate(2);
-  SET_PEN_BLACK()
-  graphics.text("FUEL   84%", Point(batteryRect1.x, batteryRect1.y),
-                batteryRect1.w);
 
-  // BATT
-  SET_PEN_GREEN()
-  Rect batteryRect2(0, 76, 100, 18);
-  // graphics.rectangle(batteryRect2);
-  batteryRect2.deflate(2);
-  SET_PEN_BLACK()
-  graphics.text("BATT 22.1V", Point(batteryRect2.x, batteryRect2.y),
-                batteryRect2.w);
+  // TODO: Bottom1 - Voltage and number of batteries
+    graphics.set_font("bitmap8");
+    // Height 27px
+    SET_PEN_GREEN()
+    Rect bottom1(0, 81, 240, 27);
+    graphics.rectangle(bottom1);
+    bottom1.deflate(2);
 
-  // CURR
-  SET_PEN_ORANGE()
-  Rect batteryRect3(0, 94, 100, 18);
-  // graphics.rectangle(batteryRect3);
-  batteryRect3.deflate(2);
-  SET_PEN_BLACK()
-  graphics.text("CURR 14.5A", Point(batteryRect3.x, batteryRect3.y),
-                batteryRect3.w);
+    SET_PEN_BLACK()
+    graphics.text("VOLTAGE: 22.1V", Point(bottom1.x, bottom1.y), bottom1.w);
+    // Draw a battery icon with 2 rectangles
 
-  // Progress bars
+    graphics.rectangle(Rect(bottom1.x + 185, bottom1.y, 24, 18));
+    graphics.rectangle(Rect(bottom1.x + 209, bottom1.y + 6, 8, 8));
 
-  SET_PEN_GREEN()
-  uint32_t maxWidth = 139; // 240 - 100 - 1(padding);
-  Rect fuelBar(101, 58, maxWidth * batteryFuel, 18);
-  fuelBar.deflate(2);
-  graphics.rectangle(fuelBar);
-  Rect battBar(101, 76, maxWidth * batteryVoltage, 18);
-  battBar.deflate(2);
-  graphics.rectangle(battBar);
-  Rect currBar(101, 94, maxWidth * batteryCurrent, 18);
-  currBar.deflate(2);
-  graphics.rectangle(currBar);
+    graphics.text("#4", Point(bottom1.x + 160, bottom1.y), bottom1.w);
 
-  // Make the text smaller
-  graphics.set_font("bitmap6");
+  // TODO: Bottom2 - Current and number of battery percentage
+  // Height 27px
+    SET_PEN_RED()
+    Rect bottom2(0, 108, 240, 27);
+    graphics.rectangle(bottom2);
+    bottom2.deflate(2);
 
-  // CRSF Status
-  SET_PEN_RED()
-  Rect rcRectL(1, 112, 100, 135 - 112);
-  // graphics.rectangle(rcRectL);
-  SET_PEN_BLACK()
-  graphics.text("RSSI 77dB", Point(rcRectL.x, rcRectL.y), rcRectL.w);
-  graphics.text("LINK  64%", Point(rcRectL.x, rcRectL.y + 11), rcRectL.w);
+    SET_PEN_BLACK()
+    graphics.text("CURRENT: 14.5A", Point(bottom2.x, bottom2.y), bottom2.w);
+    graphics.text("84%", Point(bottom2.x + 160, bottom2.y), bottom2.w);
 
-  // CRSF Progress Bars
-  SET_PEN_ORANGE()
-  Rect rssiBar(101, 112 + 1, maxWidth * 0.77, 11);
-  rssiBar.deflate(1);
-  graphics.rectangle(rssiBar);
-  Rect linkBar(101, 112 + 11 + 1, maxWidth * 0.64, 11);
-  linkBar.deflate(1);
-  graphics.rectangle(linkBar);
-
-  // now we've done our drawing let's update the screen
+    // now we've done our drawing let's update the screen
   st7789.update(&graphics);
 }
