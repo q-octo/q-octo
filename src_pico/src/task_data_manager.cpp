@@ -139,6 +139,9 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case STORAGE_UPDATE:
       broadcastStateUpdate();
       break;
+    case DISPLAY_MESSAGES:
+      state.displayMessages = message.as.displayMessages;
+      broadcastStateUpdate();
     default:
       Serial.println("[ERROR] Unknown message type");
   }

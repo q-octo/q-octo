@@ -33,6 +33,31 @@ table DisplayMessages {
     message7: string;
 }
 
+
+table CrsfTelemetry {
+  /// Signal strength indicator
+  rssi: ubyte = 0;         
+  /// Link quality
+  link_quality: ubyte = 0; 
+  /// Signal to noise ratio
+  snr: byte = 0;           
+  /// Transmission power
+  tx_power: ushort = 0;
+}
+
+struct CrsfChannels {
+  data: [ushort:16];
+}
+
+table CrsfData {
+  channels: CrsfChannels;
+  /// Telemetry data associated with the RC frame
+  telemetry: CrsfTelemetry;
+  /// Failsafe flag with a default value of true
+  failsafe:bool = true;
+}
+
+
 // Define the main table for your data structure
 table Robot {
     batteries: int = 4;
@@ -42,8 +67,7 @@ table Robot {
     voltage: float = 0.0;
     current: float = 0.0;
     fuel: float = 0.0;
-    rssi: float = 0.0;
-    link_quality: int = 0;
+    crsf_data: CrsfData;
     max_speed: float = 0.0;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;

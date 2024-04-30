@@ -11,8 +11,8 @@ public:
         float lowVoltageThreshold;
         float criticalVoltageThreshold;
         uint8_t batteryCount;
-        float leftMotorFoldAngle;
-        float rightMotorFoldAngle;
+        uint8_t leftMotorFoldAngle;
+        uint8_t rightMotorFoldAngle;
         uint8_t rssiThreshold;
         uint8_t linkQualityThreshold;
 

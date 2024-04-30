@@ -49,15 +49,41 @@ void Computer::parseIncomingSerialData() {
 
 void Computer::handleComputerTx(const OnboardComputerTx &computerMessage) {
   switch (computerMessage.message_type()) {
-    // TODO handle these cases
     case OnboardComputerTxUnion_NONE:
       break;
     case OnboardComputerTxUnion_CrsfFrame:
+      // TODO implement if we can receive data on the transmitter.
       Serial.println("Received CRSF frame to forward to transmitter");
       break;
     case OnboardComputerTxUnion_DriveRobot:
+      // TODO implement driving via the onboard computer
+      // Fun...
       Serial.println("Received drive robot message");
       break;
+    case OnboardComputerTxUnion_DisplayMessages: {
+      Serial.println("Received display messages");
+      DataManager::Message message;
+      message.type = DataManager::Type::DISPLAY_MESSAGES;
+      auto messages = computerMessage.message_as_DisplayMessages();
+
+      static std::string message1 = messages->message1()->str();
+      message.as.displayMessages.message1 = &message1;
+      static std::string message2 = messages->message2()->str();
+      message.as.displayMessages.message2 = &message2;
+      static std::string message3 = messages->message3()->str();
+      message.as.displayMessages.message3 = &message3;
+      static std::string message4 = messages->message4()->str();
+      message.as.displayMessages.message4 = &message4;
+      static std::string message5 = messages->message5()->str();
+      message.as.displayMessages.message5 = &message5;
+      static std::string message6 = messages->message6()->str();
+      message.as.displayMessages.message6 = &message6;
+      static std::string message7 = messages->message7()->str();
+      message.as.displayMessages.message7 = &message7;
+
+      sendTaskMessage(message);
+      break;
+    }
   }
 }
 
@@ -70,15 +96,6 @@ void Computer::sendStateToComputer(const DataManager::State &state) {
   serialiseState(state);
   computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
-
-// void Computer::sendCrsfDataToComputer(const DataManager:: &crsfFrame) {
-//   fbb.Reset();
-//
-//   auto crsfFrameOffset = CreateCrsfFrame(fbb, &crsfFrame);
-//   auto message = CreateOnboardComputerRx(fbb, OnboardComputerRxUnion_CrsfData, crsfFrameOffset.Union());
-//   FinishSizePrefixedOnboardComputerRxBuffer(fbb, message);
-//   computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
-// }
 
 Button Computer::serialiseDisplayButton(const DataManager::DisplayButton &displayButton) {
   switch (displayButton) {
