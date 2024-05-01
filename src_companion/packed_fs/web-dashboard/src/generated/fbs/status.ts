@@ -4,9 +4,8 @@
 
 export enum Status {
   OK = 0,
-  INIT = 1,
-  NOTX = 2,
-  BAT = 3,
-  TEMP = 4,
-  OFF = 5
+  NO_TX_SIGNAL = 1,
+  LOW_BATTERY = 2,
+  MOTOR_ERROR = 3,
+  DISARMED = 4
 }

@@ -7,7 +7,7 @@ file_identifier "ROBO";
 
 // Define enums for control sources and status codes
 enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
-enum Status : byte { OK, INIT, NOTX, BAT, TEMP, OFF }
+enum Status : byte { OK, NO_TX_SIGNAL, LOW_BATTERY, MOTOR_ERROR, DISARMED }
 
 // Define a table for motor information
 table Motor {

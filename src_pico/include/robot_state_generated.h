@@ -79,42 +79,39 @@ inline const char *EnumNameControlSource(ControlSource e) {
 
 enum Status : int8_t {
   Status_OK = 0,
-  Status_INIT = 1,
-  Status_NOTX = 2,
-  Status_BAT = 3,
-  Status_TEMP = 4,
-  Status_OFF = 5,
+  Status_NO_TX_SIGNAL = 1,
+  Status_LOW_BATTERY = 2,
+  Status_MOTOR_ERROR = 3,
+  Status_DISARMED = 4,
   Status_MIN = Status_OK,
-  Status_MAX = Status_OFF
+  Status_MAX = Status_DISARMED
 };
 
-inline const Status (&EnumValuesStatus())[6] {
+inline const Status (&EnumValuesStatus())[5] {
   static const Status values[] = {
     Status_OK,
-    Status_INIT,
-    Status_NOTX,
-    Status_BAT,
-    Status_TEMP,
-    Status_OFF
+    Status_NO_TX_SIGNAL,
+    Status_LOW_BATTERY,
+    Status_MOTOR_ERROR,
+    Status_DISARMED
   };
   return values;
 }
 
 inline const char * const *EnumNamesStatus() {
-  static const char * const names[7] = {
+  static const char * const names[6] = {
     "OK",
-    "INIT",
-    "NOTX",
-    "BAT",
-    "TEMP",
-    "OFF",
+    "NO_TX_SIGNAL",
+    "LOW_BATTERY",
+    "MOTOR_ERROR",
+    "DISARMED",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameStatus(Status e) {
-  if (::flatbuffers::IsOutRange(e, Status_OK, Status_OFF)) return "";
+  if (::flatbuffers::IsOutRange(e, Status_OK, Status_DISARMED)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesStatus()[index];
 }
