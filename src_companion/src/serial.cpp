@@ -25,6 +25,24 @@ void QOctoSerial::loop() {
   }
 }
 
+// Button is a string
+void QOctoSerial::serializeButtonPressed(Button button) {
+  fbb.Reset();
+
+    ButtonPressedT buttonPressed = ButtonPressedT();
+    buttonPressed.button = button;
+
+    auto buttonOffset = CreateButtonPressed(fbb, &buttonPressed);
+    auto message = CreateCompanionTx(fbb, CompanionTxUnion::CompanionTxUnion_ButtonPressed, buttonOffset.Union());
+    FinishCompanionTxBuffer(fbb, message);
+}
+
+void QOctoSerial::sendButtonPressed(Button button) {
+    Serial.println("Sending button pressed");
+    serializeButtonPressed(button);
+    Serial1.write(fbb.GetBufferPointer(), fbb.GetSize());
+}
+
 bool QOctoSerial::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier) {
   return SizePrefixedCompanionRxBufferHasIdentifier(parser.buffer) &&
          VerifySizePrefixedCompanionRxBuffer(verifier);
