@@ -1,5 +1,6 @@
 #include "config.h"
 #include "task_motors.h"
+#include "storage.h"
 
 #define STATUS_BROADCAST_FREQUENCY 20 // ms
 
@@ -8,8 +9,32 @@ void TaskControlMotors::init() {
     return;
   }
 
+  Storage::State &state = Storage::getState();
+  maxSpeed = state.motorSpeedLimit;
+  maxCurrent = state.motorCurrentLimit;
+  maxTorque = state.motorTorqueLimit;
+
   initMotors();
   Serial.println("Motor class init complete");
+}
+
+void TaskControlMotors::handleStateUpdate() {
+    Storage::State &state = Storage::getState();
+    if (state.motorSpeedLimit != maxSpeed) {
+      maxSpeed = state.motorSpeedLimit;
+      cybergearL.set_limit_speed(maxSpeed);
+      cybergearR.set_limit_speed(maxSpeed);
+    }
+    if (state.motorCurrentLimit != maxCurrent) {
+      maxCurrent = state.motorCurrentLimit;
+      cybergearL.set_limit_current(maxCurrent);
+      cybergearR.set_limit_current(maxCurrent);
+    }
+    if (state.motorTorqueLimit != maxTorque) {
+      maxTorque = state.motorTorqueLimit;
+      cybergearL.set_limit_torque(maxTorque);
+      cybergearR.set_limit_torque(maxTorque);
+    } 
 }
 
 void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message) {
@@ -51,6 +76,8 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
     case TaskControlMotors::FOLD_WHEELS:
       // TODO implement folding
       break;
+    case STATE_UPDATE:
+      handleStateUpdate();
   }
 }
 
@@ -92,14 +119,16 @@ void TaskControlMotors::initMotors() {
   // the messages too fast? The motor needs 500us between messages
   cybergearL.stop_motor();
   cybergearL.set_run_mode(MODE_SPEED);
-  cybergearL.set_limit_speed(CFG_MOTOR_SPEED_LIMIT);
-  cybergearL.set_limit_current(CFG_MOTOR_CURRENT_LIMIT);
+  cybergearL.set_limit_speed(maxSpeed);
+  cybergearL.set_limit_current(maxCurrent);
+  cybergearL.set_limit_torque(maxTorque);
   cybergearL.enable_motor();
 
   cybergearR.stop_motor();
   cybergearR.set_run_mode(MODE_SPEED);
-  cybergearR.set_limit_speed(CFG_MOTOR_SPEED_LIMIT);
-  cybergearR.set_limit_current(CFG_MOTOR_CURRENT_LIMIT);
+  cybergearR.set_limit_speed(maxSpeed);
+  cybergearR.set_limit_current(maxCurrent);
+  cybergearR.set_limit_torque(maxTorque);
   cybergearR.enable_motor();
   Serial.println("Motors initialised");
 }

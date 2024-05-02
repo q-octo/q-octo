@@ -24,17 +24,17 @@ DataManager::State state{};
 Companion::Message companionMessage{};
 Computer::Message computerMessage{};
 TaskRC::Message rcMessage{};
+TaskControlMotors::Message controlMotorsMessage{};
 
 void DataManager::broadcastStateUpdate() {
-  companionMessage.type = Companion::MessageType::STATE_UPDATE;
-  companionMessage.as = {.state = state};
+  companionMessage = {.type = Companion::MessageType::STATE_UPDATE, .as = {.state = state}};
   Companion::receiveMessage(companionMessage);
-  computerMessage.type = Computer::MessageType::STATE_UPDATE;
-  computerMessage.as = {.state = state};
+  computerMessage = {.type = Computer::MessageType::STATE_UPDATE, .as = {.state = state}};
   Computer::receiveMessage(computerMessage);
-  rcMessage.type = TaskRC::MessageType::STATE_UPDATE;
-  rcMessage.as = {.state = state};
+  rcMessage = {.type = TaskRC::MessageType::STATE_UPDATE, .as = {.state = state}};
   TaskRC::receiveMessage(rcMessage);
+  controlMotorsMessage = {.type = TaskControlMotors::MessageType::STATE_UPDATE, .as = {.state = state}}; 
+  TaskControlMotors::receiveMessage(controlMotorsMessage);
 }
 
 void DataManager::setWebServerEnabled(bool enabled) {
@@ -46,7 +46,6 @@ void DataManager::setWebServerEnabled(bool enabled) {
 }
 
 void DataManager::receiveMessage(const DataManager::Message &message) {
-  static TaskControlMotors::Message controlMotorsMessage;
   static TaskPowerMonitor::Message powerMonitorMessage;
 
   SystemStatus::receiveDataManagerMessage(message);
