@@ -19,6 +19,7 @@ public:
     CAN_MESSAGE_MOTOR_L,
     CAN_MESSAGE_MOTOR_R,
     FOLD_WHEELS,
+    STATE_UPDATE,
   } MessageType;
 
   typedef struct {
@@ -27,6 +28,7 @@ public:
       DataManager::SetMotorSpeedIndividual speedIndividual;
       DataManager::SetMotorSpeedCombined speedCombined;
       DataManager::CanMessage canMessage;
+      DataManager::State state;
     } as;
   } Message;
 
@@ -41,12 +43,16 @@ private:
   static void setSpeedIndividual(float speedL, float speedR);
 
   static void initMotors();
+  static void handleStateUpdate();
 
   static void debugPrintMotorStatus();
 
   static inline bool motorsEnabled = true;
   static inline uint32_t lastStatusRequestMs = 0;
   static inline uint32_t lastStatusBroadcastMs = 0;
+  static inline float maxSpeed;
+  static inline float maxTorque;
+  static inline float maxCurrent;
 
   static inline XiaomiCyberGearDriver cybergearL =
           XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);

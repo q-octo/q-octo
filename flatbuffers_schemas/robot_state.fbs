@@ -68,7 +68,9 @@ table Robot {
     current: float = 0.0;
     fuel: float = 0.0;
     crsf_data: CrsfData;
-    max_speed: float = 0.0;
+    max_speed: float = 30;
+    max_current: float = 4.0;
+    max_torque: float = 12.0;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;
     rssi_threshold: int = 0;
@@ -79,6 +81,7 @@ table Robot {
     enable_rover: bool = false;
     display_messages: DisplayMessages;
     start_web_server_on_launch: bool = false;
+
 }
 
 // Define the root type and possible update types
