@@ -66,5 +66,16 @@ void toggleBButton() {
 }
 
 void toggleXButton() {
-  Serial.println("X button pressed");
+  Serial.println("Toggling web server");
+
+  bool webServerIsRunning = webServer.getWebServerIsRunning();
+
+  if(webServerIsRunning) {
+    webServer.stop();
+  } else {
+    webServer.start();
+  }
+
+  // Tell the display that the web server is running
+  display.setWebServerIsRunning(!webServerIsRunning);
 }

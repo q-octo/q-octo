@@ -37,10 +37,23 @@ void Display::loop()
 
     // Check for button presses
 
+    // Y press changes the page
     if (button_y.read())
     {
       nextPage();
-      Serial.println("Button Y pressed");
+    }
+    // The rest of the buttons are just for toggles
+    if (button_a.read())
+    {
+        button_a_callback();
+    }
+    if (button_b.read())
+    {
+        button_b_callback();
+    }
+    if (button_x.read())
+    {
+        button_x_callback();
     }
 }
 
@@ -77,12 +90,17 @@ void Display::paintPage1()
     SET_PEN_BLACK()
     graphics.text(oss.str(), Point(topBar.x, topBar.y), topBar.w);
 
-    // TODO: Make this color conditional on wifi on/off
+    // Web Server running
     graphics.text("WIFI:", Point(topBar.x + 110, topBar.y), topBar.w);
     int wifiwidth = graphics.measure_text("WIFI:", 2, 1, false);
-    SET_PEN_GREEN();
-    graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
 
+    if (!webServerIsRunningState) {
+        SET_PEN_RED();
+        graphics.text("OFF", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
+    } else {
+        SET_PEN_GREEN();
+        graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
+    }
 
     // Middle1 - Status Code in the center
     // Height 31px

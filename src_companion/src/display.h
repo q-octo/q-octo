@@ -48,6 +48,8 @@ public:
     }
     void loop();
     void updateState(const RobotT& robot) { state = robot; }
+    bool webServerIsRunningState = false;
+    void setWebServerIsRunning(bool running) { webServerIsRunningState = running; }
 
 private:
     void repaintDisplay();
@@ -82,15 +84,6 @@ private:
     // Internal state
     // TODO phase this out in favor of the Robot object
     bool ledState = false;
-    float batteryFuel = 0.0; // 0.0 to 1.0
-    float batteryVoltage = 0.0;
-    float batteryCurrent = 0.0;
-    uint16_t motorLtemperature = 0;
-    float motorLRPM = 0.0;
-    float motorLposition = 0.0;
-    uint16_t motorRtemperature = 0;
-    float motorRRPM = 0.0;
-    float motorRposition = 0.0;
 
     void paintStack(const std::vector<std::string> &items);
 };

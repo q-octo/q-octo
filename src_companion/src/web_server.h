@@ -29,6 +29,8 @@ public:
       FinishRobotBuffer(fbb, Robot::Pack(fbb, &state));
     }
 
+    bool getWebServerIsRunning() { return webServerIsRunning; }
+
 private:
     void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
     void handleRoot();
