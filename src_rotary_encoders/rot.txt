@@ -3,3 +3,6 @@ Live on core 0
 CAN init complete
 Received extended packet with id 0x7EFE and length 8
 58 31 31 31 30 33 31 A 
+
+
+^(?!\[ENC\].*).*\n
