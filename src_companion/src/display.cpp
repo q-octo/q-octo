@@ -311,11 +311,47 @@ void Display::paintPage2() {
 
     // Channels
     // TODO: Where do I get these in state?
-    graphics.text("1-4:1500 1500 1500 1500", Point(5, 60), 225);
-    graphics.text("5-8:1500 1500 1500 1500", Point(5, 80), 225);
-    graphics.text("9-12:1500 1500 1500 1500", Point(5, 100), 225);
-    graphics.text("13-16:1500 1500 1500 1500", Point(5, 120), 230);
+    if(state.crsf_data == nullptr) {
+        graphics.text("No CRSF data.", Point(5, 65), 220);
+    } else {
+        oss.str("");
 
+        auto channels = state.crsf_data->channels->data();
+
+        // Make an array of the channels
+        auto channelData = state.crsf_data->channels->data();
+        auto chan1 = channelData[0].data();
+        auto chan2 = channelData[1].data();
+        auto chan3 = channelData[2].data();
+        auto chan4 = channelData[3].data();
+        auto chan5 = channelData[4].data();
+        auto chan6 = channelData[5].data();
+        auto chan7 = channelData[6].data();
+        auto chan8 = channelData[7].data();
+        auto chan9 = channelData[8].data();
+        auto chan10 = channelData[9].data();
+        auto chan11 = channelData[10].data();
+        auto chan12 = channelData[11].data();
+        auto chan13 = channelData[12].data();
+        auto chan14 = channelData[13].data();
+        auto chan15 = channelData[14].data();
+        auto chan16 = channelData[15].data();
+
+        //graphics.text("1-4:1500 1500 1500 1500", Point(5, 60), 225);
+        oss.str("");
+        oss << "1-4:" << chan1 << " " << chan2 << " " << chan3 << " " << chan4;
+        graphics.text(oss.str(), Point(5, 65), 220);
+        oss.str("");
+        oss << "5-8:" << chan5 << " " << chan6 << " " << chan7 << " " << chan8;
+        graphics.text(oss.str(), Point(5, 85), 220);
+        oss.str("");
+        oss << "9-12:" << chan9 << " " << chan10 << " " << chan11 << " " << chan12;
+        graphics.text(oss.str(), Point(5, 105), 220);
+        oss.str("");
+        oss << "13-16:" << chan13 << " " << chan14 << " " << chan15 << " " << chan16;
+        graphics.text(oss.str(), Point(5, 125), 220);
+
+    }
 }
 
 void Display::paintPage3() {
