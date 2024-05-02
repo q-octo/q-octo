@@ -1,11 +1,11 @@
 #pragma once
 
 static const int CFG_ENABLE_WATCHDOG = 1;
-static const int CFG_ENABLE_CAN = 0;
-static const int CFG_ENABLE_MOTORS = 0;
-static const int CFG_ENABLE_RC = 0;
+static const int CFG_ENABLE_CAN = 1;
+static const int CFG_ENABLE_MOTORS = 1;
+static const int CFG_ENABLE_RC = 1;
 static const int CFG_ENABLE_POWER_MONITOR = 0;
-static const int CFG_ENABLE_COMPANION = 1;
+static const int CFG_ENABLE_COMPANION = 0;
 static const int CFG_ENABLE_ONBOARD_COMPUTER = 0;
 static const int CFG_WAIT_FOR_USB_SERIAL = 0;
 

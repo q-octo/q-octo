@@ -18,6 +18,7 @@ Status serialiseSystemStatus(const DataManager::Status &systemStatus) {
       return Status_OK;
       break;
   }
+  return Status_OK;
 }
 
 void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
