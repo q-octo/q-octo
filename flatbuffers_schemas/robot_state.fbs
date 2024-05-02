@@ -78,6 +78,7 @@ table Robot {
     motor_error_code: string; // Defaults not supported for strings
     enable_rover: bool = false;
     display_messages: DisplayMessages;
+    start_web_server_on_launch: bool = false;
 }
 
 // Define the root type and possible update types

@@ -47,6 +47,10 @@ struct UpdateRssiThreshold;
 struct UpdateRssiThresholdBuilder;
 struct UpdateRssiThresholdT;
 
+struct UpdateStartWebServerOnLaunch;
+struct UpdateStartWebServerOnLaunchBuilder;
+struct UpdateStartWebServerOnLaunchT;
+
 struct Update;
 struct UpdateBuilder;
 struct UpdateT;
@@ -61,11 +65,12 @@ enum UpdateUnion : uint8_t {
   UpdateUnion_UpdateEnableRover = 6,
   UpdateUnion_UpdateLinkQualityThreshold = 7,
   UpdateUnion_UpdateRssiThreshold = 8,
+  UpdateUnion_UpdateStartWebServerOnLaunch = 9,
   UpdateUnion_MIN = UpdateUnion_NONE,
-  UpdateUnion_MAX = UpdateUnion_UpdateRssiThreshold
+  UpdateUnion_MAX = UpdateUnion_UpdateStartWebServerOnLaunch
 };
 
-inline const UpdateUnion (&EnumValuesUpdateUnion())[9] {
+inline const UpdateUnion (&EnumValuesUpdateUnion())[10] {
   static const UpdateUnion values[] = {
     UpdateUnion_NONE,
     UpdateUnion_UpdateBatteries,
@@ -75,13 +80,14 @@ inline const UpdateUnion (&EnumValuesUpdateUnion())[9] {
     UpdateUnion_UpdateFoldWheels,
     UpdateUnion_UpdateEnableRover,
     UpdateUnion_UpdateLinkQualityThreshold,
-    UpdateUnion_UpdateRssiThreshold
+    UpdateUnion_UpdateRssiThreshold,
+    UpdateUnion_UpdateStartWebServerOnLaunch
   };
   return values;
 }
 
 inline const char * const *EnumNamesUpdateUnion() {
-  static const char * const names[10] = {
+  static const char * const names[11] = {
     "NONE",
     "UpdateBatteries",
     "UpdateLowVoltageThreshold",
@@ -91,13 +97,14 @@ inline const char * const *EnumNamesUpdateUnion() {
     "UpdateEnableRover",
     "UpdateLinkQualityThreshold",
     "UpdateRssiThreshold",
+    "UpdateStartWebServerOnLaunch",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUpdateUnion(UpdateUnion e) {
-  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateRssiThreshold)) return "";
+  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateStartWebServerOnLaunch)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUpdateUnion()[index];
 }
@@ -138,6 +145,10 @@ template<> struct UpdateUnionTraits<fbs::UpdateRssiThreshold> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
 };
 
+template<> struct UpdateUnionTraits<fbs::UpdateStartWebServerOnLaunch> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateStartWebServerOnLaunch;
+};
+
 template<typename T> struct UpdateUnionUnionTraits {
   static const UpdateUnion enum_value = UpdateUnion_NONE;
 };
@@ -172,6 +183,10 @@ template<> struct UpdateUnionUnionTraits<fbs::UpdateLinkQualityThresholdT> {
 
 template<> struct UpdateUnionUnionTraits<fbs::UpdateRssiThresholdT> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateStartWebServerOnLaunchT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateStartWebServerOnLaunch;
 };
 
 struct UpdateUnionUnion {
@@ -267,6 +282,14 @@ struct UpdateUnionUnion {
   const fbs::UpdateRssiThresholdT *AsUpdateRssiThreshold() const {
     return type == UpdateUnion_UpdateRssiThreshold ?
       reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value) : nullptr;
+  }
+  fbs::UpdateStartWebServerOnLaunchT *AsUpdateStartWebServerOnLaunch() {
+    return type == UpdateUnion_UpdateStartWebServerOnLaunch ?
+      reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(value) : nullptr;
+  }
+  const fbs::UpdateStartWebServerOnLaunchT *AsUpdateStartWebServerOnLaunch() const {
+    return type == UpdateUnion_UpdateStartWebServerOnLaunch ?
+      reinterpret_cast<const fbs::UpdateStartWebServerOnLaunchT *>(value) : nullptr;
   }
 };
 
@@ -687,6 +710,58 @@ inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(
 
 ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct UpdateStartWebServerOnLaunchT : public ::flatbuffers::NativeTable {
+  typedef UpdateStartWebServerOnLaunch TableType;
+  bool start_web_server_on_launch = false;
+};
+
+struct UpdateStartWebServerOnLaunch FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateStartWebServerOnLaunchT NativeTableType;
+  typedef UpdateStartWebServerOnLaunchBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_START_WEB_SERVER_ON_LAUNCH = 4
+  };
+  bool start_web_server_on_launch() const {
+    return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
+           verifier.EndTable();
+  }
+  UpdateStartWebServerOnLaunchT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateStartWebServerOnLaunchBuilder {
+  typedef UpdateStartWebServerOnLaunch Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_start_web_server_on_launch(bool start_web_server_on_launch) {
+    fbb_.AddElement<uint8_t>(UpdateStartWebServerOnLaunch::VT_START_WEB_SERVER_ON_LAUNCH, static_cast<uint8_t>(start_web_server_on_launch), 0);
+  }
+  explicit UpdateStartWebServerOnLaunchBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateStartWebServerOnLaunch>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    bool start_web_server_on_launch = false) {
+  UpdateStartWebServerOnLaunchBuilder builder_(_fbb);
+  builder_.add_start_web_server_on_launch(start_web_server_on_launch);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct UpdateT : public ::flatbuffers::NativeTable {
   typedef Update TableType;
   fbs::UpdateUnionUnion update{};
@@ -730,6 +805,9 @@ struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::UpdateRssiThreshold *update_as_UpdateRssiThreshold() const {
     return update_type() == fbs::UpdateUnion_UpdateRssiThreshold ? static_cast<const fbs::UpdateRssiThreshold *>(update()) : nullptr;
   }
+  const fbs::UpdateStartWebServerOnLaunch *update_as_UpdateStartWebServerOnLaunch() const {
+    return update_type() == fbs::UpdateUnion_UpdateStartWebServerOnLaunch ? static_cast<const fbs::UpdateStartWebServerOnLaunch *>(update()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_UPDATE_TYPE, 1) &&
@@ -772,6 +850,10 @@ template<> inline const fbs::UpdateLinkQualityThreshold *Update::update_as<fbs::
 
 template<> inline const fbs::UpdateRssiThreshold *Update::update_as<fbs::UpdateRssiThreshold>() const {
   return update_as_UpdateRssiThreshold();
+}
+
+template<> inline const fbs::UpdateStartWebServerOnLaunch *Update::update_as<fbs::UpdateStartWebServerOnLaunch>() const {
+  return update_as_UpdateStartWebServerOnLaunch();
 }
 
 struct UpdateBuilder {
@@ -1015,6 +1097,32 @@ inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::fl
       _rssi_threshold);
 }
 
+inline UpdateStartWebServerOnLaunchT *UpdateStartWebServerOnLaunch::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateStartWebServerOnLaunchT>(new UpdateStartWebServerOnLaunchT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateStartWebServerOnLaunch::UnPackTo(UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = start_web_server_on_launch(); _o->start_web_server_on_launch = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> UpdateStartWebServerOnLaunch::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateStartWebServerOnLaunch(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateStartWebServerOnLaunchT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _start_web_server_on_launch = _o->start_web_server_on_launch;
+  return fbs::CreateUpdateStartWebServerOnLaunch(
+      _fbb,
+      _start_web_server_on_launch);
+}
+
 inline UpdateT *Update::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<UpdateT>(new UpdateT());
   UnPackTo(_o.get(), _resolver);
@@ -1081,6 +1189,10 @@ inline bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunch *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -1132,6 +1244,10 @@ inline void *UpdateUnionUnion::UnPack(const void *obj, UpdateUnion type, const :
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
       return ptr->UnPack(resolver);
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunch *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -1171,6 +1287,10 @@ inline ::flatbuffers::Offset<void> UpdateUnionUnion::Pack(::flatbuffers::FlatBuf
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value);
       return CreateUpdateRssiThreshold(_fbb, ptr, _rehasher).Union();
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunchT *>(value);
+      return CreateUpdateStartWebServerOnLaunch(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -1207,6 +1327,10 @@ inline UpdateUnionUnion::UpdateUnionUnion(const UpdateUnionUnion &u) : type(u.ty
     }
     case UpdateUnion_UpdateRssiThreshold: {
       value = new fbs::UpdateRssiThresholdT(*reinterpret_cast<fbs::UpdateRssiThresholdT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      value = new fbs::UpdateStartWebServerOnLaunchT(*reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(u.value));
       break;
     }
     default:
@@ -1253,6 +1377,11 @@ inline void UpdateUnionUnion::Reset() {
     }
     case UpdateUnion_UpdateRssiThreshold: {
       auto ptr = reinterpret_cast<fbs::UpdateRssiThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(value);
       delete ptr;
       break;
     }

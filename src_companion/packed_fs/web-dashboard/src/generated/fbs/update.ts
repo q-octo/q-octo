@@ -12,6 +12,7 @@ import { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from '../fbs/
 import { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from '../fbs/update-low-voltage-threshold.js';
 import { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from '../fbs/update-reference-wheel-angle.js';
 import { UpdateRssiThreshold, UpdateRssiThresholdT } from '../fbs/update-rssi-threshold.js';
+import { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from '../fbs/update-start-web-server-on-launch.js';
 import { UpdateUnion, unionToUpdateUnion, unionListToUpdateUnion } from '../fbs/update-union.js';
 
 
@@ -104,7 +105,7 @@ unpackTo(_o: UpdateT): void {
 export class UpdateT implements flatbuffers.IGeneratedObject {
 constructor(
   public updateType: UpdateUnion = UpdateUnion.NONE,
-  public update: UpdateBatteriesT|UpdateCriticalVoltageThresholdT|UpdateEnableRoverT|UpdateFoldWheelsT|UpdateLinkQualityThresholdT|UpdateLowVoltageThresholdT|UpdateReferenceWheelAngleT|UpdateRssiThresholdT|null = null
+  public update: UpdateBatteriesT|UpdateCriticalVoltageThresholdT|UpdateEnableRoverT|UpdateFoldWheelsT|UpdateLinkQualityThresholdT|UpdateLowVoltageThresholdT|UpdateReferenceWheelAngleT|UpdateRssiThresholdT|UpdateStartWebServerOnLaunchT|null = null
 ){}
 
 

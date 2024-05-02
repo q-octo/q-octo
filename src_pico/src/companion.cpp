@@ -123,6 +123,12 @@ void Companion::handleUpdateMessage(const Update &update) {
     case UpdateUnion::UpdateUnion_UpdateEnableRover:
       // TODO implement rover enable/disable
       break;
+    case UpdateUnion::UpdateUnion_UpdateStartWebServerOnLaunch:
+      // TODO we still need to check this flag on launch
+      Storage::State &state = Storage::getState();
+      state.startWebServerOnLaunch = update.update_as_UpdateStartWebServerOnLaunch()->start_web_server_on_launch();
+      Storage::save();
+      break;
   }
 }
 

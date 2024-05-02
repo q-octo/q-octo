@@ -125,8 +125,13 @@ displayMessages(obj?:DisplayMessages):DisplayMessages|null {
   return offset ? (obj || new DisplayMessages()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
+startWebServerOnLaunch():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 40);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
 static startRobot(builder:flatbuffers.Builder) {
-  builder.startObject(18);
+  builder.startObject(19);
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
@@ -201,6 +206,10 @@ static addDisplayMessages(builder:flatbuffers.Builder, displayMessagesOffset:fla
   builder.addFieldOffset(17, displayMessagesOffset, 0);
 }
 
+static addStartWebServerOnLaunch(builder:flatbuffers.Builder, startWebServerOnLaunch:boolean) {
+  builder.addFieldInt8(18, +startWebServerOnLaunch, +false);
+}
+
 static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -234,7 +243,8 @@ unpack(): RobotT {
     this.rightMotorFoldAngle(),
     this.motorErrorCode(),
     this.enableRover(),
-    (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null)
+    (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null),
+    this.startWebServerOnLaunch()
   );
 }
 
@@ -258,6 +268,7 @@ unpackTo(_o: RobotT): void {
   _o.motorErrorCode = this.motorErrorCode();
   _o.enableRover = this.enableRover();
   _o.displayMessages = (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null);
+  _o.startWebServerOnLaunch = this.startWebServerOnLaunch();
 }
 }
 
@@ -280,7 +291,8 @@ constructor(
   public rightMotorFoldAngle: number = 0,
   public motorErrorCode: string|Uint8Array|null = null,
   public enableRover: boolean = false,
-  public displayMessages: DisplayMessagesT|null = null
+  public displayMessages: DisplayMessagesT|null = null,
+  public startWebServerOnLaunch: boolean = false
 ){}
 
 
@@ -309,6 +321,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Robot.addMotorErrorCode(builder, motorErrorCode);
   Robot.addEnableRover(builder, this.enableRover);
   Robot.addDisplayMessages(builder, displayMessages);
+  Robot.addStartWebServerOnLaunch(builder, this.startWebServerOnLaunch);
 
   return Robot.endRobot(builder);
 }
