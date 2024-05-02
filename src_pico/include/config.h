@@ -11,6 +11,9 @@ static const int CFG_WAIT_FOR_USB_SERIAL = 0;
 
 static const int CFG_DEBUG_LIST_TASKS = 0;
 
+static const float CFG_MOTOR_SPEED_LIMIT = 10.0f;
+static const float CFG_MOTOR_CURRENT_LIMIT  = 5.0f;
+
 // Pins
 static const int CFG_RC_UART_TX = 0;
 static const int CFG_RC_UART_RX = 1;
