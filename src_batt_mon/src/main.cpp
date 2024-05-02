@@ -5,10 +5,22 @@
 #include "uavcan.protocol.dynamic_node_id.Allocation.h"
 #include "uavcan.protocol.NodeStatus.h"
 
-CanardInstance canard;
-uint8_t memory_pool[1024];
+extern "C"
+{
+#include "can2040.h"
+}
+
+const uint8_t CYBERGEAR_CAN_ID_L = 0x7E; // 126
+const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
+
+const uint8_t TEST_MOTOR_CAN_ID = CYBERGEAR_CAN_ID_L;
+
+static CanardInstance canard;
+static uint8_t memory_pool[1024];
 uint8_t cached_node_id[16];
 uint8_t cached_node_id_offset = 0;
+
+static struct can2040 cbus;
 
 void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packetData,
                         bool extended);
@@ -27,28 +39,57 @@ void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
 
 void transmitFrame(const CanardCANFrame *txf);
 
+static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg) {
+  // Add message processing code here...
+}
+
+static void PIOx_IRQHandler(void) {
+  can2040_pio_irq_handler(&cbus);
+}
+
+void canbus_setup(void) {
+  uint32_t pio_num = 0;
+  uint32_t sys_clock = 125000000, bitrate = 1'000'000;
+  uint32_t gpio_rx = 11, gpio_tx = 10;
+
+  // Setup canbus
+  can2040_setup(&cbus, pio_num);
+  can2040_callback_config(&cbus, can2040_cb);
+
+  // Enable irqs
+  irq_set_exclusive_handler(PIO0_IRQ_0_IRQn, PIOx_IRQHandler);
+  NVIC_SetPriority(PIO0_IRQ_0_IRQn, 1);
+  NVIC_EnableIRQ(PIO0_IRQ_0_IRQn);
+
+  // Start canbus
+  can2040_start(&cbus, sys_clock, bitrate, gpio_rx, gpio_tx);
+}
+
 void setup() {
   Serial.begin(115200);
   // Wait for serial connection to be established
   while (!Serial);
   delay(1000); // Wait for a second
   Serial.println("Live on core 0 ofc");
+  // canbus_setup();
   CanCommunication::init(onReceiveCanPacket);
+  Serial.println("Setup CAN");
+  // Serial.println("Sending start motor message");
+  // startMotor();
+
+  // move(0, 0, 0, 0, 0);
+
+  // Power monitor:
   // Initialize the Canard library
-  // TODO this only works when the debugger is enabled, what
   canardInit(&canard,
              memory_pool,
              sizeof(memory_pool),
              onTransferReceived,
              shouldAcceptTransfer,
              nullptr);
-  // Serial.print("Canard init response: ");
-  // Serial.println(response);
-
-
-  
 
   canardSetLocalNodeID(&canard, 97);
+  Serial.println("Initialized Canard");
 }
 
 void loop() {
@@ -144,8 +185,8 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
   // } else {
   // Serial.println()
   // }
-  int16_t response = canardHandleRxFrame(&canard, &rx_frame, to_us_since_boot(get_absolute_time()));
-  Serial.print("Canard response: ");
+  int16_t response = canardHandleRxFrame(&canard, &rx_frame, micros());
+  Serial.print("Canard response: ??");
   Serial.println(response);
 }
 
@@ -162,7 +203,7 @@ void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer) {
           break;
         case UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID:
           // Handle DNA message
-          // handleDynamicNodeIdAllocation(ins, transfer);
+          handleDynamicNodeIdAllocation(ins, transfer);
           break;
         case UAVCAN_PROTOCOL_NODESTATUS_ID:
           break;
