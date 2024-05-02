@@ -51,10 +51,11 @@ public:
 
 private:
     void repaintDisplay();
-    void paintStack(std::vector<std::string> items);
+    void paintStack(std::vector<std::string> &items);
     void paintPage1();
     void paintPage2();
     void paintPage3();
+    void paintPage4();
     void blinkLED();
 
     ST7789 st7789;
@@ -72,8 +73,7 @@ private:
     ButtonCallback button_b_callback;
     ButtonCallback button_x_callback;
     int current_page = 0;
-    int max_pages = 3;
-
+    int max_pages = 4;
     void nextPage() { current_page = (current_page + 1) % max_pages; }
     void prevPage() { current_page = (current_page - 1 + max_pages) % max_pages; }
 
@@ -91,4 +91,6 @@ private:
     uint16_t motorRtemperature = 0;
     float motorRRPM = 0.0;
     float motorRposition = 0.0;
+
+    void paintStack(const std::vector<std::string> &items);
 };

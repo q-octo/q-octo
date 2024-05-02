@@ -1,5 +1,7 @@
 
 #include "display.h"
+#include <vector>
+#include <string>
 
 #define SET_PEN_RED() graphics.set_pen(244, 67, 54);
 #define SET_PEN_GREEN() graphics.set_pen(76, 176, 80);
@@ -27,7 +29,7 @@ void Display::loop()
   }
 
   // Repaint the screen every 32ms (30fps)
-  if (currentMillis - lastRepaintMillis >= 64)
+  if (currentMillis - lastRepaintMillis >= 32)
   {
     lastRepaintMillis = currentMillis;
     repaintDisplay();
@@ -214,131 +216,111 @@ void Display::paintPage1()
     graphics.text(oss.str(), Point(bottom2.x + 160, bottom2.y), bottom2.w);
 }
 
-void Display::paintPage2() {
-    // Set white background
-    SET_PEN_WHITE()
+void Display::paintStack(const std::vector<std::string>& items) {
+    // Clear the display to start with a clean slate
+    SET_PEN_WHITE();
     graphics.clear();
 
+    // Set text properties
+    graphics.set_font("bitmap8");  // Assuming font size that fits the display vertically
+    SET_PEN_BLACK();
+
+    // Determine the vertical spacing for each item
+    int total_height = 135;  // Total height of the display
+    int num_items = items.size();
+    int space_per_item = total_height / num_items;
+
+    // Draw each item in the stack
+    for (int i = 0; i < num_items; ++i) {
+        int y_position = i * space_per_item + 5; // Add 5px margin to the top
+
+        // Draw text at the calculated position
+        graphics.text(items[i], Point(10, y_position), 220);  // Text position adjusted for margins
+
+        // Draw a horizontal line after the text, if not the last item
+        if (i < num_items - 1) {
+            graphics.line(Point(0, y_position + space_per_item - 1), Point(240, y_position + space_per_item - 1));
+        }
+    }
+
+    // Update the display with the new graphics
+    st7789.update(&graphics);
+}
+
+
+void Display::paintPage2() {
+
+    // Set white background
+    SET_PEN_WHITE();
+    graphics.clear();
+
+    graphics.set_font("bitmap6");
+
+    // Draw horizontal lines to separate sections
+    SET_PEN_BLACK();
+    graphics.line(Point(0, 20), Point(239, 20)); // After RSSI
+    graphics.line(Point(0, 40), Point(239, 40));
+    graphics.line(Point(0, 60), Point(239, 60));
+    graphics.line(Point(0, 80), Point(239, 80));
+    graphics.line(Point(0, 100), Point(239, 100));
+    graphics.line(Point(0, 120), Point(239, 120));
+
+    // For building strings
+    std::ostringstream oss;
+
     // Line1 - RSSI and Link Quality
-    SET_PEN_BLACK()
+    // TODO: Where do I get these in state?
+    float rssi = -77;
+    float link = 64;
 
-    int xPosition = 10;
-    int yPosition = 0;
+    oss << "RSSI: " << rssi << "dBm" << " Link: " << link << "%";
+    graphics.text(oss.str(), Point(5, 5), 220);
+    oss.str("");
 
-    // Line1 - RSSI and Link Quality
-    float rssi = state.rssi_threshold;
-    float link = state.link_quality_threshold;
+    if (state.motors == nullptr) {
+        graphics.text("No motor info.", Point(5, 25), 220);
+    } else {
+        // Motor1 Temperature, RPS, Angle
+        oss << "M1: " << state.motors->motor1->temperature << "C " << state.motors->motor1->rps << "RPS " << state.motors->motor1->angle << "deg";
+        graphics.text(oss.str(), Point(5, 25), 220);
+        oss.str("");
 
-    graphics.text("RSSI:", Point(xPosition, yPosition), 220);
-    xPosition += 50;
-    graphics.text(std::to_string((int)rssi), Point(xPosition, yPosition), 220);
-    xPosition += 50;
-    graphics.text("L:", Point(xPosition, yPosition), 220);
-    xPosition += 20;
-    graphics.text(std::to_string((int)link), Point(xPosition, yPosition), 220);
+        // Motor2 Temperature, RPS, Angle
+        oss << "M2: " << state.motors->motor2->temperature << "C " << state.motors->motor2->rps << "RPS " << state.motors->motor2->angle << "deg";
+        graphics.text(oss.str(), Point(5, 45), 220);
+        oss.str("");
+    }
 
-    // Line2 - Motor1
-    float temp1 = state.motors->motor1->temperature;
-    float rps1 = state.motors->motor1->rps;
-    float angle1 = state.motors->motor1->angle;
+    // Channels
+    // TODO: Where do I get these in state?
+    graphics.text("1-4:1500 1500 1500 1500", Point(5, 60), 225);
+    graphics.text("5-8:1500 1500 1500 1500", Point(5, 80), 225);
+    graphics.text("9-12:1500 1500 1500 1500", Point(5, 100), 225);
+    graphics.text("13-16:1500 1500 1500 1500", Point(5, 120), 230);
 
-    xPosition = 10;
-    yPosition = 25;
-
-    graphics.text("M_l:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)temp1), Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text("RPS:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)rps1), Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text("A:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)angle1), Point(xPosition, yPosition), 220);
-
-    // Line3 - Motor2
-    float temp2 = state.motors->motor2->temperature;
-    float rps2 = state.motors->motor2->rps;
-    float angle2 = state.motors->motor2->angle;
-
-    xPosition = 10;
-    yPosition = 50;
-
-graphics.text("M_r:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)temp2), Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text("RPS:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)rps2), Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text("A:", Point(xPosition, yPosition), 220);
-    xPosition += 40;
-    graphics.text(std::to_string((int)angle2), Point(xPosition, yPosition), 220);
-
-//    // Lines 4-7 - Channels 1-16
-//    graphics.text("1-4: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
-//    //graphics.line(Point(0, 105), Point(240, 105));  // Draw line
-//
-//    graphics.text("5-8: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
-//    //graphics.line(Point(0, 130), Point(240, 130));  // Draw line
-//
-//    graphics.text("9-12: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
-//    //graphics.line(Point(0, 155), Point(240, 155));  // Draw line
-//
-//    graphics.text("13-16: 1500 1500 1500 1500", Point(10, yPosition + 25), 220);
-    //graphics.line(Point(0, 180), Point(240, 180));  // Draw line
-    Serial.println("Painted page 2");
 }
 
 void Display::paintPage3() {
+    // Build strings for
+    // Low battery voltage, critical battery voltage, rssithreshold, linkqualitythreshold
+    std::ostringstream oss;
+
     // Set white background
     SET_PEN_WHITE()
-    graphics.clear();
 
-    // Prepare to display messages
-    SET_PEN_BLACK()
+    paintStack({
+        "Low Volt: " + std::to_string(state.low_voltage_threshold),
+        "Crit Volt: " + std::to_string(state.critical_voltage_threshold),
+        "RSSI Thres: " + std::to_string(state.rssi_threshold),
+        "Lnk Q. Thres: " + std::to_string(state.link_quality_threshold)
+    });
+}
 
-    // Each message is accessed individually from the struct
-    std::string message;
-    int yPos = 10; // Start position for the first message
+void Display::paintPage4() {
+    // Set white background
+    SET_PEN_WHITE()
+    paintStack({"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"});
 
-    message = "Msg1: " + std::string(state.display_messages->message1);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg2: " + std::string(state.display_messages->message2);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg3: " + std::string(state.display_messages->message3);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg4: " + std::string(state.display_messages->message4);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg5: " + std::string(state.display_messages->message5);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg6: " + std::string(state.display_messages->message6);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
-
-    message = "Msg7: " + std::string(state.display_messages->message7);
-    graphics.text(message, Point(10, yPos), 220);
-    yPos += 25;
-    // Optional last line if you want a separator after the last message
-    graphics.line(Point(0, yPos - 5), Point(240, yPos - 5));  // Draw line
 }
 
 
@@ -353,6 +335,12 @@ void Display::repaintDisplay()
         break;
     case 1:
         paintPage2();
+        break;
+    case 2:
+        paintPage3();
+        break;
+    case 3:
+        paintPage4();
         break;
     }
   st7789.update(&graphics);
