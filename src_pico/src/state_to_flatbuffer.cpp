@@ -9,15 +9,16 @@ Status serialiseSystemStatus(const DataManager::Status &systemStatus) {
     case DataManager::OK:
       return Status_OK;
     case DataManager::LOW_BATTERY:
-      return Status_BAT;
+      return Status_LOW_BATTERY;
     case DataManager::NO_TX_SIGNAL:
-      return Status_NOTX;
+      return Status_NO_TX_SIGNAL;
     case DataManager::MOTOR_ERROR:
+      return Status_MOTOR_ERROR;
     case DataManager::DISARMED:
-      // TODO update schema to handle these cases
-      return Status_OK;
-      break;
+      return Status_DISARMED;
   }
+
+  // Unreachable
   return Status_OK;
 }
 
