@@ -629,6 +629,7 @@ struct RobotT : public ::flatbuffers::NativeTable {
   std::string motor_error_code{};
   bool enable_rover = false;
   std::unique_ptr<fbs::DisplayMessagesT> display_messages{};
+  bool start_web_server_on_launch = false;
   RobotT() = default;
   RobotT(const RobotT &o);
   RobotT(RobotT&&) FLATBUFFERS_NOEXCEPT = default;
@@ -656,7 +657,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_RIGHT_MOTOR_FOLD_ANGLE = 32,
     VT_MOTOR_ERROR_CODE = 34,
     VT_ENABLE_ROVER = 36,
-    VT_DISPLAY_MESSAGES = 38
+    VT_DISPLAY_MESSAGES = 38,
+    VT_START_WEB_SERVER_ON_LAUNCH = 40
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -712,6 +714,9 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::DisplayMessages *display_messages() const {
     return GetPointer<const fbs::DisplayMessages *>(VT_DISPLAY_MESSAGES);
   }
+  bool start_web_server_on_launch() const {
+    return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_BATTERIES, 4) &&
@@ -736,6 +741,7 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_ENABLE_ROVER, 1) &&
            VerifyOffset(verifier, VT_DISPLAY_MESSAGES) &&
            verifier.VerifyTable(display_messages()) &&
+           VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
            verifier.EndTable();
   }
   RobotT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -801,6 +807,9 @@ struct RobotBuilder {
   void add_display_messages(::flatbuffers::Offset<fbs::DisplayMessages> display_messages) {
     fbb_.AddOffset(Robot::VT_DISPLAY_MESSAGES, display_messages);
   }
+  void add_start_web_server_on_launch(bool start_web_server_on_launch) {
+    fbb_.AddElement<uint8_t>(Robot::VT_START_WEB_SERVER_ON_LAUNCH, static_cast<uint8_t>(start_web_server_on_launch), 0);
+  }
   explicit RobotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -831,7 +840,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     int32_t right_motor_fold_angle = 0,
     ::flatbuffers::Offset<::flatbuffers::String> motor_error_code = 0,
     bool enable_rover = false,
-    ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0) {
+    ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
+    bool start_web_server_on_launch = false) {
   RobotBuilder builder_(_fbb);
   builder_.add_display_messages(display_messages);
   builder_.add_motor_error_code(motor_error_code);
@@ -848,6 +858,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_voltage(voltage);
   builder_.add_motors(motors);
   builder_.add_batteries(batteries);
+  builder_.add_start_web_server_on_launch(start_web_server_on_launch);
   builder_.add_enable_rover(enable_rover);
   builder_.add_status(status);
   builder_.add_control_source(control_source);
@@ -873,7 +884,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     int32_t right_motor_fold_angle = 0,
     const char *motor_error_code = nullptr,
     bool enable_rover = false,
-    ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0) {
+    ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
+    bool start_web_server_on_launch = false) {
   auto motor_error_code__ = motor_error_code ? _fbb.CreateString(motor_error_code) : 0;
   return fbs::CreateRobot(
       _fbb,
@@ -894,7 +906,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       right_motor_fold_angle,
       motor_error_code__,
       enable_rover,
-      display_messages);
+      display_messages,
+      start_web_server_on_launch);
 }
 
 ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -1116,7 +1129,8 @@ inline RobotT::RobotT(const RobotT &o)
         right_motor_fold_angle(o.right_motor_fold_angle),
         motor_error_code(o.motor_error_code),
         enable_rover(o.enable_rover),
-        display_messages((o.display_messages) ? new fbs::DisplayMessagesT(*o.display_messages) : nullptr) {
+        display_messages((o.display_messages) ? new fbs::DisplayMessagesT(*o.display_messages) : nullptr),
+        start_web_server_on_launch(o.start_web_server_on_launch) {
 }
 
 inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
@@ -1138,6 +1152,7 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(motor_error_code, o.motor_error_code);
   std::swap(enable_rover, o.enable_rover);
   std::swap(display_messages, o.display_messages);
+  std::swap(start_web_server_on_launch, o.start_web_server_on_launch);
   return *this;
 }
 
@@ -1168,6 +1183,7 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = motor_error_code(); if (_e) _o->motor_error_code = _e->str(); }
   { auto _e = enable_rover(); _o->enable_rover = _e; }
   { auto _e = display_messages(); if (_e) { if(_o->display_messages) { _e->UnPackTo(_o->display_messages.get(), _resolver); } else { _o->display_messages = std::unique_ptr<fbs::DisplayMessagesT>(_e->UnPack(_resolver)); } } else if (_o->display_messages) { _o->display_messages.reset(); } }
+  { auto _e = start_web_server_on_launch(); _o->start_web_server_on_launch = _e; }
 }
 
 inline ::flatbuffers::Offset<Robot> Robot::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -1196,6 +1212,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _motor_error_code = _o->motor_error_code.empty() ? 0 : _fbb.CreateString(_o->motor_error_code);
   auto _enable_rover = _o->enable_rover;
   auto _display_messages = _o->display_messages ? CreateDisplayMessages(_fbb, _o->display_messages.get(), _rehasher) : 0;
+  auto _start_web_server_on_launch = _o->start_web_server_on_launch;
   return fbs::CreateRobot(
       _fbb,
       _batteries,
@@ -1215,7 +1232,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _right_motor_fold_angle,
       _motor_error_code,
       _enable_rover,
-      _display_messages);
+      _display_messages,
+      _start_web_server_on_launch);
 }
 
 inline const fbs::Robot *GetRobot(const void *buf) {

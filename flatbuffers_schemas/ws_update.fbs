@@ -37,6 +37,10 @@ table UpdateRssiThreshold {
     rssi_threshold: int;
 }
 
+table UpdateStartWebServerOnLaunch {
+    start_web_server_on_launch: bool;
+}
+
 union UpdateUnion {
     UpdateBatteries,
     UpdateLowVoltageThreshold,
@@ -45,7 +49,8 @@ union UpdateUnion {
     UpdateFoldWheels,
     UpdateEnableRover,
     UpdateLinkQualityThreshold,
-    UpdateRssiThreshold
+    UpdateRssiThreshold,
+    UpdateStartWebServerOnLaunch,
 }
 
 table Update {

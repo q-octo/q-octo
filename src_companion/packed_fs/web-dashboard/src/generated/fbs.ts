@@ -11,4 +11,5 @@ export { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from './fbs/u
 export { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from './fbs/update-low-voltage-threshold.js';
 export { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from './fbs/update-reference-wheel-angle.js';
 export { UpdateRssiThreshold, UpdateRssiThresholdT } from './fbs/update-rssi-threshold.js';
+export { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from './fbs/update-start-web-server-on-launch.js';
 export { UpdateUnion } from './fbs/update-union.js';
