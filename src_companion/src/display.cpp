@@ -239,8 +239,8 @@ void Display::paintStack(const std::vector<std::string>& items) {
     SET_PEN_WHITE();
     graphics.clear();
 
-    // Set text properties
-    graphics.set_font("bitmap8");  // Assuming font size that fits the display vertically
+    graphics.set_font("bitmap8");
+
     SET_PEN_BLACK();
 
     // Determine the vertical spacing for each item
@@ -252,8 +252,14 @@ void Display::paintStack(const std::vector<std::string>& items) {
     for (int i = 0; i < num_items; ++i) {
         int y_position = i * space_per_item + 5; // Add 5px margin to the top
 
+        // Cutoff text > 25 chars
+        std::string shortened = items[i];
+        if (items[i].length() > 25) {
+            shortened = items[i].substr(0, 25);
+        }
+
         // Draw text at the calculated position
-        graphics.text(items[i], Point(10, y_position), 220);  // Text position adjusted for margins
+        graphics.text(shortened, Point(10, y_position), 230);  // Text position adjusted for margins
 
         // Draw a horizontal line after the text, if not the last item
         if (i < num_items - 1) {
@@ -310,7 +316,6 @@ void Display::paintPage2() {
     }
 
     // Channels
-    // TODO: Where do I get these in state?
     if(state.crsf_data == nullptr) {
         graphics.text("No CRSF data.", Point(5, 65), 220);
     } else {
@@ -337,7 +342,6 @@ void Display::paintPage2() {
         auto chan15 = channelData[14].data();
         auto chan16 = channelData[15].data();
 
-        //graphics.text("1-4:1500 1500 1500 1500", Point(5, 60), 225);
         oss.str("");
         oss << "1-4:" << chan1 << " " << chan2 << " " << chan3 << " " << chan4;
         graphics.text(oss.str(), Point(5, 65), 220);
@@ -373,7 +377,21 @@ void Display::paintPage3() {
 void Display::paintPage4() {
     // Set white background
     SET_PEN_WHITE()
-    paintStack({"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"});
+
+    if (state.display_messages == nullptr) {
+        paintStack({"No messages."});
+        return;
+    }
+    
+    paintStack({
+        state.display_messages->message1,
+        state.display_messages->message2,
+        state.display_messages->message3,
+        state.display_messages->message4,
+        state.display_messages->message5,
+        state.display_messages->message6,
+        state.display_messages->message7,
+    });
 
 }
 
