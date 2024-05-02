@@ -70,20 +70,16 @@ void setup() {
   } else {
     Serial.println("mDNS responder started");
     // Add service to mDNS
-//    MDNS.addService("http", "tcp", 80);
+    //    MDNS.addService("http", "tcp", 80);
     MDNS.addService("ws", "tcp", 81);
   }
 
   motor.stop_motor();
-  delayMicroseconds(500);
-  motor.set_run_mode(MODE_CURRENT);
-  delayMicroseconds(500);
-  motor.set_limit_speed(10);
-  delayMicroseconds(500);
-  motor.set_limit_current(4);
-  delayMicroseconds(500);
+  motor.set_run_mode(MODE_SPEED);
+  motor.set_limit_speed(2);
+  motor.set_limit_current(0.5);
+  // motor.set_limit_torque(0.5);
   motor.enable_motor();
-  delayMicroseconds(500);
   // motor.set_speed_ref(2);
   // motor.set_position_ref(6);
 
@@ -102,13 +98,15 @@ void setup() {
   // delayMicroseconds(500);
 
   // XiaomiCyberGearMotionCommand cmd = {
-  //     .position = 0,
+  //     .position = 3.14,
   //     .speed = 1,
-  //     .torque = 0,
+  //     .torque = 1,
   //     .kp = 1,
   //     .kd = 1};
 
   // motor.send_motion_control(cmd);
+  //
+  // motor.set_speed_ref(2);
 }
 
 long lastTimeWeResetTarget = 0;
@@ -116,28 +114,107 @@ long lastTimeWeResetTarget = 0;
 float target = 6;
 int current = 0;
 
+int counter = 0;
+
+long loops = 0;
+
 void loop() {
+  loops++;
   webSocket->loop();
   MDNS.update();
   CanCommunication::checkForPacket();
   CanCommunication::checkForPacket();
   CanCommunication::checkForPacket();
 
-  motor.set_current_ref(0.5);
-  delay(100);
   auto status = motor.get_status();
   // Print position, speed, torque, temperature
-  Serial.print("Position: ");
-  Serial.println(status.position);
-  Serial.print("Speed: ");
-  Serial.println(status.speed);
-  Serial.print("Torque: ");
-  Serial.println(status.torque);
-  Serial.print("Temperature: ");
-  Serial.println(status.temperature);
+  Serial.print("[MOT] POS: ");
+  Serial.print(status.position);
+  Serial.print(" SPD: ");
+  Serial.print(status.speed);
+  Serial.print(" TRQ: ");
+  Serial.print(status.torque);
+  Serial.print(" TMP: ");
+  Serial.println(status.temperature / 10.0);
+
+  // XiaomiCyberGearMotionCommand cmd = {
+  //       // .position = 3.14,
+  //       .speed = 1,
+  //       .torque = 1,
+  //       .kp = 1,
+  //       .kd = 1
+  //     };
+
+  // switch (counter % 4) {
+  //   case 0:
+  //     cmd.position = 1;
+  //     break;
+  //   case 1:
+  //     cmd.position = -1;
+  //     break;
+  //   case 2:
+  //     cmd.position = 0;
+  //     break;
+  //   case 3:
+  //     cmd.position = -1;
+  //     break;
+  // }
+
+  // counter++;
+
+  // motor.send_motion_control(cmd);
+
+  // motor.set_current_ref(0.1);
+  //
+
+  motor.request_status();
+
+  // motor.set_speed_ref(2);
+  // motor.set_position_ref(3.14);
+
+  delay(100);
+
+  if (loops == 100) {
+    for (int i = 0; i < 5; i++) {
+      Serial.println("RESETTING POSITION");
+    }
+    motor.set_run_mode(MODE_MOTION);
+    // motor.set_position_ref(0);
+
+    XiaomiCyberGearMotionCommand cmd = {
+            .position = 1,
+            .speed = 0.1,
+            .torque = 0,
+            .kp = 0,
+            .kd = 0};
+
+    motor.send_motion_control(cmd);
+    // motor.set_run_mode(MODE_SPEED);
+  }
+
+  // if (loops == 100)
+  // {
+  //   for (int i = 0; i < 5; i++)
+  //   {
+  //     Serial.println("RESETTING POSITION");
+  //   }
+  //   motor.set_run_mode(MODE_MOTION);
+  //   // motor.set_position_ref(0);
+
+  //   XiaomiCyberGearMotionCommand cmd = {
+  //       .position = 1,
+  //       .speed = 0,
+  //       .torque = 0,
+  //       .kp = 0,
+  //       .kd = 0};
+
+  //   motor.send_motion_control(cmd);
+  //   // motor.set_run_mode(MODE_SPEED);
+  // }
 
   // if (millis() - lastTimeWeResetTarget > 5000)
   // {
+  //
   //   lastTimeWeResetTarget = millis();
   //   target = lastTimeWeResetTarget % 25;
   //   target -= 12.5;
@@ -168,8 +245,6 @@ void loop() {
   // Serial.println("Current position: ");
   // Serial.println(current);
 }
-
-
 
 void printCommand(MotorControl::CommandT &command) {
   using namespace MotorControl;
@@ -268,13 +343,11 @@ void printCommand(MotorControl::CommandT &command) {
   }
 }
 
-
 void parseFlatbufferMessage(uint8_t *payload) {
   using namespace MotorControl;
   CommandT command;
   GetCommand(payload)->UnPackTo(&command);
   printCommand(command);
-
 
   if (command.type == CommandType_MOTOR_COMMAND) {
     MotorCommandT motorCommand = *command.motor_control;
@@ -510,7 +583,6 @@ void parseFlatbufferMessage(uint8_t *payload) {
   }
 }
 
-
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   switch (type) {
     case WStype_DISCONNECTED: {
@@ -569,16 +641,17 @@ void onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_t *packet
     motor.process_message(packetId, packetData);
   }
 
-  // if (packetId == 0x64)
-  // {
-  //   RotaryEncoderResponse response;
-  //   encoder.processMessage(&response, packetLength, packetId, packetData);
-  //   // Print position, speed, torque
-  //   Serial.print("Position: ");
-  //   Serial.println(response.position);
-  //   Serial.print("Speed: ");
-  //   Serial.println(response.speed);
-  //   Serial.print("Torque: ");
-  //   Serial.println(response.torque);
-  // }
+  if (packetId == 0x64) {
+    RotaryEncoderResponse response;
+    encoder.processMessage(&response, packetLength, packetId, packetData);
+    // Print position, speed, torque
+    float posDegrees = response.position;
+    float posRadians = posDegrees * 3.14159 / 180;
+    Serial.print("[ENC] POS: ");
+    Serial.print(posRadians);
+    Serial.print(" SPD: ");
+    Serial.print(response.speed);
+    Serial.print(" TRQ: ");
+    Serial.println(response.torque);
+  }
 }
