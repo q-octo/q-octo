@@ -92,10 +92,15 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   memcpy(lastChannels, channels, sizeof(lastChannels));
 #if DEBUG_LOG_RC_CHANNELS
   const uint32_t currentMillis = millis();
-  if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive) {
+  if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY) {
     lastRcChannelsLogMs = currentMillis;
 
-    Serial.print("[INFO]: RC Channels: <");
+    if (isFailsafeActive) {
+      Serial.print("[WARN]: FAILSAFED RC Channels: <");
+    } else {
+      Serial.print("[INFO]: RC Channels: <");
+    }
+
     for (int i = 0; i < rcChannelCount; i++) {
       Serial.print(rcChannelNames[i]);
       Serial.print(": ");
@@ -112,7 +117,7 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
   Storage::State &state = Storage::getState();
-  float rpm = mapRange(992, 2008, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
+  float rpm = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
   if (lastRPM != rpm) {
     lastRPM = rpm;
     taskMessage = {
