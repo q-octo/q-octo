@@ -43,7 +43,6 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
 
   // TODO set these
   robot.crsf_data->failsafe = false;
-  robot.max_speed = 30;
 
   robot.low_voltage_threshold = storageState.lowVoltageThreshold;
   robot.critical_voltage_threshold = storageState.criticalVoltageThreshold;
@@ -51,7 +50,11 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   robot.link_quality_threshold = storageState.linkQualityThreshold;
   robot.left_motor_fold_angle = storageState.leftMotorFoldAngle;
   robot.right_motor_fold_angle = storageState.rightMotorFoldAngle;
-
+  robot.max_speed = storageState.motorSpeedLimit;
+  robot.max_current = storageState.motorCurrentLimit;
+  robot.max_torque = storageState.motorTorqueLimit;
+  robot.start_web_server_on_launch = storageState.startWebServerOnLaunch;
+  
   // TODO set these
   robot.motor_error_code = "";
   robot.enable_rover = true;
@@ -72,4 +75,5 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   robot.display_messages->message5 = *robotState.displayMessages.message5;
   robot.display_messages->message6 = *robotState.displayMessages.message6;
   robot.display_messages->message7 = *robotState.displayMessages.message7;
+  
 }
