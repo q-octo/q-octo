@@ -25,7 +25,6 @@ void QOctoSerial::loop() {
   }
 }
 
-// Button is a string
 void QOctoSerial::serializeButtonPressed(Button button) {
   fbb.Reset();
 

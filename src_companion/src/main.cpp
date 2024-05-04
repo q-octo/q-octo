@@ -68,17 +68,7 @@ void toggleBButton() {
 }
 
 void toggleXButton() {
-  Serial.println("Toggling web server");
-
-
-  bool webServerIsRunning = webServer.getWebServerIsRunning();
-
-  if(webServerIsRunning) {
-    webServer.stop();
-  } else {
-    webServer.start();
-  }
-
-  // Tell the display that the web server is running
-  display.setWebServerIsRunning(!webServerIsRunning);
+    Serial.println("X button pressed sending message to serial port");
+  QOctoSerial::sendButtonPressed(fbs::Button::Button_X);
 }
+    
