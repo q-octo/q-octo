@@ -117,19 +117,12 @@ void Display::paintPage1()
         case Status_OK:
             SET_PEN_GREEN();
             break;
-        case Status_INIT:
-            SET_PEN_ORANGE()
-            break;
-        case Status_NOTX:
+        case Status_NO_TX_SIGNAL:
+        case Status_DISARMED:
             SET_PEN_RED()
             break;
-        case Status_BAT:
-            SET_PEN_RED()
-            break;
-        case Status_TEMP:
-            SET_PEN_ORANGE()
-            break;
-        case Status_OFF:
+        case Status_LOW_BATTERY:
+        case Status_MOTOR_ERROR:
             SET_PEN_RED()
             break;
     }

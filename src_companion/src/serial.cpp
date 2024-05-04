@@ -9,14 +9,14 @@ void QOctoSerial::init(MessageCallback callback) {
   Serial1.setPinout(PIN_UART_TX, PIN_UART_RX);
   // Certainly needs to be larger than a single message ~108 bytes.
   // If messages are received faster than we process them then this will inevitably fill up and bytes will be lost.
-  Serial1.setFIFOSize(1024);
+  Serial1.setFIFOSize(4096);
   Serial1.begin(115200);
 }
 
 void QOctoSerial::loop() {
   if (parser.parseMessage()) {
     CompanionRxT message;
-    GetCompanionRx(parser.buffer)->UnPackTo(&message);
+    GetSizePrefixedCompanionRx(parser.buffer)->UnPackTo(&message);
     if (messageCallback == nullptr) {
       Serial.println("[ERROR] QOctoSerial not initialised with a callback");
       return;
