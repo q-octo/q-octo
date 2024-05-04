@@ -118,11 +118,16 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
   Storage::State &state = Storage::getState();
   float rpm = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
+  float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
+  // if within 50 of 1500, set rpm to 0
+  if (abs(TICKS_TO_US(channels[0]) - 1500) < 50) {
+    rpm = 0;
+  }
   if (lastRPM != rpm) {
     lastRPM = rpm;
     taskMessage = {
             .type = DataManager::Type::SET_MOTOR_SPEED_COMBINED,
-            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
+            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = direction}},
     };
     DataManager::receiveMessage(taskMessage);
   }

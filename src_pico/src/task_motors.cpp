@@ -131,6 +131,8 @@ void TaskControlMotors::initMotors() {
   cybergearR.set_limit_torque(maxTorque);
   cybergearR.enable_motor();
   Serial.println("Motors initialised");
+  Serial.print("Speed limit: ");
+  Serial.println(maxSpeed);
 }
 
 void TaskControlMotors::debugPrintMotorStatus() {
