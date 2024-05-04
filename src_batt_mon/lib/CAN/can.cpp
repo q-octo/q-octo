@@ -7,6 +7,7 @@
 
 // Set CAN bus baud rate
 #define CAN_BAUDRATE (1000000) // 1Mbit/s (determined by the motor)
+// #define CAN_BAUDRATE (500000) 
 Adafruit_MCP2515 mcp(CS_PIN);
 
 #define DEBUG_CAN 0

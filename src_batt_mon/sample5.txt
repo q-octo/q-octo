@@ -1,0 +1,15 @@
+Received extended packet with id 0x18044478 and length 8
+0xF63400006616A080
+Canard response: 0
+
+Received extended packet with id 0x18044478 and length 8
+0x0000001FC0000100
+Canard response: -14
+
+Received extended packet with id 0x18044478 and length 8
+0x426174744D6F6E20
+Canard response: 0
+
+Received extended packet with id 0x18044478 and length 4
+0x202D3140
+Canard response: -17

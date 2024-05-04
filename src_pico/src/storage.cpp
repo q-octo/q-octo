@@ -4,6 +4,9 @@
 void Storage::init()
 {
     EEPROM.begin(sizeof(State));
+    // TODO remove this workaround as it makes this system redundant
+    // We shuold figure out how to check if this is the first read or not
+    save();
     EEPROM.get(0, state);
 }
 

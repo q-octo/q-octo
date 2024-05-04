@@ -7,7 +7,7 @@ file_identifier "ROBO";
 
 // Define enums for control sources and status codes
 enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
-enum Status : byte { OK, INIT, NOTX, BAT, TEMP, OFF }
+enum Status : byte { OK, NO_TX_SIGNAL, LOW_BATTERY, MOTOR_ERROR, DISARMED }
 
 // Define a table for motor information
 table Motor {
@@ -15,6 +15,12 @@ table Motor {
     rps: float = 0.0;
     angle: float = 0.0;
     torque: float = 0.0;
+}
+
+table MotorLimits {
+    max_speed: float = -1;
+    max_current: float = -1;
+    max_torque: float = -1;
 }
 
 // Define a table for the motors group
@@ -68,7 +74,8 @@ table Robot {
     current: float = 0.0;
     fuel: float = 0.0;
     crsf_data: CrsfData;
-    max_speed: float = 0.0;
+    left_motor_limits: MotorLimits;
+    right_motor_limits: MotorLimits;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;
     rssi_threshold: int = 0;
@@ -78,6 +85,8 @@ table Robot {
     motor_error_code: string; // Defaults not supported for strings
     enable_rover: bool = false;
     display_messages: DisplayMessages;
+    start_web_server_on_launch: bool = false;
+
 }
 
 // Define the root type and possible update types

@@ -47,6 +47,22 @@ struct UpdateRssiThreshold;
 struct UpdateRssiThresholdBuilder;
 struct UpdateRssiThresholdT;
 
+struct UpdateStartWebServerOnLaunch;
+struct UpdateStartWebServerOnLaunchBuilder;
+struct UpdateStartWebServerOnLaunchT;
+
+struct UpdateMaxSpeed;
+struct UpdateMaxSpeedBuilder;
+struct UpdateMaxSpeedT;
+
+struct UpdateMaxCurrent;
+struct UpdateMaxCurrentBuilder;
+struct UpdateMaxCurrentT;
+
+struct UpdateMaxTorque;
+struct UpdateMaxTorqueBuilder;
+struct UpdateMaxTorqueT;
+
 struct Update;
 struct UpdateBuilder;
 struct UpdateT;
@@ -61,11 +77,15 @@ enum UpdateUnion : uint8_t {
   UpdateUnion_UpdateEnableRover = 6,
   UpdateUnion_UpdateLinkQualityThreshold = 7,
   UpdateUnion_UpdateRssiThreshold = 8,
+  UpdateUnion_UpdateStartWebServerOnLaunch = 9,
+  UpdateUnion_UpdateMaxSpeed = 10,
+  UpdateUnion_UpdateMaxCurrent = 11,
+  UpdateUnion_UpdateMaxTorque = 12,
   UpdateUnion_MIN = UpdateUnion_NONE,
-  UpdateUnion_MAX = UpdateUnion_UpdateRssiThreshold
+  UpdateUnion_MAX = UpdateUnion_UpdateMaxTorque
 };
 
-inline const UpdateUnion (&EnumValuesUpdateUnion())[9] {
+inline const UpdateUnion (&EnumValuesUpdateUnion())[13] {
   static const UpdateUnion values[] = {
     UpdateUnion_NONE,
     UpdateUnion_UpdateBatteries,
@@ -75,13 +95,17 @@ inline const UpdateUnion (&EnumValuesUpdateUnion())[9] {
     UpdateUnion_UpdateFoldWheels,
     UpdateUnion_UpdateEnableRover,
     UpdateUnion_UpdateLinkQualityThreshold,
-    UpdateUnion_UpdateRssiThreshold
+    UpdateUnion_UpdateRssiThreshold,
+    UpdateUnion_UpdateStartWebServerOnLaunch,
+    UpdateUnion_UpdateMaxSpeed,
+    UpdateUnion_UpdateMaxCurrent,
+    UpdateUnion_UpdateMaxTorque
   };
   return values;
 }
 
 inline const char * const *EnumNamesUpdateUnion() {
-  static const char * const names[10] = {
+  static const char * const names[14] = {
     "NONE",
     "UpdateBatteries",
     "UpdateLowVoltageThreshold",
@@ -91,13 +115,17 @@ inline const char * const *EnumNamesUpdateUnion() {
     "UpdateEnableRover",
     "UpdateLinkQualityThreshold",
     "UpdateRssiThreshold",
+    "UpdateStartWebServerOnLaunch",
+    "UpdateMaxSpeed",
+    "UpdateMaxCurrent",
+    "UpdateMaxTorque",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUpdateUnion(UpdateUnion e) {
-  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateRssiThreshold)) return "";
+  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateMaxTorque)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUpdateUnion()[index];
 }
@@ -138,6 +166,22 @@ template<> struct UpdateUnionTraits<fbs::UpdateRssiThreshold> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
 };
 
+template<> struct UpdateUnionTraits<fbs::UpdateStartWebServerOnLaunch> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateStartWebServerOnLaunch;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateMaxSpeed> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxSpeed;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateMaxCurrent> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxCurrent;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateMaxTorque> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxTorque;
+};
+
 template<typename T> struct UpdateUnionUnionTraits {
   static const UpdateUnion enum_value = UpdateUnion_NONE;
 };
@@ -172,6 +216,22 @@ template<> struct UpdateUnionUnionTraits<fbs::UpdateLinkQualityThresholdT> {
 
 template<> struct UpdateUnionUnionTraits<fbs::UpdateRssiThresholdT> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateRssiThreshold;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateStartWebServerOnLaunchT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateStartWebServerOnLaunch;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateMaxSpeedT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxSpeed;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateMaxCurrentT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxCurrent;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateMaxTorqueT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMaxTorque;
 };
 
 struct UpdateUnionUnion {
@@ -267,6 +327,38 @@ struct UpdateUnionUnion {
   const fbs::UpdateRssiThresholdT *AsUpdateRssiThreshold() const {
     return type == UpdateUnion_UpdateRssiThreshold ?
       reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value) : nullptr;
+  }
+  fbs::UpdateStartWebServerOnLaunchT *AsUpdateStartWebServerOnLaunch() {
+    return type == UpdateUnion_UpdateStartWebServerOnLaunch ?
+      reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(value) : nullptr;
+  }
+  const fbs::UpdateStartWebServerOnLaunchT *AsUpdateStartWebServerOnLaunch() const {
+    return type == UpdateUnion_UpdateStartWebServerOnLaunch ?
+      reinterpret_cast<const fbs::UpdateStartWebServerOnLaunchT *>(value) : nullptr;
+  }
+  fbs::UpdateMaxSpeedT *AsUpdateMaxSpeed() {
+    return type == UpdateUnion_UpdateMaxSpeed ?
+      reinterpret_cast<fbs::UpdateMaxSpeedT *>(value) : nullptr;
+  }
+  const fbs::UpdateMaxSpeedT *AsUpdateMaxSpeed() const {
+    return type == UpdateUnion_UpdateMaxSpeed ?
+      reinterpret_cast<const fbs::UpdateMaxSpeedT *>(value) : nullptr;
+  }
+  fbs::UpdateMaxCurrentT *AsUpdateMaxCurrent() {
+    return type == UpdateUnion_UpdateMaxCurrent ?
+      reinterpret_cast<fbs::UpdateMaxCurrentT *>(value) : nullptr;
+  }
+  const fbs::UpdateMaxCurrentT *AsUpdateMaxCurrent() const {
+    return type == UpdateUnion_UpdateMaxCurrent ?
+      reinterpret_cast<const fbs::UpdateMaxCurrentT *>(value) : nullptr;
+  }
+  fbs::UpdateMaxTorqueT *AsUpdateMaxTorque() {
+    return type == UpdateUnion_UpdateMaxTorque ?
+      reinterpret_cast<fbs::UpdateMaxTorqueT *>(value) : nullptr;
+  }
+  const fbs::UpdateMaxTorqueT *AsUpdateMaxTorque() const {
+    return type == UpdateUnion_UpdateMaxTorque ?
+      reinterpret_cast<const fbs::UpdateMaxTorqueT *>(value) : nullptr;
   }
 };
 
@@ -687,6 +779,214 @@ inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(
 
 ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateRssiThresholdT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct UpdateStartWebServerOnLaunchT : public ::flatbuffers::NativeTable {
+  typedef UpdateStartWebServerOnLaunch TableType;
+  bool start_web_server_on_launch = false;
+};
+
+struct UpdateStartWebServerOnLaunch FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateStartWebServerOnLaunchT NativeTableType;
+  typedef UpdateStartWebServerOnLaunchBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_START_WEB_SERVER_ON_LAUNCH = 4
+  };
+  bool start_web_server_on_launch() const {
+    return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
+           verifier.EndTable();
+  }
+  UpdateStartWebServerOnLaunchT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateStartWebServerOnLaunchBuilder {
+  typedef UpdateStartWebServerOnLaunch Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_start_web_server_on_launch(bool start_web_server_on_launch) {
+    fbb_.AddElement<uint8_t>(UpdateStartWebServerOnLaunch::VT_START_WEB_SERVER_ON_LAUNCH, static_cast<uint8_t>(start_web_server_on_launch), 0);
+  }
+  explicit UpdateStartWebServerOnLaunchBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateStartWebServerOnLaunch>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    bool start_web_server_on_launch = false) {
+  UpdateStartWebServerOnLaunchBuilder builder_(_fbb);
+  builder_.add_start_web_server_on_launch(start_web_server_on_launch);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateMaxSpeedT : public ::flatbuffers::NativeTable {
+  typedef UpdateMaxSpeed TableType;
+  float max_speed = 0.0f;
+};
+
+struct UpdateMaxSpeed FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateMaxSpeedT NativeTableType;
+  typedef UpdateMaxSpeedBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MAX_SPEED = 4
+  };
+  float max_speed() const {
+    return GetField<float>(VT_MAX_SPEED, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
+           verifier.EndTable();
+  }
+  UpdateMaxSpeedT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateMaxSpeedT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateMaxSpeed> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxSpeedT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateMaxSpeedBuilder {
+  typedef UpdateMaxSpeed Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_max_speed(float max_speed) {
+    fbb_.AddElement<float>(UpdateMaxSpeed::VT_MAX_SPEED, max_speed, 0.0f);
+  }
+  explicit UpdateMaxSpeedBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateMaxSpeed> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateMaxSpeed>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateMaxSpeed> CreateUpdateMaxSpeed(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float max_speed = 0.0f) {
+  UpdateMaxSpeedBuilder builder_(_fbb);
+  builder_.add_max_speed(max_speed);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateMaxSpeed> CreateUpdateMaxSpeed(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxSpeedT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateMaxCurrentT : public ::flatbuffers::NativeTable {
+  typedef UpdateMaxCurrent TableType;
+  float max_current = 0.0f;
+};
+
+struct UpdateMaxCurrent FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateMaxCurrentT NativeTableType;
+  typedef UpdateMaxCurrentBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MAX_CURRENT = 4
+  };
+  float max_current() const {
+    return GetField<float>(VT_MAX_CURRENT, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MAX_CURRENT, 4) &&
+           verifier.EndTable();
+  }
+  UpdateMaxCurrentT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateMaxCurrentT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateMaxCurrent> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxCurrentT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateMaxCurrentBuilder {
+  typedef UpdateMaxCurrent Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_max_current(float max_current) {
+    fbb_.AddElement<float>(UpdateMaxCurrent::VT_MAX_CURRENT, max_current, 0.0f);
+  }
+  explicit UpdateMaxCurrentBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateMaxCurrent> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateMaxCurrent>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateMaxCurrent> CreateUpdateMaxCurrent(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float max_current = 0.0f) {
+  UpdateMaxCurrentBuilder builder_(_fbb);
+  builder_.add_max_current(max_current);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateMaxCurrent> CreateUpdateMaxCurrent(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxCurrentT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateMaxTorqueT : public ::flatbuffers::NativeTable {
+  typedef UpdateMaxTorque TableType;
+  float max_torque = 0.0f;
+};
+
+struct UpdateMaxTorque FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateMaxTorqueT NativeTableType;
+  typedef UpdateMaxTorqueBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MAX_TORQUE = 4
+  };
+  float max_torque() const {
+    return GetField<float>(VT_MAX_TORQUE, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MAX_TORQUE, 4) &&
+           verifier.EndTable();
+  }
+  UpdateMaxTorqueT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateMaxTorqueT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateMaxTorque> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxTorqueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateMaxTorqueBuilder {
+  typedef UpdateMaxTorque Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_max_torque(float max_torque) {
+    fbb_.AddElement<float>(UpdateMaxTorque::VT_MAX_TORQUE, max_torque, 0.0f);
+  }
+  explicit UpdateMaxTorqueBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateMaxTorque> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateMaxTorque>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float max_torque = 0.0f) {
+  UpdateMaxTorqueBuilder builder_(_fbb);
+  builder_.add_max_torque(max_torque);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxTorqueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct UpdateT : public ::flatbuffers::NativeTable {
   typedef Update TableType;
   fbs::UpdateUnionUnion update{};
@@ -730,6 +1030,18 @@ struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::UpdateRssiThreshold *update_as_UpdateRssiThreshold() const {
     return update_type() == fbs::UpdateUnion_UpdateRssiThreshold ? static_cast<const fbs::UpdateRssiThreshold *>(update()) : nullptr;
   }
+  const fbs::UpdateStartWebServerOnLaunch *update_as_UpdateStartWebServerOnLaunch() const {
+    return update_type() == fbs::UpdateUnion_UpdateStartWebServerOnLaunch ? static_cast<const fbs::UpdateStartWebServerOnLaunch *>(update()) : nullptr;
+  }
+  const fbs::UpdateMaxSpeed *update_as_UpdateMaxSpeed() const {
+    return update_type() == fbs::UpdateUnion_UpdateMaxSpeed ? static_cast<const fbs::UpdateMaxSpeed *>(update()) : nullptr;
+  }
+  const fbs::UpdateMaxCurrent *update_as_UpdateMaxCurrent() const {
+    return update_type() == fbs::UpdateUnion_UpdateMaxCurrent ? static_cast<const fbs::UpdateMaxCurrent *>(update()) : nullptr;
+  }
+  const fbs::UpdateMaxTorque *update_as_UpdateMaxTorque() const {
+    return update_type() == fbs::UpdateUnion_UpdateMaxTorque ? static_cast<const fbs::UpdateMaxTorque *>(update()) : nullptr;
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_UPDATE_TYPE, 1) &&
@@ -772,6 +1084,22 @@ template<> inline const fbs::UpdateLinkQualityThreshold *Update::update_as<fbs::
 
 template<> inline const fbs::UpdateRssiThreshold *Update::update_as<fbs::UpdateRssiThreshold>() const {
   return update_as_UpdateRssiThreshold();
+}
+
+template<> inline const fbs::UpdateStartWebServerOnLaunch *Update::update_as<fbs::UpdateStartWebServerOnLaunch>() const {
+  return update_as_UpdateStartWebServerOnLaunch();
+}
+
+template<> inline const fbs::UpdateMaxSpeed *Update::update_as<fbs::UpdateMaxSpeed>() const {
+  return update_as_UpdateMaxSpeed();
+}
+
+template<> inline const fbs::UpdateMaxCurrent *Update::update_as<fbs::UpdateMaxCurrent>() const {
+  return update_as_UpdateMaxCurrent();
+}
+
+template<> inline const fbs::UpdateMaxTorque *Update::update_as<fbs::UpdateMaxTorque>() const {
+  return update_as_UpdateMaxTorque();
 }
 
 struct UpdateBuilder {
@@ -1015,6 +1343,110 @@ inline ::flatbuffers::Offset<UpdateRssiThreshold> CreateUpdateRssiThreshold(::fl
       _rssi_threshold);
 }
 
+inline UpdateStartWebServerOnLaunchT *UpdateStartWebServerOnLaunch::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateStartWebServerOnLaunchT>(new UpdateStartWebServerOnLaunchT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateStartWebServerOnLaunch::UnPackTo(UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = start_web_server_on_launch(); _o->start_web_server_on_launch = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> UpdateStartWebServerOnLaunch::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateStartWebServerOnLaunch(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateStartWebServerOnLaunch> CreateUpdateStartWebServerOnLaunch(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateStartWebServerOnLaunchT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateStartWebServerOnLaunchT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _start_web_server_on_launch = _o->start_web_server_on_launch;
+  return fbs::CreateUpdateStartWebServerOnLaunch(
+      _fbb,
+      _start_web_server_on_launch);
+}
+
+inline UpdateMaxSpeedT *UpdateMaxSpeed::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateMaxSpeedT>(new UpdateMaxSpeedT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateMaxSpeed::UnPackTo(UpdateMaxSpeedT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = max_speed(); _o->max_speed = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateMaxSpeed> UpdateMaxSpeed::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxSpeedT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateMaxSpeed(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateMaxSpeed> CreateUpdateMaxSpeed(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxSpeedT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateMaxSpeedT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _max_speed = _o->max_speed;
+  return fbs::CreateUpdateMaxSpeed(
+      _fbb,
+      _max_speed);
+}
+
+inline UpdateMaxCurrentT *UpdateMaxCurrent::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateMaxCurrentT>(new UpdateMaxCurrentT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateMaxCurrent::UnPackTo(UpdateMaxCurrentT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = max_current(); _o->max_current = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateMaxCurrent> UpdateMaxCurrent::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxCurrentT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateMaxCurrent(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateMaxCurrent> CreateUpdateMaxCurrent(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxCurrentT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateMaxCurrentT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _max_current = _o->max_current;
+  return fbs::CreateUpdateMaxCurrent(
+      _fbb,
+      _max_current);
+}
+
+inline UpdateMaxTorqueT *UpdateMaxTorque::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateMaxTorqueT>(new UpdateMaxTorqueT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateMaxTorque::UnPackTo(UpdateMaxTorqueT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = max_torque(); _o->max_torque = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateMaxTorque> UpdateMaxTorque::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxTorqueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateMaxTorque(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxTorqueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateMaxTorqueT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _max_torque = _o->max_torque;
+  return fbs::CreateUpdateMaxTorque(
+      _fbb,
+      _max_torque);
+}
+
 inline UpdateT *Update::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<UpdateT>(new UpdateT());
   UnPackTo(_o.get(), _resolver);
@@ -1081,6 +1513,22 @@ inline bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunch *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateMaxSpeed: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxSpeed *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxCurrent *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxTorque *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -1132,6 +1580,22 @@ inline void *UpdateUnionUnion::UnPack(const void *obj, UpdateUnion type, const :
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThreshold *>(obj);
       return ptr->UnPack(resolver);
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunch *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateMaxSpeed: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxSpeed *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxCurrent *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxTorque *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -1171,6 +1635,22 @@ inline ::flatbuffers::Offset<void> UpdateUnionUnion::Pack(::flatbuffers::FlatBuf
       auto ptr = reinterpret_cast<const fbs::UpdateRssiThresholdT *>(value);
       return CreateUpdateRssiThreshold(_fbb, ptr, _rehasher).Union();
     }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<const fbs::UpdateStartWebServerOnLaunchT *>(value);
+      return CreateUpdateStartWebServerOnLaunch(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateMaxSpeed: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxSpeedT *>(value);
+      return CreateUpdateMaxSpeed(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxCurrentT *>(value);
+      return CreateUpdateMaxCurrent(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMaxTorqueT *>(value);
+      return CreateUpdateMaxTorque(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -1207,6 +1687,22 @@ inline UpdateUnionUnion::UpdateUnionUnion(const UpdateUnionUnion &u) : type(u.ty
     }
     case UpdateUnion_UpdateRssiThreshold: {
       value = new fbs::UpdateRssiThresholdT(*reinterpret_cast<fbs::UpdateRssiThresholdT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      value = new fbs::UpdateStartWebServerOnLaunchT(*reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateMaxSpeed: {
+      value = new fbs::UpdateMaxSpeedT(*reinterpret_cast<fbs::UpdateMaxSpeedT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      value = new fbs::UpdateMaxCurrentT(*reinterpret_cast<fbs::UpdateMaxCurrentT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      value = new fbs::UpdateMaxTorqueT(*reinterpret_cast<fbs::UpdateMaxTorqueT *>(u.value));
       break;
     }
     default:
@@ -1253,6 +1749,26 @@ inline void UpdateUnionUnion::Reset() {
     }
     case UpdateUnion_UpdateRssiThreshold: {
       auto ptr = reinterpret_cast<fbs::UpdateRssiThresholdT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateStartWebServerOnLaunch: {
+      auto ptr = reinterpret_cast<fbs::UpdateStartWebServerOnLaunchT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateMaxSpeed: {
+      auto ptr = reinterpret_cast<fbs::UpdateMaxSpeedT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      auto ptr = reinterpret_cast<fbs::UpdateMaxCurrentT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      auto ptr = reinterpret_cast<fbs::UpdateMaxTorqueT *>(value);
       delete ptr;
       break;
     }

@@ -69,12 +69,12 @@ void Companion::sendTaskMessage(const DataManager::Message &message) {
 
 void Companion::handleUpdateMessage(const Update &update) {
   static DataManager::Message taskMessage;
+  Storage::State &state = Storage::getState();
   switch (update.update_type()) {
     case UpdateUnion::UpdateUnion_NONE:
       break;
     case UpdateUnion::UpdateUnion_UpdateBatteries: {
       auto updateBatteries = update.update_as_UpdateBatteries();
-      Storage::State &state = Storage::getState();
       state.batteryCount = updateBatteries->batteries();
       Storage::save();
       break;
@@ -82,8 +82,6 @@ void Companion::handleUpdateMessage(const Update &update) {
     case UpdateUnion::UpdateUnion_UpdateLowVoltageThreshold: {
       auto updateLowVoltageThreshold =
               update.update_as_UpdateLowVoltageThreshold();
-
-      Storage::State &state = Storage::getState();
       state.lowVoltageThreshold = updateLowVoltageThreshold->low_voltage_threshold();
       Storage::save();
       break;
@@ -92,13 +90,11 @@ void Companion::handleUpdateMessage(const Update &update) {
 
       auto updateCriticalVoltageThreshold =
               update.update_as_UpdateCriticalVoltageThreshold();
-      Storage::State &state = Storage::getState();
       state.criticalVoltageThreshold = updateCriticalVoltageThreshold->critical_voltage_threshold();
       Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateReferenceWheelAngle: {
-      Storage::State &state = Storage::getState();
       state.leftMotorFoldAngle = update.update_as_UpdateReferenceWheelAngle()->left_motor_fold_angle();
       state.rightMotorFoldAngle = update.update_as_UpdateReferenceWheelAngle()->right_motor_fold_angle();
       Storage::save();
@@ -109,13 +105,11 @@ void Companion::handleUpdateMessage(const Update &update) {
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateRssiThreshold: {
-      Storage::State &state = Storage::getState();
       state.rssiThreshold = update.update_as_UpdateRssiThreshold()->rssi_threshold();
       Storage::save();
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateLinkQualityThreshold: {
-      Storage::State &state = Storage::getState();
       state.linkQualityThreshold = update.update_as_UpdateLinkQualityThreshold()->link_quality_threshold();
       Storage::save();
       break;
@@ -123,6 +117,26 @@ void Companion::handleUpdateMessage(const Update &update) {
     case UpdateUnion::UpdateUnion_UpdateEnableRover:
       // TODO implement rover enable/disable
       break;
+    case UpdateUnion::UpdateUnion_UpdateStartWebServerOnLaunch:
+      // TODO we still need to check this flag on launch
+      state.startWebServerOnLaunch = update.update_as_UpdateStartWebServerOnLaunch()->start_web_server_on_launch();
+      Storage::save();
+      break;
+    case UpdateUnion_UpdateMaxSpeed: {
+      state.motorSpeedLimit = update.update_as_UpdateMaxSpeed()->max_speed();
+      Storage::save();
+      break;
+    }
+    case UpdateUnion_UpdateMaxCurrent: {
+      state.motorCurrentLimit = update.update_as_UpdateMaxCurrent()->max_current();
+      Storage::save();
+      break;
+    }
+    case UpdateUnion_UpdateMaxTorque: {
+      state.motorTorqueLimit = update.update_as_UpdateMaxTorque()->max_torque();
+      Storage::save();
+      break;
+    }
   }
 }
 

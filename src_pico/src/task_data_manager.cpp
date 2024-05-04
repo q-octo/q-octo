@@ -5,6 +5,7 @@
 #include "task_rc.h"
 #include "companion.h"
 #include "computer.h"
+#include "system_status.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -23,17 +24,17 @@ DataManager::State state{};
 Companion::Message companionMessage{};
 Computer::Message computerMessage{};
 TaskRC::Message rcMessage{};
+TaskControlMotors::Message controlMotorsMessage{};
 
 void DataManager::broadcastStateUpdate() {
-  companionMessage.type = Companion::MessageType::STATE_UPDATE;
-  companionMessage.as = {.state = state};
+  companionMessage = {.type = Companion::MessageType::STATE_UPDATE, .as = {.state = state}};
   Companion::receiveMessage(companionMessage);
-  computerMessage.type = Computer::MessageType::STATE_UPDATE;
-  computerMessage.as = {.state = state};
+  computerMessage = {.type = Computer::MessageType::STATE_UPDATE, .as = {.state = state}};
   Computer::receiveMessage(computerMessage);
-  rcMessage.type = TaskRC::MessageType::STATE_UPDATE;
-  rcMessage.as = {.state = state};
+  rcMessage = {.type = TaskRC::MessageType::STATE_UPDATE, .as = {.state = state}};
   TaskRC::receiveMessage(rcMessage);
+  controlMotorsMessage = {.type = TaskControlMotors::MessageType::STATE_UPDATE, .as = {.state = state}}; 
+  TaskControlMotors::receiveMessage(controlMotorsMessage);
 }
 
 void DataManager::setWebServerEnabled(bool enabled) {
@@ -45,8 +46,9 @@ void DataManager::setWebServerEnabled(bool enabled) {
 }
 
 void DataManager::receiveMessage(const DataManager::Message &message) {
-  static TaskControlMotors::Message controlMotorsMessage;
   static TaskPowerMonitor::Message powerMonitorMessage;
+
+  SystemStatus::receiveDataManagerMessage(message);
 
   switch (message.type) {
     case STATE_MOTORS:
@@ -84,12 +86,12 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case TX_LOST:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
-      // TODO update display status to NO_TX
+      broadcastStateUpdate();
       break;
     case TX_RESTORED:
       controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
-      // Update display status
+      broadcastStateUpdate();
       break;
     case CAN_MESSAGE_MOTOR_L:
       controlMotorsMessage.type = TaskControlMotors::MessageType::CAN_MESSAGE_MOTOR_L;
@@ -118,9 +120,9 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_VOLTAGE_LOW:
       // Disable motors
-      // TODO Update status on web dashboard & display
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      broadcastStateUpdate();
       break;
     case BATT_VOLTAGE_CRITICAL:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
@@ -135,6 +137,10 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       computerMessage.type = Computer::MessageType::DISPLAY_BUTTON;
       computerMessage.as = {.displayButton = message.as.displayButton};
       Computer::receiveMessage(computerMessage);
+      break;
+    case BUTTON_DOWN:
+      break;
+    case BUTTON_UP:
       break;
     case STORAGE_UPDATE:
       broadcastStateUpdate();

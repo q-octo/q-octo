@@ -29,6 +29,8 @@ public:
     DISPLAY_BUTTON_PRESSED,         // taskCompanionProducer
     STORAGE_UPDATE,
     DISPLAY_MESSAGES,
+    BUTTON_DOWN,
+    BUTTON_UP,
   } Type;
 
   typedef struct {
@@ -88,14 +90,27 @@ public:
   } DisplayButton;
 
   typedef struct {
-    std::string* message1;
-    std::string* message2;
-    std::string* message3;
-    std::string* message4;
-    std::string* message5;
-    std::string* message6;
-    std::string* message7;
+    std::string *message1;
+    std::string *message2;
+    std::string *message3;
+    std::string *message4;
+    std::string *message5;
+    std::string *message6;
+    std::string *message7;
   } DisplayMessages;
+
+  typedef enum {
+    WEB_SERVER,
+    MOTORS,
+  } PhysicalButton;
+
+  typedef enum {
+    OK,
+    LOW_BATTERY,
+    NO_TX_SIGNAL,
+    MOTOR_ERROR,
+    DISARMED,
+  } Status;
 
   typedef struct {
     Type type;
@@ -111,6 +126,7 @@ public:
       int batteryCount;
       DisplayButton displayButton;
       DisplayMessages displayMessages;
+      PhysicalButton physicalButton;
     } as;
   } Message;
 

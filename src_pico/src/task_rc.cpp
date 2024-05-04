@@ -92,10 +92,15 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   memcpy(lastChannels, channels, sizeof(lastChannels));
 #if DEBUG_LOG_RC_CHANNELS
   const uint32_t currentMillis = millis();
-  if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY && !isFailsafeActive) {
+  if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY) {
     lastRcChannelsLogMs = currentMillis;
 
-    Serial.print("[INFO]: RC Channels: <");
+    if (isFailsafeActive) {
+      Serial.print("[WARN]: FAILSAFED RC Channels: <");
+    } else {
+      Serial.print("[INFO]: RC Channels: <");
+    }
+
     for (int i = 0; i < rcChannelCount; i++) {
       Serial.print(rcChannelNames[i]);
       Serial.print(": ");
@@ -109,13 +114,20 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   }
 #endif
 
+  // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
-  float rpm = mapRange(992, 2008, -10, 10, TICKS_TO_US(channels[0]));
+  Storage::State &state = Storage::getState();
+  float rpm = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
+  float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
+  // if within 50 of 1500, set rpm to 0
+  if (abs(TICKS_TO_US(channels[0]) - 1500) < 50) {
+    rpm = 0;
+  }
   if (lastRPM != rpm) {
     lastRPM = rpm;
     taskMessage = {
             .type = DataManager::Type::SET_MOTOR_SPEED_COMBINED,
-            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = 0}},
+            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = direction}},
     };
     DataManager::receiveMessage(taskMessage);
   }

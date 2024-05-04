@@ -15,6 +15,10 @@ public:
         uint8_t rightMotorFoldAngle;
         uint8_t rssiThreshold;
         uint8_t linkQualityThreshold;
+        bool startWebServerOnLaunch;
+        float motorSpeedLimit;
+        float motorCurrentLimit;
+        float motorTorqueLimit;
 
         State_s()
             : lowVoltageThreshold(17.5f),      // 3.5V * 5
@@ -23,7 +27,11 @@ public:
               leftMotorFoldAngle(0),
               rightMotorFoldAngle(0),
               rssiThreshold(105),
-              linkQualityThreshold(70)
+              linkQualityThreshold(70),
+              startWebServerOnLaunch(false),
+              motorSpeedLimit(30.0f),
+              motorCurrentLimit(4.0f),
+              motorTorqueLimit(12.5f)
         {
         }
     } State;

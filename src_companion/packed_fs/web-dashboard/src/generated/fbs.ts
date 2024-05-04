@@ -9,6 +9,10 @@ export { UpdateEnableRover, UpdateEnableRoverT } from './fbs/update-enable-rover
 export { UpdateFoldWheels, UpdateFoldWheelsT } from './fbs/update-fold-wheels.js';
 export { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from './fbs/update-link-quality-threshold.js';
 export { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from './fbs/update-low-voltage-threshold.js';
+export { UpdateMaxCurrent, UpdateMaxCurrentT } from './fbs/update-max-current.js';
+export { UpdateMaxSpeed, UpdateMaxSpeedT } from './fbs/update-max-speed.js';
+export { UpdateMaxTorque, UpdateMaxTorqueT } from './fbs/update-max-torque.js';
 export { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from './fbs/update-reference-wheel-angle.js';
 export { UpdateRssiThreshold, UpdateRssiThresholdT } from './fbs/update-rssi-threshold.js';
+export { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from './fbs/update-start-web-server-on-launch.js';
 export { UpdateUnion } from './fbs/update-union.js';
