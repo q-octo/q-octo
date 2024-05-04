@@ -292,14 +292,24 @@ void Display::paintPage2() {
     // For building strings
     std::ostringstream oss;
 
-    // Line1 - RSSI and Link Quality
-    // TODO: Where do I get these in state?
-    float rssi = -77;
-    float link = 64;
+    if (state.crsf_data == nullptr) {
+        graphics.text("No CRSF data.", Point(5, 5), 220);
+        return;
+    } else{
+        // Line1 - RSSI and Link Quality
+        float rssi = state.crsf_data->telemetry->rssi;
+        rssi = roundf(rssi * 100) / 100;
+        float link = state.crsf_data->telemetry->link_quality;
+        link = roundf(link * 100) / 100;
+        float snr = state.crsf_data->telemetry->snr;
+        snr = roundf(snr * 100) / 100;
+        oss << "RSSI:" << rssi << "dBm" << " Link:" << link << "%" << " SNR:" << snr;
+        graphics.text(oss.str(), Point(5, 5), 230);
+        oss.str("");
+    }
 
-    oss << "RSSI: " << rssi << "dBm" << " Link: " << link << "%";
-    graphics.text(oss.str(), Point(5, 5), 220);
-    oss.str("");
+
+
 
     if (state.motors == nullptr) {
         graphics.text("No motor info.", Point(5, 25), 220);
