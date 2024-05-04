@@ -34,7 +34,7 @@ void QOctoSerial::serializeButtonPressed(Button button) {
 
     auto buttonOffset = CreateButtonPressed(fbb, &buttonPressed);
     auto message = CreateCompanionTx(fbb, CompanionTxUnion::CompanionTxUnion_ButtonPressed, buttonOffset.Union());
-    FinishCompanionTxBuffer(fbb, message);
+    FinishSizePrefixedCompanionTxBuffer(fbb, message);
 }
 
 void QOctoSerial::sendButtonPressed(Button button) {
