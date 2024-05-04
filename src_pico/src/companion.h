@@ -53,4 +53,5 @@ private:
   // 1024 is the default size, but it will grow automatically.
   static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
   static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
+  static inline uint32_t msSinceLastBroadcast = 0;
 };

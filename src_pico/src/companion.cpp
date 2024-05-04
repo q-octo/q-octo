@@ -164,6 +164,14 @@ void Companion::handleButtonPressedMessage(const ButtonPressed &buttonPressed) {
 }
 
 void Companion::sendStateToCompanion(const DataManager::State &state) {
+
+  uint32_t currentMillis = millis();
+  if (currentMillis - msSinceLastBroadcast < 500) {
+    Serial.println("Not sending state to companion, too soon");
+    Serial.println(currentMillis - msSinceLastBroadcast);
+    return;
+  }
+  msSinceLastBroadcast = currentMillis;
   Serial.println("Sending state to companion");
   serialiseState(state);
   companionSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
