@@ -7,6 +7,7 @@ import * as flatbuffers from 'flatbuffers';
 import { ControlSource } from '../fbs/control-source.js';
 import { CrsfData, CrsfDataT } from '../fbs/crsf-data.js';
 import { DisplayMessages, DisplayMessagesT } from '../fbs/display-messages.js';
+import { MotorLimits, MotorLimitsT } from '../fbs/motor-limits.js';
 import { Motors, MotorsT } from '../fbs/motors.js';
 import { Status } from '../fbs/status.js';
 
@@ -73,75 +74,70 @@ crsfData(obj?:CrsfData):CrsfData|null {
   return offset ? (obj || new CrsfData()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-maxSpeed():number {
+leftMotorLimits(obj?:MotorLimits):MotorLimits|null {
   const offset = this.bb!.__offset(this.bb_pos, 20);
-  return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 30.0;
+  return offset ? (obj || new MotorLimits()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-maxCurrent():number {
+rightMotorLimits(obj?:MotorLimits):MotorLimits|null {
   const offset = this.bb!.__offset(this.bb_pos, 22);
-  return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 4.0;
+  return offset ? (obj || new MotorLimits()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-maxTorque():number {
+lowVoltageThreshold():number {
   const offset = this.bb!.__offset(this.bb_pos, 24);
   return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 12.0;
 }
 
-lowVoltageThreshold():number {
-  const offset = this.bb!.__offset(this.bb_pos, 26);
-  return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 12.0;
-}
-
 criticalVoltageThreshold():number {
-  const offset = this.bb!.__offset(this.bb_pos, 28);
+  const offset = this.bb!.__offset(this.bb_pos, 26);
   return offset ? this.bb!.readFloat32(this.bb_pos + offset) : 16.0;
 }
 
 rssiThreshold():number {
-  const offset = this.bb!.__offset(this.bb_pos, 30);
+  const offset = this.bb!.__offset(this.bb_pos, 28);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 linkQualityThreshold():number {
-  const offset = this.bb!.__offset(this.bb_pos, 32);
+  const offset = this.bb!.__offset(this.bb_pos, 30);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 leftMotorFoldAngle():number {
-  const offset = this.bb!.__offset(this.bb_pos, 34);
+  const offset = this.bb!.__offset(this.bb_pos, 32);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 rightMotorFoldAngle():number {
-  const offset = this.bb!.__offset(this.bb_pos, 36);
+  const offset = this.bb!.__offset(this.bb_pos, 34);
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
 }
 
 motorErrorCode():string|null
 motorErrorCode(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
 motorErrorCode(optionalEncoding?:any):string|Uint8Array|null {
-  const offset = this.bb!.__offset(this.bb_pos, 38);
+  const offset = this.bb!.__offset(this.bb_pos, 36);
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
 enableRover():boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 40);
+  const offset = this.bb!.__offset(this.bb_pos, 38);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
 displayMessages(obj?:DisplayMessages):DisplayMessages|null {
-  const offset = this.bb!.__offset(this.bb_pos, 42);
+  const offset = this.bb!.__offset(this.bb_pos, 40);
   return offset ? (obj || new DisplayMessages()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 startWebServerOnLaunch():boolean {
-  const offset = this.bb!.__offset(this.bb_pos, 44);
+  const offset = this.bb!.__offset(this.bb_pos, 42);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
 static startRobot(builder:flatbuffers.Builder) {
-  builder.startObject(21);
+  builder.startObject(20);
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
@@ -176,56 +172,52 @@ static addCrsfData(builder:flatbuffers.Builder, crsfDataOffset:flatbuffers.Offse
   builder.addFieldOffset(7, crsfDataOffset, 0);
 }
 
-static addMaxSpeed(builder:flatbuffers.Builder, maxSpeed:number) {
-  builder.addFieldFloat32(8, maxSpeed, 30.0);
+static addLeftMotorLimits(builder:flatbuffers.Builder, leftMotorLimitsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(8, leftMotorLimitsOffset, 0);
 }
 
-static addMaxCurrent(builder:flatbuffers.Builder, maxCurrent:number) {
-  builder.addFieldFloat32(9, maxCurrent, 4.0);
-}
-
-static addMaxTorque(builder:flatbuffers.Builder, maxTorque:number) {
-  builder.addFieldFloat32(10, maxTorque, 12.0);
+static addRightMotorLimits(builder:flatbuffers.Builder, rightMotorLimitsOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(9, rightMotorLimitsOffset, 0);
 }
 
 static addLowVoltageThreshold(builder:flatbuffers.Builder, lowVoltageThreshold:number) {
-  builder.addFieldFloat32(11, lowVoltageThreshold, 12.0);
+  builder.addFieldFloat32(10, lowVoltageThreshold, 12.0);
 }
 
 static addCriticalVoltageThreshold(builder:flatbuffers.Builder, criticalVoltageThreshold:number) {
-  builder.addFieldFloat32(12, criticalVoltageThreshold, 16.0);
+  builder.addFieldFloat32(11, criticalVoltageThreshold, 16.0);
 }
 
 static addRssiThreshold(builder:flatbuffers.Builder, rssiThreshold:number) {
-  builder.addFieldInt32(13, rssiThreshold, 0);
+  builder.addFieldInt32(12, rssiThreshold, 0);
 }
 
 static addLinkQualityThreshold(builder:flatbuffers.Builder, linkQualityThreshold:number) {
-  builder.addFieldInt32(14, linkQualityThreshold, 0);
+  builder.addFieldInt32(13, linkQualityThreshold, 0);
 }
 
 static addLeftMotorFoldAngle(builder:flatbuffers.Builder, leftMotorFoldAngle:number) {
-  builder.addFieldInt32(15, leftMotorFoldAngle, 0);
+  builder.addFieldInt32(14, leftMotorFoldAngle, 0);
 }
 
 static addRightMotorFoldAngle(builder:flatbuffers.Builder, rightMotorFoldAngle:number) {
-  builder.addFieldInt32(16, rightMotorFoldAngle, 0);
+  builder.addFieldInt32(15, rightMotorFoldAngle, 0);
 }
 
 static addMotorErrorCode(builder:flatbuffers.Builder, motorErrorCodeOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(17, motorErrorCodeOffset, 0);
+  builder.addFieldOffset(16, motorErrorCodeOffset, 0);
 }
 
 static addEnableRover(builder:flatbuffers.Builder, enableRover:boolean) {
-  builder.addFieldInt8(18, +enableRover, +false);
+  builder.addFieldInt8(17, +enableRover, +false);
 }
 
 static addDisplayMessages(builder:flatbuffers.Builder, displayMessagesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(19, displayMessagesOffset, 0);
+  builder.addFieldOffset(18, displayMessagesOffset, 0);
 }
 
 static addStartWebServerOnLaunch(builder:flatbuffers.Builder, startWebServerOnLaunch:boolean) {
-  builder.addFieldInt8(20, +startWebServerOnLaunch, +false);
+  builder.addFieldInt8(19, +startWebServerOnLaunch, +false);
 }
 
 static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
@@ -252,9 +244,8 @@ unpack(): RobotT {
     this.current(),
     this.fuel(),
     (this.crsfData() !== null ? this.crsfData()!.unpack() : null),
-    this.maxSpeed(),
-    this.maxCurrent(),
-    this.maxTorque(),
+    (this.leftMotorLimits() !== null ? this.leftMotorLimits()!.unpack() : null),
+    (this.rightMotorLimits() !== null ? this.rightMotorLimits()!.unpack() : null),
     this.lowVoltageThreshold(),
     this.criticalVoltageThreshold(),
     this.rssiThreshold(),
@@ -278,9 +269,8 @@ unpackTo(_o: RobotT): void {
   _o.current = this.current();
   _o.fuel = this.fuel();
   _o.crsfData = (this.crsfData() !== null ? this.crsfData()!.unpack() : null);
-  _o.maxSpeed = this.maxSpeed();
-  _o.maxCurrent = this.maxCurrent();
-  _o.maxTorque = this.maxTorque();
+  _o.leftMotorLimits = (this.leftMotorLimits() !== null ? this.leftMotorLimits()!.unpack() : null);
+  _o.rightMotorLimits = (this.rightMotorLimits() !== null ? this.rightMotorLimits()!.unpack() : null);
   _o.lowVoltageThreshold = this.lowVoltageThreshold();
   _o.criticalVoltageThreshold = this.criticalVoltageThreshold();
   _o.rssiThreshold = this.rssiThreshold();
@@ -304,9 +294,8 @@ constructor(
   public current: number = 0.0,
   public fuel: number = 0.0,
   public crsfData: CrsfDataT|null = null,
-  public maxSpeed: number = 30.0,
-  public maxCurrent: number = 4.0,
-  public maxTorque: number = 12.0,
+  public leftMotorLimits: MotorLimitsT|null = null,
+  public rightMotorLimits: MotorLimitsT|null = null,
   public lowVoltageThreshold: number = 12.0,
   public criticalVoltageThreshold: number = 16.0,
   public rssiThreshold: number = 0,
@@ -323,6 +312,8 @@ constructor(
 pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   const motors = (this.motors !== null ? this.motors!.pack(builder) : 0);
   const crsfData = (this.crsfData !== null ? this.crsfData!.pack(builder) : 0);
+  const leftMotorLimits = (this.leftMotorLimits !== null ? this.leftMotorLimits!.pack(builder) : 0);
+  const rightMotorLimits = (this.rightMotorLimits !== null ? this.rightMotorLimits!.pack(builder) : 0);
   const motorErrorCode = (this.motorErrorCode !== null ? builder.createString(this.motorErrorCode!) : 0);
   const displayMessages = (this.displayMessages !== null ? this.displayMessages!.pack(builder) : 0);
 
@@ -335,9 +326,8 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Robot.addCurrent(builder, this.current);
   Robot.addFuel(builder, this.fuel);
   Robot.addCrsfData(builder, crsfData);
-  Robot.addMaxSpeed(builder, this.maxSpeed);
-  Robot.addMaxCurrent(builder, this.maxCurrent);
-  Robot.addMaxTorque(builder, this.maxTorque);
+  Robot.addLeftMotorLimits(builder, leftMotorLimits);
+  Robot.addRightMotorLimits(builder, rightMotorLimits);
   Robot.addLowVoltageThreshold(builder, this.lowVoltageThreshold);
   Robot.addCriticalVoltageThreshold(builder, this.criticalVoltageThreshold);
   Robot.addRssiThreshold(builder, this.rssiThreshold);

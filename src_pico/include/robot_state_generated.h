@@ -19,6 +19,10 @@ struct Motor;
 struct MotorBuilder;
 struct MotorT;
 
+struct MotorLimits;
+struct MotorLimitsBuilder;
+struct MotorLimitsT;
+
 struct Motors;
 struct MotorsBuilder;
 struct MotorsT;
@@ -217,6 +221,80 @@ inline ::flatbuffers::Offset<Motor> CreateMotor(
 }
 
 ::flatbuffers::Offset<Motor> CreateMotor(::flatbuffers::FlatBufferBuilder &_fbb, const MotorT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct MotorLimitsT : public ::flatbuffers::NativeTable {
+  typedef MotorLimits TableType;
+  float max_speed = -1.0f;
+  float max_current = -1.0f;
+  float max_torque = -1.0f;
+};
+
+struct MotorLimits FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef MotorLimitsT NativeTableType;
+  typedef MotorLimitsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MAX_SPEED = 4,
+    VT_MAX_CURRENT = 6,
+    VT_MAX_TORQUE = 8
+  };
+  float max_speed() const {
+    return GetField<float>(VT_MAX_SPEED, -1.0f);
+  }
+  float max_current() const {
+    return GetField<float>(VT_MAX_CURRENT, -1.0f);
+  }
+  float max_torque() const {
+    return GetField<float>(VT_MAX_TORQUE, -1.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
+           VerifyField<float>(verifier, VT_MAX_CURRENT, 4) &&
+           VerifyField<float>(verifier, VT_MAX_TORQUE, 4) &&
+           verifier.EndTable();
+  }
+  MotorLimitsT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(MotorLimitsT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<MotorLimits> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const MotorLimitsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct MotorLimitsBuilder {
+  typedef MotorLimits Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_max_speed(float max_speed) {
+    fbb_.AddElement<float>(MotorLimits::VT_MAX_SPEED, max_speed, -1.0f);
+  }
+  void add_max_current(float max_current) {
+    fbb_.AddElement<float>(MotorLimits::VT_MAX_CURRENT, max_current, -1.0f);
+  }
+  void add_max_torque(float max_torque) {
+    fbb_.AddElement<float>(MotorLimits::VT_MAX_TORQUE, max_torque, -1.0f);
+  }
+  explicit MotorLimitsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<MotorLimits> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<MotorLimits>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<MotorLimits> CreateMotorLimits(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float max_speed = -1.0f,
+    float max_current = -1.0f,
+    float max_torque = -1.0f) {
+  MotorLimitsBuilder builder_(_fbb);
+  builder_.add_max_torque(max_torque);
+  builder_.add_max_current(max_current);
+  builder_.add_max_speed(max_speed);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<MotorLimits> CreateMotorLimits(::flatbuffers::FlatBufferBuilder &_fbb, const MotorLimitsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct MotorsT : public ::flatbuffers::NativeTable {
   typedef Motors TableType;
@@ -619,9 +697,8 @@ struct RobotT : public ::flatbuffers::NativeTable {
   float current = 0.0f;
   float fuel = 0.0f;
   std::unique_ptr<fbs::CrsfDataT> crsf_data{};
-  float max_speed = 30.0f;
-  float max_current = 4.0f;
-  float max_torque = 12.0f;
+  std::unique_ptr<fbs::MotorLimitsT> left_motor_limits{};
+  std::unique_ptr<fbs::MotorLimitsT> right_motor_limits{};
   float low_voltage_threshold = 12.0f;
   float critical_voltage_threshold = 16.0f;
   int32_t rssi_threshold = 0;
@@ -650,19 +727,18 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CURRENT = 14,
     VT_FUEL = 16,
     VT_CRSF_DATA = 18,
-    VT_MAX_SPEED = 20,
-    VT_MAX_CURRENT = 22,
-    VT_MAX_TORQUE = 24,
-    VT_LOW_VOLTAGE_THRESHOLD = 26,
-    VT_CRITICAL_VOLTAGE_THRESHOLD = 28,
-    VT_RSSI_THRESHOLD = 30,
-    VT_LINK_QUALITY_THRESHOLD = 32,
-    VT_LEFT_MOTOR_FOLD_ANGLE = 34,
-    VT_RIGHT_MOTOR_FOLD_ANGLE = 36,
-    VT_MOTOR_ERROR_CODE = 38,
-    VT_ENABLE_ROVER = 40,
-    VT_DISPLAY_MESSAGES = 42,
-    VT_START_WEB_SERVER_ON_LAUNCH = 44
+    VT_LEFT_MOTOR_LIMITS = 20,
+    VT_RIGHT_MOTOR_LIMITS = 22,
+    VT_LOW_VOLTAGE_THRESHOLD = 24,
+    VT_CRITICAL_VOLTAGE_THRESHOLD = 26,
+    VT_RSSI_THRESHOLD = 28,
+    VT_LINK_QUALITY_THRESHOLD = 30,
+    VT_LEFT_MOTOR_FOLD_ANGLE = 32,
+    VT_RIGHT_MOTOR_FOLD_ANGLE = 34,
+    VT_MOTOR_ERROR_CODE = 36,
+    VT_ENABLE_ROVER = 38,
+    VT_DISPLAY_MESSAGES = 40,
+    VT_START_WEB_SERVER_ON_LAUNCH = 42
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -688,14 +764,11 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::CrsfData *crsf_data() const {
     return GetPointer<const fbs::CrsfData *>(VT_CRSF_DATA);
   }
-  float max_speed() const {
-    return GetField<float>(VT_MAX_SPEED, 30.0f);
+  const fbs::MotorLimits *left_motor_limits() const {
+    return GetPointer<const fbs::MotorLimits *>(VT_LEFT_MOTOR_LIMITS);
   }
-  float max_current() const {
-    return GetField<float>(VT_MAX_CURRENT, 4.0f);
-  }
-  float max_torque() const {
-    return GetField<float>(VT_MAX_TORQUE, 12.0f);
+  const fbs::MotorLimits *right_motor_limits() const {
+    return GetPointer<const fbs::MotorLimits *>(VT_RIGHT_MOTOR_LIMITS);
   }
   float low_voltage_threshold() const {
     return GetField<float>(VT_LOW_VOLTAGE_THRESHOLD, 12.0f);
@@ -739,9 +812,10 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_FUEL, 4) &&
            VerifyOffset(verifier, VT_CRSF_DATA) &&
            verifier.VerifyTable(crsf_data()) &&
-           VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
-           VerifyField<float>(verifier, VT_MAX_CURRENT, 4) &&
-           VerifyField<float>(verifier, VT_MAX_TORQUE, 4) &&
+           VerifyOffset(verifier, VT_LEFT_MOTOR_LIMITS) &&
+           verifier.VerifyTable(left_motor_limits()) &&
+           VerifyOffset(verifier, VT_RIGHT_MOTOR_LIMITS) &&
+           verifier.VerifyTable(right_motor_limits()) &&
            VerifyField<float>(verifier, VT_LOW_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
@@ -789,14 +863,11 @@ struct RobotBuilder {
   void add_crsf_data(::flatbuffers::Offset<fbs::CrsfData> crsf_data) {
     fbb_.AddOffset(Robot::VT_CRSF_DATA, crsf_data);
   }
-  void add_max_speed(float max_speed) {
-    fbb_.AddElement<float>(Robot::VT_MAX_SPEED, max_speed, 30.0f);
+  void add_left_motor_limits(::flatbuffers::Offset<fbs::MotorLimits> left_motor_limits) {
+    fbb_.AddOffset(Robot::VT_LEFT_MOTOR_LIMITS, left_motor_limits);
   }
-  void add_max_current(float max_current) {
-    fbb_.AddElement<float>(Robot::VT_MAX_CURRENT, max_current, 4.0f);
-  }
-  void add_max_torque(float max_torque) {
-    fbb_.AddElement<float>(Robot::VT_MAX_TORQUE, max_torque, 12.0f);
+  void add_right_motor_limits(::flatbuffers::Offset<fbs::MotorLimits> right_motor_limits) {
+    fbb_.AddOffset(Robot::VT_RIGHT_MOTOR_LIMITS, right_motor_limits);
   }
   void add_low_voltage_threshold(float low_voltage_threshold) {
     fbb_.AddElement<float>(Robot::VT_LOW_VOLTAGE_THRESHOLD, low_voltage_threshold, 12.0f);
@@ -849,9 +920,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     float current = 0.0f,
     float fuel = 0.0f,
     ::flatbuffers::Offset<fbs::CrsfData> crsf_data = 0,
-    float max_speed = 30.0f,
-    float max_current = 4.0f,
-    float max_torque = 12.0f,
+    ::flatbuffers::Offset<fbs::MotorLimits> left_motor_limits = 0,
+    ::flatbuffers::Offset<fbs::MotorLimits> right_motor_limits = 0,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
     int32_t rssi_threshold = 0,
@@ -871,9 +941,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_rssi_threshold(rssi_threshold);
   builder_.add_critical_voltage_threshold(critical_voltage_threshold);
   builder_.add_low_voltage_threshold(low_voltage_threshold);
-  builder_.add_max_torque(max_torque);
-  builder_.add_max_current(max_current);
-  builder_.add_max_speed(max_speed);
+  builder_.add_right_motor_limits(right_motor_limits);
+  builder_.add_left_motor_limits(left_motor_limits);
   builder_.add_crsf_data(crsf_data);
   builder_.add_fuel(fuel);
   builder_.add_current(current);
@@ -897,9 +966,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     float current = 0.0f,
     float fuel = 0.0f,
     ::flatbuffers::Offset<fbs::CrsfData> crsf_data = 0,
-    float max_speed = 30.0f,
-    float max_current = 4.0f,
-    float max_torque = 12.0f,
+    ::flatbuffers::Offset<fbs::MotorLimits> left_motor_limits = 0,
+    ::flatbuffers::Offset<fbs::MotorLimits> right_motor_limits = 0,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
     int32_t rssi_threshold = 0,
@@ -921,9 +989,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       current,
       fuel,
       crsf_data,
-      max_speed,
-      max_current,
-      max_torque,
+      left_motor_limits,
+      right_motor_limits,
       low_voltage_threshold,
       critical_voltage_threshold,
       rssi_threshold,
@@ -971,6 +1038,38 @@ inline ::flatbuffers::Offset<Motor> CreateMotor(::flatbuffers::FlatBufferBuilder
       _rps,
       _angle,
       _torque);
+}
+
+inline MotorLimitsT *MotorLimits::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<MotorLimitsT>(new MotorLimitsT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void MotorLimits::UnPackTo(MotorLimitsT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = max_speed(); _o->max_speed = _e; }
+  { auto _e = max_current(); _o->max_current = _e; }
+  { auto _e = max_torque(); _o->max_torque = _e; }
+}
+
+inline ::flatbuffers::Offset<MotorLimits> MotorLimits::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const MotorLimitsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateMotorLimits(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<MotorLimits> CreateMotorLimits(::flatbuffers::FlatBufferBuilder &_fbb, const MotorLimitsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const MotorLimitsT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _max_speed = _o->max_speed;
+  auto _max_current = _o->max_current;
+  auto _max_torque = _o->max_torque;
+  return fbs::CreateMotorLimits(
+      _fbb,
+      _max_speed,
+      _max_current,
+      _max_torque);
 }
 
 inline MotorsT::MotorsT(const MotorsT &o)
@@ -1146,9 +1245,8 @@ inline RobotT::RobotT(const RobotT &o)
         current(o.current),
         fuel(o.fuel),
         crsf_data((o.crsf_data) ? new fbs::CrsfDataT(*o.crsf_data) : nullptr),
-        max_speed(o.max_speed),
-        max_current(o.max_current),
-        max_torque(o.max_torque),
+        left_motor_limits((o.left_motor_limits) ? new fbs::MotorLimitsT(*o.left_motor_limits) : nullptr),
+        right_motor_limits((o.right_motor_limits) ? new fbs::MotorLimitsT(*o.right_motor_limits) : nullptr),
         low_voltage_threshold(o.low_voltage_threshold),
         critical_voltage_threshold(o.critical_voltage_threshold),
         rssi_threshold(o.rssi_threshold),
@@ -1170,9 +1268,8 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(current, o.current);
   std::swap(fuel, o.fuel);
   std::swap(crsf_data, o.crsf_data);
-  std::swap(max_speed, o.max_speed);
-  std::swap(max_current, o.max_current);
-  std::swap(max_torque, o.max_torque);
+  std::swap(left_motor_limits, o.left_motor_limits);
+  std::swap(right_motor_limits, o.right_motor_limits);
   std::swap(low_voltage_threshold, o.low_voltage_threshold);
   std::swap(critical_voltage_threshold, o.critical_voltage_threshold);
   std::swap(rssi_threshold, o.rssi_threshold);
@@ -1203,9 +1300,8 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = current(); _o->current = _e; }
   { auto _e = fuel(); _o->fuel = _e; }
   { auto _e = crsf_data(); if (_e) { if(_o->crsf_data) { _e->UnPackTo(_o->crsf_data.get(), _resolver); } else { _o->crsf_data = std::unique_ptr<fbs::CrsfDataT>(_e->UnPack(_resolver)); } } else if (_o->crsf_data) { _o->crsf_data.reset(); } }
-  { auto _e = max_speed(); _o->max_speed = _e; }
-  { auto _e = max_current(); _o->max_current = _e; }
-  { auto _e = max_torque(); _o->max_torque = _e; }
+  { auto _e = left_motor_limits(); if (_e) { if(_o->left_motor_limits) { _e->UnPackTo(_o->left_motor_limits.get(), _resolver); } else { _o->left_motor_limits = std::unique_ptr<fbs::MotorLimitsT>(_e->UnPack(_resolver)); } } else if (_o->left_motor_limits) { _o->left_motor_limits.reset(); } }
+  { auto _e = right_motor_limits(); if (_e) { if(_o->right_motor_limits) { _e->UnPackTo(_o->right_motor_limits.get(), _resolver); } else { _o->right_motor_limits = std::unique_ptr<fbs::MotorLimitsT>(_e->UnPack(_resolver)); } } else if (_o->right_motor_limits) { _o->right_motor_limits.reset(); } }
   { auto _e = low_voltage_threshold(); _o->low_voltage_threshold = _e; }
   { auto _e = critical_voltage_threshold(); _o->critical_voltage_threshold = _e; }
   { auto _e = rssi_threshold(); _o->rssi_threshold = _e; }
@@ -1234,9 +1330,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _current = _o->current;
   auto _fuel = _o->fuel;
   auto _crsf_data = _o->crsf_data ? CreateCrsfData(_fbb, _o->crsf_data.get(), _rehasher) : 0;
-  auto _max_speed = _o->max_speed;
-  auto _max_current = _o->max_current;
-  auto _max_torque = _o->max_torque;
+  auto _left_motor_limits = _o->left_motor_limits ? CreateMotorLimits(_fbb, _o->left_motor_limits.get(), _rehasher) : 0;
+  auto _right_motor_limits = _o->right_motor_limits ? CreateMotorLimits(_fbb, _o->right_motor_limits.get(), _rehasher) : 0;
   auto _low_voltage_threshold = _o->low_voltage_threshold;
   auto _critical_voltage_threshold = _o->critical_voltage_threshold;
   auto _rssi_threshold = _o->rssi_threshold;
@@ -1257,9 +1352,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _current,
       _fuel,
       _crsf_data,
-      _max_speed,
-      _max_current,
-      _max_torque,
+      _left_motor_limits,
+      _right_motor_limits,
       _low_voltage_threshold,
       _critical_voltage_threshold,
       _rssi_threshold,

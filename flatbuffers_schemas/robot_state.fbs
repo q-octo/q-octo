@@ -17,6 +17,12 @@ table Motor {
     torque: float = 0.0;
 }
 
+table MotorLimits {
+    max_speed: float = -1;
+    max_current: float = -1;
+    max_torque: float = -1;
+}
+
 // Define a table for the motors group
 table Motors {
     motor1: Motor;
@@ -68,9 +74,8 @@ table Robot {
     current: float = 0.0;
     fuel: float = 0.0;
     crsf_data: CrsfData;
-    max_speed: float = 30;
-    max_current: float = 4.0;
-    max_torque: float = 12.0;
+    left_motor_limits: MotorLimits;
+    right_motor_limits: MotorLimits;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;
     rssi_threshold: int = 0;
