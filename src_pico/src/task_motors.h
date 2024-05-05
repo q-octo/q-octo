@@ -41,6 +41,7 @@ public:
 private:
 
   static void setSpeedIndividual(float speedL, float speedR);
+  static void setSpeedCombined(float speed, float direction);
 
   static void initMotors();
   static void handleStateUpdate();

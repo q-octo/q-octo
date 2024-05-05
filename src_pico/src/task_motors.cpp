@@ -54,23 +54,19 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
       cybergearR.stop_motor();
       break;
     case TaskControlMotors::SET_SPEED_COMBINED:
-      // TODO implement mixing
-      setSpeedIndividual(-message.as.speedCombined.rpm,
-                         message.as.speedCombined.rpm);
+      setSpeedCombined(message.as.speedCombined.rpm,
+                       message.as.speedCombined.direction);
       break;
     case TaskControlMotors::SET_SPEED_INDIVIDUAL:
-      setSpeedIndividual(message
-                                 .as.speedIndividual.rpmL,
+      setSpeedIndividual(message.as.speedIndividual.rpmL,
                          message.as.speedIndividual.rpmR);
       break;
     case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
-      cybergearL.process_message(message
-                                         .as.canMessage.id,
+      cybergearL.process_message(message.as.canMessage.id,
                                  message.as.canMessage.data);
       break;
     case TaskControlMotors::CAN_MESSAGE_MOTOR_R:
-      cybergearR.process_message(message
-                                         .as.canMessage.id,
+      cybergearR.process_message(message.as.canMessage.id,
                                  message.as.canMessage.data);
       break;
     case TaskControlMotors::FOLD_WHEELS:
@@ -111,6 +107,13 @@ void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   // cybergearL.enable_motor();
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
+}
+
+void TaskControlMotors::setSpeedCombined(float speed, float direction) { 
+  // Speed is between -30 and 30 rad/s
+  // Direction is between -1 and 1 (full left to full right)
+  // TODO implement mixing
+  setSpeedIndividual(speed, -speed);
 }
 
 void TaskControlMotors::initMotors() {
