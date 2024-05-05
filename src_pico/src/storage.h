@@ -29,9 +29,9 @@ public:
               rssiThreshold(105),
               linkQualityThreshold(70),
               startWebServerOnLaunch(false),
-              motorSpeedLimit(30.0f),
-              motorCurrentLimit(4.0f),
-              motorTorqueLimit(12.5f)
+              motorSpeedLimit(2.0f),
+              motorCurrentLimit(1.0f),
+              motorTorqueLimit(1.0f)
         {
         }
     } State;

@@ -24,16 +24,22 @@ void TaskControlMotors::handleStateUpdate() {
       maxSpeed = state.motorSpeedLimit;
       cybergearL.set_limit_speed(maxSpeed);
       cybergearR.set_limit_speed(maxSpeed);
+      Serial.print("Speed limit: ");
+      Serial.println(maxSpeed);
     }
     if (state.motorCurrentLimit != maxCurrent) {
       maxCurrent = state.motorCurrentLimit;
       cybergearL.set_limit_current(maxCurrent);
       cybergearR.set_limit_current(maxCurrent);
+      Serial.print("Current limit: ");
+      Serial.println(maxCurrent);
     }
     if (state.motorTorqueLimit != maxTorque) {
       maxTorque = state.motorTorqueLimit;
       cybergearL.set_limit_torque(maxTorque);
       cybergearR.set_limit_torque(maxTorque);
+      Serial.print("Torque limit: ");
+      Serial.println(maxTorque);
     } 
 }
 
@@ -136,6 +142,10 @@ void TaskControlMotors::initMotors() {
   Serial.println("Motors initialised");
   Serial.print("Speed limit: ");
   Serial.println(maxSpeed);
+  Serial.print("Current limit: ");
+  Serial.println(maxCurrent);
+  Serial.print("Torque limit: ");
+  Serial.println(maxTorque);
 }
 
 void TaskControlMotors::debugPrintMotorStatus() {
