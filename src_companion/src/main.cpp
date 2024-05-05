@@ -58,13 +58,17 @@ void onReceiveSerialMessage(const CompanionRxT &message) {
 }
 
 void toggleAButton() {
-  Serial.println("A button pressed");
+  Serial.println("A button pressed sending message to serial port");
+  QOctoSerial::sendButtonPressed(fbs::Button::Button_A);
 }
 
 void toggleBButton() {
-  Serial.println("B button pressed");
+  Serial.println("B button pressed sending message to serial port");
+  QOctoSerial::sendButtonPressed(fbs::Button::Button_B);
 }
 
 void toggleXButton() {
-  Serial.println("X button pressed");
+    Serial.println("X button pressed sending message to serial port");
+  QOctoSerial::sendButtonPressed(fbs::Button::Button_X);
 }
+    

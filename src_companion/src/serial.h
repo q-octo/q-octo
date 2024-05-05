@@ -13,9 +13,12 @@ public:
     typedef void (*MessageCallback)(const CompanionRxT &message);
     static void init(MessageCallback callback);
     static void loop();
-
+    static void serializeButtonPressed(fbs::Button button);
+    static void sendButtonPressed(fbs::Button button);
 private:
     static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
     static inline FlatbufferSerialParser parser = FlatbufferSerialParser(Serial1, verifyIncomingFlatbuffer);
     static inline MessageCallback messageCallback;
+    // 1024 is the default size, but it will grow automatically.
+    static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(1024);
 };

@@ -27,7 +27,7 @@ Things we need to do here:
 - [x] Display should create a statically allocated buffer and parse it into a
 state object
 - [x] Check the size of a serialised Robot object. The buffers to hold it are
-currently set to 1024
+currently set to 4096
 - [x] Create a macro to define the buffer size in a single place.
 
 For Niall
