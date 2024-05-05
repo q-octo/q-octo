@@ -35,13 +35,13 @@ public:
 
   typedef struct {
     struct {
-      uint16_t temperature;
+      float temperature;
       float RPM;
       float torque;
       float position;
     } left;
     struct {
-      uint16_t temperature;
+      float temperature;
       float RPM;
       float torque;
       float position;

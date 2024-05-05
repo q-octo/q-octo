@@ -90,15 +90,15 @@ void TaskControlMotors::broadcastStatusUpdate() {
   DataManager::Motors motors = {
           .left =
                   {
-                          .temperature = statusL.temperature,
+                          .temperature = statusL.temperature / 10.0f,
                           .RPM = statusL.speed,
                           .torque = statusL.torque,
                           .position = statusL.position,
                   },
           .right =
                   {
-                          // .temperature = statusR.temperature,
-                          .temperature = static_cast<uint16_t>((millis() % 24)),
+                          // .temperature = statusR.temperature / 10.0f,
+                          .temperature = static_cast<float>((millis() % 24)),
                           .RPM = statusR.speed,
                           .torque = statusR.torque,
                           .position = statusR.position,
