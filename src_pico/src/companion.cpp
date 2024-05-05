@@ -69,7 +69,7 @@ void Companion::sendTaskMessage(const DataManager::Message &message) {
 
 void Companion::handleUpdateMessage(const Update &update) {
   static DataManager::Message taskMessage;
-  Storage::State &state = Storage::getState();
+  StorageState &state = Storage::getState();
   switch (update.update_type()) {
     case UpdateUnion::UpdateUnion_NONE:
       break;

@@ -74,7 +74,7 @@ private:
   static inline link_statistics_t lastLinkStats = {0};
   static inline uint16_t lastChannels[16] = {0};
 
-  static inline Storage::State &state = Storage::getState();
+  static inline StorageState &state = Storage::getState();
 
   static void setThresholds();
 

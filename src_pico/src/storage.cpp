@@ -35,10 +35,10 @@ bool Storage::isCrcValid()
     return calculateCRC(stateWithCRC.state) == stateWithCRC.crc;
 }
 
-uint32_t Storage::calculateCRC(State &state)
+uint32_t Storage::calculateCRC(StorageState &state)
 {
     const uint8_t *data = (uint8_t *)&state;
-    return CRC::Calculate(data, sizeof(State), CRC::CRC_32());
+    return CRC::Calculate(data, sizeof(StorageState), CRC::CRC_32());
 }
 
 void Storage::save()

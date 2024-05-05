@@ -9,7 +9,7 @@ void TaskControlMotors::init() {
     return;
   }
 
-  Storage::State &state = Storage::getState();
+  StorageState &state = Storage::getState();
   maxSpeed = state.motorSpeedLimit;
   maxCurrent = state.motorCurrentLimit;
   maxTorque = state.motorTorqueLimit;
@@ -19,7 +19,7 @@ void TaskControlMotors::init() {
 }
 
 void TaskControlMotors::handleStateUpdate() {
-    Storage::State &state = Storage::getState();
+    StorageState &state = Storage::getState();
     if (state.motorSpeedLimit != maxSpeed) {
       maxSpeed = state.motorSpeedLimit;
       cybergearL.set_limit_speed(maxSpeed);

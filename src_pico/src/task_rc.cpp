@@ -116,7 +116,7 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
 
   // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
-  Storage::State &state = Storage::getState();
+  StorageState &state = Storage::getState();
   float speed = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
   float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
   // if within 100 of 1500, set speed to 0
