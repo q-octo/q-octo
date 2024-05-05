@@ -9,12 +9,14 @@ export type RoverState = {
             rps: number,
             angle: number,
             torque: number
+            torque_limit: number,
         },
         motor2: {
             temperature: number,
             rps: number,
             angle: number,
-            torque: number
+            torque: number,
+            torque_limit: number,
         }
     },
     batteries: number
@@ -28,8 +30,4 @@ export type RoverState = {
     critical_voltage_threshold: number,
     motor_error_code: string,
     fuel: number,
-    torque_limit_left: number,
-    torque_limit_right: number
-    max_speed_left: number
-    max_speed_right: number
 }

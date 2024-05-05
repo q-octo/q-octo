@@ -25,6 +25,7 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor1.rps} RPM</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor1.angle} °</span></p>
 					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
+					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor1.torque_limit}Nm</span></p>
 				</div>
 
 				{/* Motor 2 Card */}
@@ -34,6 +35,7 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor2.rps} RPM</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor2.angle} °</span></p>
 					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
+					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor2.torque_limit}Nm</span></p>
 				</div>
 			</div>
 
@@ -194,13 +196,15 @@ export function App() {
 				temperature: -1,
 				rps: -1,
 				angle: -1,
-				torque: -1
+				torque: -1,
+				torque_limit: -1
 			},
 			motor2: {
 				temperature: -1,
 				rps: -1,
 				angle: -1,
-				torque: -1
+				torque: -1,
+				torque_limit: -1
 			}
 		},
 		batteries: -1,
