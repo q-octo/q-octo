@@ -31,7 +31,6 @@ void initTasks();
 //                                                   {eSuspended, "Suspended"},
 //                                                   {eDeleted,   "Deleted"}};
 uint32_t lastDebugListTasksMs = 0;
-uint32_t lastBroadcastMotorStatusMs = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -66,10 +65,7 @@ void loop() {
 
   TaskCAN::loop();
   TaskRC::loop();
-  if (currentMillis - lastBroadcastMotorStatusMs >= 3000) {
-    lastBroadcastMotorStatusMs = currentMillis;
-    TaskControlMotors::broadcastStatusUpdate();
-  }
+  TaskControlMotors::loop();
   Companion::loop();
   Computer::loop();
   Buttons::loop();

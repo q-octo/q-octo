@@ -15,6 +15,7 @@
 #define ADDR_SPEED_KP              0x2014
 #define ADDR_SPEED_KI              0x2015
 #define ADDR_POSITION_KP           0x2016
+
 #define ADDR_RUN_MODE              0x7005
 #define ADDR_I_REF                 0x7006
 #define ADDR_SPEED_REF             0x700A
@@ -25,6 +26,8 @@
 #define ADDR_POSITION_REF          0x7016
 #define ADDR_LIMIT_SPEED           0x7017
 #define ADDR_LIMIT_CURRENT         0x7018
+#define ADDR_VBUS                  0x701C
+
 
 #define MODE_MOTION                  0x00
 #define MODE_POSITION                0x01

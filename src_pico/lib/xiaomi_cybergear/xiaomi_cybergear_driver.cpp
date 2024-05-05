@@ -172,6 +172,7 @@ void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
     case CMD_DEVICE_ID:
         break;
     case CMD_RAM_READ:
+        process_read_parameter_packet(data);
         break;
     case CMD_GET_MOTOR_FAIL:
         // TODO handle this case
@@ -180,6 +181,51 @@ void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
         break;
     }
 }
+
+void XiaomiCyberGearDriver::process_read_parameter_packet(const uint8_t * data)
+{
+  uint16_t index = data[1] << 8 | data[0];
+
+  uint8_t uint8_data;
+  memcpy(&uint8_data, &data[4], sizeof(uint8_t));
+
+  int16_t int16_data;
+  memcpy(&int16_data, &data[4], sizeof(int16_t));
+
+  float float_data;
+  memcpy(&float_data, &data[4], sizeof(float));
+
+  bool is_updated = true;
+
+  switch (index)
+  {
+    case ADDR_LIMIT_TORQUE:
+      motor_param_.limit_torque = float_data;
+      Serial.printf("Receive ADDR_LIMIT_TORQUE = [%f]\n", float_data);
+      break;
+    case ADDR_LIMIT_SPEED:
+      motor_param_.limit_spd = float_data;
+      Serial.printf("Receive ADDR_LIMIT_SPEED = [%f]\n", float_data);
+      break;
+    case ADDR_LIMIT_CURRENT:
+      motor_param_.limit_cur = float_data;
+      Serial.printf("Receive ADDR_LIMIT_CURRENT = [%f]\n", float_data);
+      break;
+    case ADDR_VBUS:
+      motor_param_.vbus = float_data;
+      Serial.printf("Receive ADDR_VBUS = [%f]\n", float_data);
+      break;
+    default:
+      Serial.printf("Unknown parameter value index=[0x%04x]\n", index);
+      is_updated = false;
+      break;
+  }
+
+  if (is_updated) {
+    motor_param_.stamp_usec = micros();
+  }
+}
+
 XiaomiCyberGearStatus XiaomiCyberGearDriver::get_status() const
 {
     return _status;

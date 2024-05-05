@@ -123,18 +123,30 @@ void Companion::handleUpdateMessage(const Update &update) {
       Storage::save();
       break;
     case UpdateUnion_UpdateMaxSpeed: {
-      state.motorSpeedLimit = update.update_as_UpdateMaxSpeed()->max_speed();
-      Storage::save();
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_SPEED_LIMIT,
+              .as = {.motorLimit = update.update_as_UpdateMaxSpeed()->max_speed()}};
+      DataManager::receiveMessage(taskMessage);
+      // state.motorSpeedLimit = update.update_as_UpdateMaxSpeed()->max_speed();
+      // Storage::save();
       break;
     }
     case UpdateUnion_UpdateMaxCurrent: {
-      state.motorCurrentLimit = update.update_as_UpdateMaxCurrent()->max_current();
-      Storage::save();
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_CURRENT_LIMIT,
+              .as = {.motorLimit = update.update_as_UpdateMaxCurrent()->max_current()}};
+      DataManager::receiveMessage(taskMessage);
+      // state.motorCurrentLimit = update.update_as_UpdateMaxCurrent()->max_current();
+      // Storage::save();
       break;
     }
     case UpdateUnion_UpdateMaxTorque: {
-      state.motorTorqueLimit = update.update_as_UpdateMaxTorque()->max_torque();
-      Storage::save();
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_TORQUE_LIMIT,
+              .as = {.motorLimit = update.update_as_UpdateMaxTorque()->max_torque()}};
+      DataManager::receiveMessage(taskMessage);
+      // state.motorTorqueLimit = update.update_as_UpdateMaxTorque()->max_torque();
+      // Storage::save();
       break;
     }
   }

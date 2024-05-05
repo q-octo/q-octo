@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <string>
+#include "robot_state_generated.h"
 
 class DataManager {
 public:
@@ -31,6 +32,9 @@ public:
     DISPLAY_MESSAGES,
     BUTTON_DOWN,
     BUTTON_UP,
+    UPDATE_MOTOR_SPEED_LIMIT,
+    UPDATE_MOTOR_CURRENT_LIMIT,
+    UPDATE_MOTOR_TORQUE_LIMIT,
   } Type;
 
   typedef struct {
@@ -127,6 +131,7 @@ public:
       DisplayButton displayButton;
       DisplayMessages displayMessages;
       PhysicalButton physicalButton;
+      float motorLimit;
     } as;
   } Message;
 
@@ -136,6 +141,8 @@ public:
     RC rc;
     bool webServerEnabled;
     DisplayMessages displayMessages;
+    MotorLimitsT* leftMotorLimits = nullptr;
+    MotorLimitsT* rightMotorLimits = nullptr;
   } State;
 
   static void receiveMessage(const Message &message);

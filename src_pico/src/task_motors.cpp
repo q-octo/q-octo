@@ -2,7 +2,7 @@
 #include "task_motors.h"
 #include "storage.h"
 
-#define STATUS_BROADCAST_FREQUENCY 20 // ms
+#define STATUS_BROADCAST_FREQUENCY 3000 // ms
 
 void TaskControlMotors::init() {
   if (!CFG_ENABLE_MOTORS) {
@@ -16,6 +16,25 @@ void TaskControlMotors::init() {
 
   initMotors();
   Serial.println("Motor class init complete");
+}
+
+void TaskControlMotors::loop() {
+  if (!CFG_ENABLE_MOTORS) {
+    return;
+  }
+  const uint32_t currentMillis = millis();
+  const uint32_t currentMicros = micros();
+
+  if (currentMillis - lastStatusBroadcastMs > STATUS_BROADCAST_FREQUENCY) {
+    broadcastStatusUpdate();
+    lastStatusBroadcastMs = currentMillis;
+  }
+
+  if (cybergearL.get_motor_param().stamp_usec > lastLeftMotorParameterResponseMicros) {
+    // TODO send this as a state update 
+    lastLeftMotorParameterResponseMicros = currentMicros;
+  }
+
 }
 
 void TaskControlMotors::handleStateUpdate() {

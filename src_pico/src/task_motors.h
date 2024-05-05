@@ -36,12 +36,13 @@ public:
 
   static void receiveMessage(const Message &message);
 
-  static void broadcastStatusUpdate();
+  static void loop();
 
 private:
 
   static void setSpeedIndividual(float speedL, float speedR);
   static void setSpeedCombined(float speed, float direction);
+  static void broadcastStatusUpdate();
 
   static void initMotors();
   static void handleStateUpdate();
@@ -49,11 +50,16 @@ private:
   static void debugPrintMotorStatus();
 
   static inline bool motorsEnabled = true;
-  static inline uint32_t lastStatusRequestMs = 0;
+  // static inline uint32_t lastStatusRequestMs = 0;
   static inline uint32_t lastStatusBroadcastMs = 0;
   static inline float maxSpeed;
   static inline float maxTorque;
   static inline float maxCurrent;
+  static inline MotorLimitsT leftMotorLimits;
+  static inline MotorLimitsT rightMotorLimits;
+  static inline unsigned long lastLeftMotorParameterResponseMicros = 0;
+  static inline unsigned long lastRightMotorParameterResponseMicros = 0;
+  
 
   static inline XiaomiCyberGearDriver cybergearL =
           XiaomiCyberGearDriver(CYBERGEAR_CAN_ID_L, MASTER_CAN_ID);

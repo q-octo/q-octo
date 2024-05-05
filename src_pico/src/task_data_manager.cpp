@@ -148,6 +148,11 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case DISPLAY_MESSAGES:
       state.displayMessages = message.as.displayMessages;
       broadcastStateUpdate();
+    case UPDATE_MOTOR_SPEED_LIMIT:
+      // controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_SPEED_LIMIT;
+      // controlMotorsMessage.as = {.speedLimit = message.as.motorLimit};
+      // TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
     default:
       Serial.println("[ERROR] Unknown message type");
   }
