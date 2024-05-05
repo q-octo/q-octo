@@ -26,15 +26,16 @@ export const RobotToObj = (robot : Robot) => {
         status: Status[robot.status()],
         voltage: robot.voltage(),
         current: robot.current(),
-        rssi: robot.rssi(),
         linkQualityThreshold: robot.linkQualityThreshold(),
-        max_speed: robot.maxSpeed(),
         low_voltage_threshold: robot.lowVoltageThreshold(),
         critical_voltage_threshold: robot.criticalVoltageThreshold(),
-        reference_wheel_angle: robot.referenceWheelAngle(),
         motor_error_code: robot.motorErrorCode(),
-        wheels_folded: robot.wheelsFolded(),
         enable_rover: robot.enableRover(),
         fuel: robot.fuel(),
+        torque_limit_left: robot.leftMotorLimits().maxTorque(),
+        torque_limit_right: robot.rightMotorLimits().maxTorque(),
+        max_speed_left: robot.leftMotorLimits().maxSpeed(),
+        max_speed_right: robot.rightMotorLimits().maxSpeed(),
+        rssi: robot.crsfData().telemetry().rssi()
     } as RoverState;
 }

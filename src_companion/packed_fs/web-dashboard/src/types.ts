@@ -24,11 +24,12 @@ export type RoverState = {
     current: number,
     rssi: number,
     linkQualityThreshold: number,
-    max_speed: number,
     low_voltage_threshold: number,
     critical_voltage_threshold: number,
-    reference_wheel_angle: number,
     motor_error_code: string,
-    wheels_folded: boolean,
     fuel: number,
+    torque_limit_left: number,
+    torque_limit_right: number
+    max_speed_left: number
+    max_speed_right: number
 }

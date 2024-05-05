@@ -186,39 +186,38 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	);
 };
 
-
 export function App() {
 
 	const [rover, setRover] = useState<RoverState>({
 		motors: {
 			motor1: {
-				temperature: 22,
-				rps: 40,
-				angle: 3,
-				torque: 1.5
+				temperature: -1,
+				rps: -1,
+				angle: -1,
+				torque: -1
 			},
 			motor2: {
-				temperature: 24,
-				rps: 50,
-				angle: 3,
-				torque: 1.5
+				temperature: -1,
+				rps: -1,
+				angle: -1,
+				torque: -1
 			}
 		},
-		batteries: 4,
+		batteries: -1,
 		control_source: "RC",
 		status: "NOT_X",
-		voltage: 12,
-		current: 2,
-		rssi: -50,
-		linkQualityThreshold: -50,
-		max_speed: 5,
-		low_voltage_threshold: 10,
-		critical_voltage_threshold: 5,
-		reference_wheel_angle: 0,
+		voltage: -1,
+		current: -1,
+		rssi: -1,
+		linkQualityThreshold: -1,
+		max_speed: -1,
+		low_voltage_threshold: -1,
+		critical_voltage_threshold: -1,
+		reference_wheel_angle: -1,
 		motor_error_code: "0xFF",
 		wheels_folded: false,
-		fuel: 50,
-
+		fuel: -1,
+		torque_limit: -1
 	});
 
 	const wsClient = ws;
