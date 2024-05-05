@@ -31,6 +31,7 @@ void TaskControlMotors::handleStateUpdate() {
       maxCurrent = state.motorCurrentLimit;
       cybergearL.set_limit_current(maxCurrent);
       cybergearR.set_limit_current(maxCurrent);
+      cybergearR.set_limit_current(maxCurrent);
       Serial.print("Current limit: ");
       Serial.println(maxCurrent);
     }
@@ -115,11 +116,17 @@ void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   cybergearR.set_speed_ref(speedR);
 }
 
-void TaskControlMotors::setSpeedCombined(float speed, float direction) { 
-  // Speed is between -30 and 30 rad/s
-  // Direction is between -1 and 1 (full left to full right)
-  // TODO implement mixing
-  setSpeedIndividual(speed, -speed);
+void TaskControlMotors::setSpeedCombined(float speed, float direction) {
+    // Speed is between -30 and 30 rad/s
+    // Direction is between -1 and 1 (full left to full right)
+
+    float scaledSpeed = speed / maxSpeed;
+
+    float left = scaledSpeed + direction;
+    float right = scaledSpeed - direction;
+
+    // TODO implement mixing
+    setSpeedIndividual(left, -right);
 }
 
 void TaskControlMotors::initMotors() {

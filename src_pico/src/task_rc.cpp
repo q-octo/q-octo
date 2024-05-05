@@ -123,8 +123,9 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   if (abs(TICKS_TO_US(channels[0]) - 1500) < 50) {
     rpm = 0;
   }
-  if (lastRPM != rpm) {
+  if (lastRPM !=  rpm || lastDirection != direction) {
     lastRPM = rpm;
+    lastDirection = direction;
     taskMessage = {
             .type = DataManager::Type::SET_MOTOR_SPEED_COMBINED,
             .as = {.motorSpeedCombined = {.rpm = rpm, .direction = direction}},
