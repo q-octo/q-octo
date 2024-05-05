@@ -12,13 +12,15 @@ export const RobotToObj = (robot : Robot) => {
                 temperature: robot.motors().motor1().temperature(),
                 rps: robot.motors().motor1().rps(),
                 angle: robot.motors().motor1().angle(),
-                torque: robot.motors().motor1().torque()
+                torque: robot.motors().motor1().torque(),
+                torque_limit: robot.leftMotorLimits().maxTorque()
             },
             motor2: {
                 temperature: robot.motors().motor2().temperature(),
                 rps: robot.motors().motor2().rps(),
                 angle: robot.motors().motor2().angle(),
                 torque: robot.motors().motor2().torque(),
+                torque_limit: robot.rightMotorLimits().maxTorque()
             }
         },
         batteries: robot.batteries(),
@@ -26,15 +28,12 @@ export const RobotToObj = (robot : Robot) => {
         status: Status[robot.status()],
         voltage: robot.voltage(),
         current: robot.current(),
-        rssi: robot.rssi(),
         linkQualityThreshold: robot.linkQualityThreshold(),
-        max_speed: robot.maxSpeed(),
         low_voltage_threshold: robot.lowVoltageThreshold(),
         critical_voltage_threshold: robot.criticalVoltageThreshold(),
-        reference_wheel_angle: robot.referenceWheelAngle(),
         motor_error_code: robot.motorErrorCode(),
-        wheels_folded: robot.wheelsFolded(),
         enable_rover: robot.enableRover(),
         fuel: robot.fuel(),
+        rssi: robot.crsfData().telemetry().rssi()
     } as RoverState;
 }
