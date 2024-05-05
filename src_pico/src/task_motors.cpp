@@ -124,9 +124,8 @@ void TaskControlMotors::setSpeedCombined(float speed, float direction) {
 
     Serial.printf("Setting speed %f direction %f\n", speed, direction);
 
-    float left = scaledSpeed - direction;
-    float right = scaledSpeed + direction;
-    // TODO implement mixing
+    float left = (scaledSpeed - direction) * maxSpeed;
+    float right = (scaledSpeed + direction) * maxSpeed;
 
     Serial.printf("Setting speed L: %f R: %f\n", left, right);
 
