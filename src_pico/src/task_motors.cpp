@@ -110,7 +110,9 @@ void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
 }
 
 void TaskControlMotors::setSpeedCombined(float speed, float direction) { 
-      // TODO implement mixing
+  // Speed is between -30 and 30 rad/s
+  // Direction is between -1 and 1 (full left to full right)
+  // TODO implement mixing
   setSpeedIndividual(speed, -speed);
 }
 
