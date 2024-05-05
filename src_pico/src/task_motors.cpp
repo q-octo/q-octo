@@ -119,32 +119,20 @@ void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
 void TaskControlMotors::setSpeedCombined(float speed, float direction) {
     // Speed is between -30 and 30 rad/s
     // Direction is between -1 and 1 (full left to full right)
-
     float scaledSpeed = speed / maxSpeed;
-
-    Serial.printf("Setting speed %f direction %f\n", speed, direction);
-
     float left = (scaledSpeed - direction) * maxSpeed;
     float right = (scaledSpeed + direction) * maxSpeed;
-
-    Serial.printf("Setting speed L: %f R: %f\n", left, right);
-
     setSpeedIndividual(left, -right);
 }
 
 void TaskControlMotors::initMotors() {
-  // Command + 3 x ram write + command (for each motor)
-  // Seems like we only get two responses back though, so are we sending
-  // the messages too fast? The motor needs 500us between messages
-  cybergearL.stop_motor();
-  cybergearL.set_run_mode(MODE_SPEED);
+  cybergearL.init_motor(MODE_SPEED);
   cybergearL.set_limit_speed(maxSpeed);
   cybergearL.set_limit_current(maxCurrent);
   cybergearL.set_limit_torque(maxTorque);
   cybergearL.enable_motor();
 
-  cybergearR.stop_motor();
-  cybergearR.set_run_mode(MODE_SPEED);
+  cybergearR.init_motor(MODE_SPEED);
   cybergearR.set_limit_speed(maxSpeed);
   cybergearR.set_limit_current(maxCurrent);
   cybergearR.set_limit_torque(maxTorque);
