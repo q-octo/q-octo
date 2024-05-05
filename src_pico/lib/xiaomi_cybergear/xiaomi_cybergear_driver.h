@@ -60,7 +60,7 @@ struct XiaomiCyberGearMotorParameter
 class XiaomiCyberGearDriver {
     public:
         XiaomiCyberGearDriver();
-        XiaomiCyberGearDriver(uint8_t master_can_id, uint8_t cybergear_can_id);
+        XiaomiCyberGearDriver(uint8_t cybergear_can_id, uint8_t master_can_id);
         virtual ~XiaomiCyberGearDriver();
 
         void init_motor(uint8_t mode);
