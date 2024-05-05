@@ -36,6 +36,11 @@ public:
         }
     } State;
 
+    typedef struct {
+        State state;
+        uint32_t crc;
+    } StateWithCRC;
+
     static void init();
     static void save();
 
@@ -43,5 +48,8 @@ public:
 
 private:
     static inline State state = State();
+    static inline StateWithCRC stateWithCRC = StateWithCRC();
     static void notifyStateUpdate();
+    static bool isCrcValid();
+    static uint32_t calculateCRC(State &state);
 };
