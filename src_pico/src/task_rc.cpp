@@ -117,18 +117,18 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
   Storage::State &state = Storage::getState();
-  float rpm = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
+  float speed = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
   float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
-  // if within 50 of 1500, set rpm to 0
-  if (abs(TICKS_TO_US(channels[0]) - 1500) < 50) {
-    rpm = 0;
+  // if within 100 of 1500, set speed to 0
+  if (abs(TICKS_TO_US(channels[0]) - 1500) < 100) {
+    speed = 0;
   }
-  if (lastRPM !=  rpm || lastDirection != direction) {
-    lastRPM = rpm;
+  if (lastSpeed !=  speed || lastDirection != direction) {
+    lastSpeed = speed;
     lastDirection = direction;
     taskMessage = {
             .type = DataManager::Type::SET_MOTOR_SPEED_COMBINED,
-            .as = {.motorSpeedCombined = {.rpm = rpm, .direction = direction}},
+            .as = {.motorSpeedCombined = {.speed = speed, .direction = direction}},
     };
     DataManager::receiveMessage(taskMessage);
   }

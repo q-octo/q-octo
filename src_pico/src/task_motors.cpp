@@ -61,12 +61,12 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
       cybergearR.stop_motor();
       break;
     case TaskControlMotors::SET_SPEED_COMBINED:
-      setSpeedCombined(message.as.speedCombined.rpm,
+      setSpeedCombined(message.as.speedCombined.speed,
                        message.as.speedCombined.direction);
       break;
     case TaskControlMotors::SET_SPEED_INDIVIDUAL:
-      setSpeedIndividual(message.as.speedIndividual.rpmL,
-                         message.as.speedIndividual.rpmR);
+      setSpeedIndividual(message.as.speedIndividual.leftSpeed,
+                         message.as.speedIndividual.rightSpeed);
       break;
     case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
       cybergearL.process_message(message.as.canMessage.id,

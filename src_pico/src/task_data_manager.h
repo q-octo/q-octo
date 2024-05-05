@@ -70,12 +70,12 @@ public:
   } Diagnostics;
 
   typedef struct {
-    float rpmL;
-    float rpmR;
+    float leftSpeed;
+    float rightSpeed;
   } SetMotorSpeedIndividual;
 
   typedef struct {
-    float rpm;
+    float speed;
     float direction;
   } SetMotorSpeedCombined;
 
