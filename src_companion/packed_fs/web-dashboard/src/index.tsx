@@ -10,7 +10,7 @@ import * as flatbuffers from 'flatbuffers';
 import { Update, UpdateUnion } from './generated/fbs';
 import { SendUpdate } from './util/SendUpdate';
 
-const Dashboard = ({rover} : {rover: RoverState}) => {
+const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 	console.log(rover);
 
@@ -68,7 +68,7 @@ const Dashboard = ({rover} : {rover: RoverState}) => {
 	);
 };
 
-const EditValuesForm = () => {
+const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	// Function to handle form submission for each field
 	const handleSubmit = (fieldName, event) => {
 		event.preventDefault();
@@ -83,69 +83,109 @@ const EditValuesForm = () => {
 
 		// Send the update
 		ws.send(SendUpdate(fieldName, data[fieldName]));
-
 	};
-  
-	return (
-	  <div className="bg-slate-200 p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md">
-		<h2 className="text-xl sm:text-2xl font-bold mb-4">Edit Values</h2>
+
+	const [formValues, setFormValues] = useState({
+		1: 0,
+		2: 0,
+		3: 0,
+	});
+
+	const handleChange = (e) => {
+		const { name, value } = e.target;
+		setFormValues({ ...formValues, [name]: value });
+	}
+
+	// Green if value is equal to the current value, red if not
+	const formColour = (fieldname: string) => {
+
+		console.log(formValues);
+		console.log(rover);
+
+		switch (fieldname) {
+			case 'bats':
+				if (formValues[1] == rover.batteries) return "bg-green-100";
+				break;
+			case 'lowV':
+				if (formValues[2]  == rover.low_voltage_threshold) return "bg-green-100";
+				break;
+			case 'critV':
+				if (formValues[3]  == rover.critical_voltage_threshold) return "bg-green-100";
+				break;
+		}
 		
-		{/* Number of batteries */}
-		<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateBatteries, e)} className="mb-4">
-		  <label htmlFor={`${UpdateUnion.UpdateBatteries}`} className="block text-sm font-medium text-gray-700">
-			Number of batteries
-		  </label>
-		  <div className="mt-1 flex rounded-md shadow-sm">
-			<input type="number" id={`${UpdateUnion.UpdateBatteries}`} name={`${UpdateUnion.UpdateBatteries}`} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
-			<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-			  Save
-			</button>
-		  </div>
-		</form>
-  
-		{/* Low Voltage Threshold */}
-		<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateLowVoltageThreshold, e)} className="mb-4">
-		  <label htmlFor={`${UpdateUnion.UpdateLowVoltageThreshold}`} className="block text-sm font-medium text-gray-700">
-			Low Voltage threshold
-		  </label>
-		  <div className="mt-1 flex rounded-md shadow-sm">
-			<input type="number" step="0.1" id={`${UpdateUnion.UpdateLowVoltageThreshold}`} name={`${UpdateUnion.UpdateLowVoltageThreshold}`} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
-			<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-			  Save
-			</button>
-		  </div>
-		</form>
-  
-		{/* Critical Voltage Threshold */}
-		<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateCriticalVoltageThreshold, e)} className="mb-4">
-		  <label htmlFor={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} className="block text-sm font-medium text-gray-700">
-			Critical Voltage Threshold
-		  </label>
-		  <div className="mt-1 flex rounded-md shadow-sm">
-			<input type="number" step="0.1" id={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} name={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
-			<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-			  Save
-			</button>
-		  </div>
-		</form>
-  
-		{/* Reference Wheel Angle */}
-		<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateReferenceWheelAngle, e)} className="mb-4">
-		  <label htmlFor="referenceWheelAngle" className="block text-sm font-medium text-gray-700">
-			Reference Wheel Angle
-		  </label>
-		  <div className="mt-1 flex rounded-md shadow-sm">
-			<input type="number" step="0.2" id={`${UpdateUnion.UpdateReferenceWheelAngle}`} name={`${UpdateUnion.UpdateReferenceWheelAngle}`} className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required />
-			<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-			  Save
-			</button>
-		  </div>
-		</form>
-  
-	  </div>
+		return "bg-red-100";
+	}
+
+	return (
+		<div className="bg-slate-200 p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md">
+			<h2 className="text-xl sm:text-2xl font-bold mb-4">Edit Values</h2>
+
+			{/* Number of batteries */}
+			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateBatteries, e)} className="mb-4">
+				<label htmlFor={`${UpdateUnion.UpdateBatteries}`} className="block text-sm font-medium text-gray-700">
+					Number of batteries
+				</label>
+				<div className="mt-1 flex rounded-md shadow-sm">
+					<input type="number" id={`${UpdateUnion.UpdateBatteries}`} name={`${UpdateUnion.UpdateBatteries}`} className={`${formColour('bats')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md`} required
+						onChange={handleChange}
+					/>
+					<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+						Save
+					</button>
+				</div>
+			</form>
+
+			{/* Low Voltage Threshold */}
+			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateLowVoltageThreshold, e)} className="mb-4">
+				<label htmlFor={`${UpdateUnion.UpdateLowVoltageThreshold}`} className="block text-sm font-medium text-gray-700">
+					Low Voltage threshold
+				</label>
+				<div className="mt-1 flex rounded-md shadow-sm">
+					<input type="number" step="0.1" id={`${UpdateUnion.UpdateLowVoltageThreshold}`} name={`${UpdateUnion.UpdateLowVoltageThreshold}`} className={`${formColour('lowV')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md`} required
+						onChange={handleChange}
+					/>
+					<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+						Save
+					</button>
+				</div>
+			</form>
+
+			{/* Critical Voltage Threshold */}
+			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateCriticalVoltageThreshold, e)} className="mb-4">
+				<label htmlFor={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} className="block text-sm font-medium text-gray-700">
+					Critical Voltage Threshold
+				</label>
+				<div className="mt-1 flex rounded-md shadow-sm">
+					<input type="number" step="0.1" id={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} name={`${UpdateUnion.UpdateCriticalVoltageThreshold}`} className={`${formColour('critV')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md`} required
+						onChange={handleChange}
+					/>
+					<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+						Save
+					</button>
+				</div>
+			</form>
+
+			{/* Reference Wheel Angle */}
+			{/* <form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateReferenceWheelAngle, e)} className="mb-4">
+				<label htmlFor="referenceWheelAngle" className="block text-sm font-medium text-gray-700">
+					Reference Wheel Angle
+				</label>
+				<div className="mt-1 flex rounded-md shadow-sm">
+					<input type="number" step="0.2" id={`${UpdateUnion.UpdateReferenceWheelAngle}`} name={`${UpdateUnion.UpdateReferenceWheelAngle}`} className={`${formColour('refWheel')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required`}
+						onChange={handleChange}
+					/>
+					<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+						Save
+					</button>
+				</div>
+			</form> */}
+
+
+		</div>
 	);
-  };
-  
+};
+
 
 export function App() {
 
@@ -178,36 +218,36 @@ export function App() {
 		motor_error_code: "0xFF",
 		wheels_folded: false,
 		fuel: 50,
-		
+
 	});
 
 	const wsClient = ws;
 	ws.onmessage = (event) => {
-        console.log(event)
-        
-        // From blob to array buffer
-        try {
-            const reader = new FileReader();
-            reader.readAsArrayBuffer(event.data);
-            reader.onload = () => {
-                const buf = new flatbuffers.ByteBuffer(new Uint8Array(reader.result as ArrayBuffer));
-                const robot = Robot.getRootAsRobot(buf);
-                console.log(RobotToObj(robot));
+		console.log(event)
+
+		// From blob to array buffer
+		try {
+			const reader = new FileReader();
+			reader.readAsArrayBuffer(event.data);
+			reader.onload = () => {
+				const buf = new flatbuffers.ByteBuffer(new Uint8Array(reader.result as ArrayBuffer));
+				const robot = Robot.getRootAsRobot(buf);
+				console.log(RobotToObj(robot));
 
 				// Update the state
 				setRover(RobotToObj(robot));
 
-            }
-        } catch (error) {
-            console.log("Invalid data received from server");
-        }
-    }
+			}
+		} catch (error) {
+			console.log("Invalid data received from server");
+		}
+	}
 
 
 	return (
 		<main className="space-y-8">
-			<Dashboard rover={rover}/>
-			<EditValuesForm />
+			<Dashboard rover={rover} />
+			<EditValuesForm rover={rover} />
 		</main>
 	);
 }
