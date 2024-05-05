@@ -10,6 +10,9 @@ import * as flatbuffers from 'flatbuffers';
 import { Update, UpdateUnion } from './generated/fbs';
 import { SendUpdate } from './util/SendUpdate';
 
+/**
+ * This Component is where the current values of the rover are displayed
+ */
 const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 	console.log(rover);
@@ -63,6 +66,10 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 	);
 };
 
+
+/**
+ * Component for the input form.
+ */
 const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	// Function to handle form submission for each field
 	const handleSubmit = (fieldName, event) => {
@@ -92,7 +99,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 		setFormValues({ ...formValues, [name]: value });
 	}
 
-	// Green if value is equal to the current value, red if not
+	// Decides what colour to render in the background of the input fields
 	const formColour = (fieldname: string) => {
 
 		console.log(formValues);
@@ -185,8 +192,12 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	);
 };
 
+/**
+ * Root component of the application.
+ */
 export function App() {
 
+	// These defaults are shown until the first message is received from the server
 	const [rover, setRover] = useState<RoverState>({
 		motors: {
 			motor1: {
@@ -217,6 +228,8 @@ export function App() {
 		fuel: -1,
 	});
 
+	// WebSocket client
+	// Just a typical listener callback pattern.
 	const wsClient = ws;
 	ws.onmessage = (event) => {
 		console.log(event)
