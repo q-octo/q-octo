@@ -57,13 +57,6 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 					<p class="text-base sm:text-sm">Link 📻: <span class="font-medium">{rover.linkQualityThreshold} %</span></p>
 				</div>
 
-				{/* 
-				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
-					<p class="text-base sm:text-sm">Offset L: <span class="font-medium">{rover.offset.left} °</span></p>
-					<p class="text-base sm:text-sm">Offset R: <span class="font-medium">{rover.offset.right} °</span></p>
-				</div> */}
-
-
 			</div>
 
 		</div>
@@ -91,6 +84,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 		1: 0,
 		2: 0,
 		3: 0,
+		4: 0
 	});
 
 	const handleChange = (e) => {
@@ -109,13 +103,17 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 				if (formValues[1] == rover.batteries) return "bg-green-100";
 				break;
 			case 'lowV':
-				if (formValues[2]  == rover.low_voltage_threshold) return "bg-green-100";
+				if (formValues[2] == rover.low_voltage_threshold) return "bg-green-100";
 				break;
 			case 'critV':
-				if (formValues[3]  == rover.critical_voltage_threshold) return "bg-green-100";
+				if (formValues[3] == rover.critical_voltage_threshold) return "bg-green-100";
 				break;
+			case 'torqueLimit':
+				if ((formValues[4] == rover.motors.motor1.torque_limit) && (formValues[4] == rover.motors.motor2.torque_limit)) {
+					return "bg-green-100";
+				}
 		}
-		
+
 		return "bg-red-100";
 	}
 
@@ -168,22 +166,21 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 				</div>
 			</form>
 
-			{/* Reference Wheel Angle */}
-			{/* <form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateReferenceWheelAngle, e)} className="mb-4">
-				<label htmlFor="referenceWheelAngle" className="block text-sm font-medium text-gray-700">
-					Reference Wheel Angle
+
+			{/* Torque Limit */}
+			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateMaxTorque, e)} className="mb-4">
+				<label htmlFor="torqueLimit" className="block text-sm font-medium text-gray-700">
+					Torque Limit Left
 				</label>
 				<div className="mt-1 flex rounded-md shadow-sm">
-					<input type="number" step="0.2" id={`${UpdateUnion.UpdateReferenceWheelAngle}`} name={`${UpdateUnion.UpdateReferenceWheelAngle}`} className={`${formColour('refWheel')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required`}
+					<input type="number" step="0.1" id={`${UpdateUnion.UpdateMaxTorque}`} name={`${UpdateUnion.UpdateMaxTorque}`} className={`${formColour('torqueLimitLeft')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required`}
 						onChange={handleChange}
 					/>
 					<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
 						Save
 					</button>
 				</div>
-			</form> */}
-
-
+			</form>
 		</div>
 	);
 };
@@ -214,14 +211,10 @@ export function App() {
 		current: -1,
 		rssi: -1,
 		linkQualityThreshold: -1,
-		max_speed: -1,
 		low_voltage_threshold: -1,
 		critical_voltage_threshold: -1,
-		reference_wheel_angle: -1,
 		motor_error_code: "0xFF",
-		wheels_folded: false,
 		fuel: -1,
-		torque_limit: -1
 	});
 
 	const wsClient = ws;
