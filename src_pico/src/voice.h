@@ -1,8 +1,10 @@
 #pragma once
 
-class Voice {
+class Voice
+{
 public:
-    typedef enum {
+    typedef enum
+    {
         OK,
         LOW_BATTERY,
         TX_LOST,
@@ -18,5 +20,8 @@ public:
         FOLDING_WHEELS,
         STAND_CLEAR,
     } Announcement;
+    static void init();
+    static void announce(Announcement announcement);
+
 private:
 };
