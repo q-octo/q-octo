@@ -112,6 +112,12 @@ void TaskControlMotors::broadcastStatusUpdate() {
 void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
   
+  if (abs(maxSpeed) > 30 || abs(maxSpeed) > 30) {
+    Serial.println("[WARN] max speed is configured out of range!");
+    Serial.println("Not setting speed.");
+    return;
+  }
+  
   // These checks are important because the motor doesn't have a speed limit
   // that applies to the speed control mode.
   if (speedL > maxSpeed || speedL < -maxSpeed) {
