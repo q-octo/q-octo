@@ -97,6 +97,12 @@ class XiaomiCyberGearDriver {
         void request_status();
         void process_message(uint32_t id, uint8_t* data);
         XiaomiCyberGearStatus get_status() const;
+        void set_mech_position_to_zero();
+        void read_ram_data(uint16_t index);
+        void get_vbus();
+        void get_speed_limit();
+        void get_current_limit();
+        void get_torque_limit();
 
         /**
         * @brief Get the motor param object

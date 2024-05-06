@@ -143,6 +143,40 @@ void XiaomiCyberGearDriver::request_status()
     _send_can_package(_cybergear_can_id, CMD_GET_MOTOR_FAIL, _master_can_id, 8, data);
 }
 
+void XiaomiCyberGearDriver::set_mech_position_to_zero()
+{
+  uint8_t data[8] = {0x00};
+  data[0] = 0x01;
+  _send_can_package(_cybergear_can_id, CMD_SET_MECH_POSITION_TO_ZERO, _master_can_id, 8, data);
+}
+
+void XiaomiCyberGearDriver::read_ram_data(uint16_t index)
+{
+  uint8_t data[8] = {0x00};
+  memcpy(&data[0], &index, 2);
+  _send_can_package(_cybergear_can_id, CMD_RAM_READ, _master_can_id, 8, data);
+}
+
+void XiaomiCyberGearDriver::get_vbus()
+{
+  read_ram_data(ADDR_VBUS);
+}
+
+void XiaomiCyberGearDriver::get_speed_limit()
+{
+  read_ram_data(ADDR_LIMIT_SPEED);
+}
+
+void XiaomiCyberGearDriver::get_current_limit()
+{
+  read_ram_data(ADDR_LIMIT_CURRENT);
+}
+
+void XiaomiCyberGearDriver::get_torque_limit()
+{
+  read_ram_data(ADDR_LIMIT_TORQUE);
+}
+
 void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
 {
     const uint8_t type = id >> 24;
