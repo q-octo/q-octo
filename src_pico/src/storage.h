@@ -13,11 +13,12 @@ struct StorageState
     uint8_t rssiThreshold = 105;
     uint8_t linkQualityThreshold = 70;
     bool startWebServerOnLaunch = false;
-    float motorSpeedLimit = 2.0f;
-    float motorCurrentLimit = 1.0f;
-    float motorTorqueLimit = 1.0f;
-    float speedKp = 0.0f; // Default was 1
-    float speedKi = 0.0f; // Default was 0.002
+    float motorSpeedLimit = 12.0f;
+    float motorCurrentLimit = 2.0f;
+    float motorTorqueLimit = 12.5f;
+    // TODO use these
+    float speedKp = 1.0f; // Default was 1
+    float speedKi = 0.002f; // Default was 0.002
 };
 
 class Storage
