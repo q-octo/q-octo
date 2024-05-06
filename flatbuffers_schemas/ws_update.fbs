@@ -53,6 +53,18 @@ table UpdateMaxTorque {
     max_torque: float;
 }
 
+table UpdateMotorKp {
+    motor_kp: float;
+}
+
+table UpdateMotorKi {
+    motor_ki: float;
+}
+
+table UpdateCrsfLinkStatsTimeout {
+    timeout_millis: int;
+}
+
 union UpdateUnion {
     UpdateBatteries,
     UpdateLowVoltageThreshold,
@@ -66,6 +78,9 @@ union UpdateUnion {
     UpdateMaxSpeed,
     UpdateMaxCurrent,
     UpdateMaxTorque,
+    UpdateMotorKp,
+    UpdateMotorKi,
+    UpdateCrsfLinkStatsTimeout,
 }
 
 table Update {

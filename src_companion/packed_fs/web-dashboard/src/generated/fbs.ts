@@ -5,6 +5,7 @@
 export { Update, UpdateT } from './fbs/update.js';
 export { UpdateBatteries, UpdateBatteriesT } from './fbs/update-batteries.js';
 export { UpdateCriticalVoltageThreshold, UpdateCriticalVoltageThresholdT } from './fbs/update-critical-voltage-threshold.js';
+export { UpdateCrsfLinkStatsTimeout, UpdateCrsfLinkStatsTimeoutT } from './fbs/update-crsf-link-stats-timeout.js';
 export { UpdateEnableRover, UpdateEnableRoverT } from './fbs/update-enable-rover.js';
 export { UpdateFoldWheels, UpdateFoldWheelsT } from './fbs/update-fold-wheels.js';
 export { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from './fbs/update-link-quality-threshold.js';
@@ -12,6 +13,8 @@ export { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from './fbs/upd
 export { UpdateMaxCurrent, UpdateMaxCurrentT } from './fbs/update-max-current.js';
 export { UpdateMaxSpeed, UpdateMaxSpeedT } from './fbs/update-max-speed.js';
 export { UpdateMaxTorque, UpdateMaxTorqueT } from './fbs/update-max-torque.js';
+export { UpdateMotorKi, UpdateMotorKiT } from './fbs/update-motor-ki.js';
+export { UpdateMotorKp, UpdateMotorKpT } from './fbs/update-motor-kp.js';
 export { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from './fbs/update-reference-wheel-angle.js';
 export { UpdateRssiThreshold, UpdateRssiThresholdT } from './fbs/update-rssi-threshold.js';
 export { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from './fbs/update-start-web-server-on-launch.js';

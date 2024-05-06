@@ -6,6 +6,7 @@ import * as flatbuffers from 'flatbuffers';
 
 import { UpdateBatteries, UpdateBatteriesT } from '../fbs/update-batteries.js';
 import { UpdateCriticalVoltageThreshold, UpdateCriticalVoltageThresholdT } from '../fbs/update-critical-voltage-threshold.js';
+import { UpdateCrsfLinkStatsTimeout, UpdateCrsfLinkStatsTimeoutT } from '../fbs/update-crsf-link-stats-timeout.js';
 import { UpdateEnableRover, UpdateEnableRoverT } from '../fbs/update-enable-rover.js';
 import { UpdateFoldWheels, UpdateFoldWheelsT } from '../fbs/update-fold-wheels.js';
 import { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from '../fbs/update-link-quality-threshold.js';
@@ -13,6 +14,8 @@ import { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from '../fbs/up
 import { UpdateMaxCurrent, UpdateMaxCurrentT } from '../fbs/update-max-current.js';
 import { UpdateMaxSpeed, UpdateMaxSpeedT } from '../fbs/update-max-speed.js';
 import { UpdateMaxTorque, UpdateMaxTorqueT } from '../fbs/update-max-torque.js';
+import { UpdateMotorKi, UpdateMotorKiT } from '../fbs/update-motor-ki.js';
+import { UpdateMotorKp, UpdateMotorKpT } from '../fbs/update-motor-kp.js';
 import { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from '../fbs/update-reference-wheel-angle.js';
 import { UpdateRssiThreshold, UpdateRssiThresholdT } from '../fbs/update-rssi-threshold.js';
 import { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from '../fbs/update-start-web-server-on-launch.js';
@@ -108,7 +111,7 @@ unpackTo(_o: UpdateT): void {
 export class UpdateT implements flatbuffers.IGeneratedObject {
 constructor(
   public updateType: UpdateUnion = UpdateUnion.NONE,
-  public update: UpdateBatteriesT|UpdateCriticalVoltageThresholdT|UpdateEnableRoverT|UpdateFoldWheelsT|UpdateLinkQualityThresholdT|UpdateLowVoltageThresholdT|UpdateMaxCurrentT|UpdateMaxSpeedT|UpdateMaxTorqueT|UpdateReferenceWheelAngleT|UpdateRssiThresholdT|UpdateStartWebServerOnLaunchT|null = null
+  public update: UpdateBatteriesT|UpdateCriticalVoltageThresholdT|UpdateCrsfLinkStatsTimeoutT|UpdateEnableRoverT|UpdateFoldWheelsT|UpdateLinkQualityThresholdT|UpdateLowVoltageThresholdT|UpdateMaxCurrentT|UpdateMaxSpeedT|UpdateMaxTorqueT|UpdateMotorKiT|UpdateMotorKpT|UpdateReferenceWheelAngleT|UpdateRssiThresholdT|UpdateStartWebServerOnLaunchT|null = null
 ){}
 
 

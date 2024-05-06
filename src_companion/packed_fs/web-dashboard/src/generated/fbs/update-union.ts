@@ -4,6 +4,7 @@
 
 import { UpdateBatteries, UpdateBatteriesT } from '../fbs/update-batteries.js';
 import { UpdateCriticalVoltageThreshold, UpdateCriticalVoltageThresholdT } from '../fbs/update-critical-voltage-threshold.js';
+import { UpdateCrsfLinkStatsTimeout, UpdateCrsfLinkStatsTimeoutT } from '../fbs/update-crsf-link-stats-timeout.js';
 import { UpdateEnableRover, UpdateEnableRoverT } from '../fbs/update-enable-rover.js';
 import { UpdateFoldWheels, UpdateFoldWheelsT } from '../fbs/update-fold-wheels.js';
 import { UpdateLinkQualityThreshold, UpdateLinkQualityThresholdT } from '../fbs/update-link-quality-threshold.js';
@@ -11,6 +12,8 @@ import { UpdateLowVoltageThreshold, UpdateLowVoltageThresholdT } from '../fbs/up
 import { UpdateMaxCurrent, UpdateMaxCurrentT } from '../fbs/update-max-current.js';
 import { UpdateMaxSpeed, UpdateMaxSpeedT } from '../fbs/update-max-speed.js';
 import { UpdateMaxTorque, UpdateMaxTorqueT } from '../fbs/update-max-torque.js';
+import { UpdateMotorKi, UpdateMotorKiT } from '../fbs/update-motor-ki.js';
+import { UpdateMotorKp, UpdateMotorKpT } from '../fbs/update-motor-kp.js';
 import { UpdateReferenceWheelAngle, UpdateReferenceWheelAngleT } from '../fbs/update-reference-wheel-angle.js';
 import { UpdateRssiThreshold, UpdateRssiThresholdT } from '../fbs/update-rssi-threshold.js';
 import { UpdateStartWebServerOnLaunch, UpdateStartWebServerOnLaunchT } from '../fbs/update-start-web-server-on-launch.js';
@@ -29,13 +32,16 @@ export enum UpdateUnion {
   UpdateStartWebServerOnLaunch = 9,
   UpdateMaxSpeed = 10,
   UpdateMaxCurrent = 11,
-  UpdateMaxTorque = 12
+  UpdateMaxTorque = 12,
+  UpdateMotorKp = 13,
+  UpdateMotorKi = 14,
+  UpdateCrsfLinkStatsTimeout = 15
 }
 
 export function unionToUpdateUnion(
   type: UpdateUnion,
-  accessor: (obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null
-): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null {
+  accessor: (obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null
+): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null {
   switch(UpdateUnion[type]) {
     case 'NONE': return null; 
     case 'UpdateBatteries': return accessor(new UpdateBatteries())! as UpdateBatteries;
@@ -50,15 +56,18 @@ export function unionToUpdateUnion(
     case 'UpdateMaxSpeed': return accessor(new UpdateMaxSpeed())! as UpdateMaxSpeed;
     case 'UpdateMaxCurrent': return accessor(new UpdateMaxCurrent())! as UpdateMaxCurrent;
     case 'UpdateMaxTorque': return accessor(new UpdateMaxTorque())! as UpdateMaxTorque;
+    case 'UpdateMotorKp': return accessor(new UpdateMotorKp())! as UpdateMotorKp;
+    case 'UpdateMotorKi': return accessor(new UpdateMotorKi())! as UpdateMotorKi;
+    case 'UpdateCrsfLinkStatsTimeout': return accessor(new UpdateCrsfLinkStatsTimeout())! as UpdateCrsfLinkStatsTimeout;
     default: return null;
   }
 }
 
 export function unionListToUpdateUnion(
   type: UpdateUnion, 
-  accessor: (index: number, obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null, 
+  accessor: (index: number, obj:UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch) => UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null, 
   index: number
-): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null {
+): UpdateBatteries|UpdateCriticalVoltageThreshold|UpdateCrsfLinkStatsTimeout|UpdateEnableRover|UpdateFoldWheels|UpdateLinkQualityThreshold|UpdateLowVoltageThreshold|UpdateMaxCurrent|UpdateMaxSpeed|UpdateMaxTorque|UpdateMotorKi|UpdateMotorKp|UpdateReferenceWheelAngle|UpdateRssiThreshold|UpdateStartWebServerOnLaunch|null {
   switch(UpdateUnion[type]) {
     case 'NONE': return null; 
     case 'UpdateBatteries': return accessor(index, new UpdateBatteries())! as UpdateBatteries;
@@ -73,6 +82,9 @@ export function unionListToUpdateUnion(
     case 'UpdateMaxSpeed': return accessor(index, new UpdateMaxSpeed())! as UpdateMaxSpeed;
     case 'UpdateMaxCurrent': return accessor(index, new UpdateMaxCurrent())! as UpdateMaxCurrent;
     case 'UpdateMaxTorque': return accessor(index, new UpdateMaxTorque())! as UpdateMaxTorque;
+    case 'UpdateMotorKp': return accessor(index, new UpdateMotorKp())! as UpdateMotorKp;
+    case 'UpdateMotorKi': return accessor(index, new UpdateMotorKi())! as UpdateMotorKi;
+    case 'UpdateCrsfLinkStatsTimeout': return accessor(index, new UpdateCrsfLinkStatsTimeout())! as UpdateCrsfLinkStatsTimeout;
     default: return null;
   }
 }

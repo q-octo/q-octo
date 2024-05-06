@@ -63,6 +63,18 @@ struct UpdateMaxTorque;
 struct UpdateMaxTorqueBuilder;
 struct UpdateMaxTorqueT;
 
+struct UpdateMotorKp;
+struct UpdateMotorKpBuilder;
+struct UpdateMotorKpT;
+
+struct UpdateMotorKi;
+struct UpdateMotorKiBuilder;
+struct UpdateMotorKiT;
+
+struct UpdateCrsfLinkStatsTimeout;
+struct UpdateCrsfLinkStatsTimeoutBuilder;
+struct UpdateCrsfLinkStatsTimeoutT;
+
 struct Update;
 struct UpdateBuilder;
 struct UpdateT;
@@ -81,11 +93,14 @@ enum UpdateUnion : uint8_t {
   UpdateUnion_UpdateMaxSpeed = 10,
   UpdateUnion_UpdateMaxCurrent = 11,
   UpdateUnion_UpdateMaxTorque = 12,
+  UpdateUnion_UpdateMotorKp = 13,
+  UpdateUnion_UpdateMotorKi = 14,
+  UpdateUnion_UpdateCrsfLinkStatsTimeout = 15,
   UpdateUnion_MIN = UpdateUnion_NONE,
-  UpdateUnion_MAX = UpdateUnion_UpdateMaxTorque
+  UpdateUnion_MAX = UpdateUnion_UpdateCrsfLinkStatsTimeout
 };
 
-inline const UpdateUnion (&EnumValuesUpdateUnion())[13] {
+inline const UpdateUnion (&EnumValuesUpdateUnion())[16] {
   static const UpdateUnion values[] = {
     UpdateUnion_NONE,
     UpdateUnion_UpdateBatteries,
@@ -99,13 +114,16 @@ inline const UpdateUnion (&EnumValuesUpdateUnion())[13] {
     UpdateUnion_UpdateStartWebServerOnLaunch,
     UpdateUnion_UpdateMaxSpeed,
     UpdateUnion_UpdateMaxCurrent,
-    UpdateUnion_UpdateMaxTorque
+    UpdateUnion_UpdateMaxTorque,
+    UpdateUnion_UpdateMotorKp,
+    UpdateUnion_UpdateMotorKi,
+    UpdateUnion_UpdateCrsfLinkStatsTimeout
   };
   return values;
 }
 
 inline const char * const *EnumNamesUpdateUnion() {
-  static const char * const names[14] = {
+  static const char * const names[17] = {
     "NONE",
     "UpdateBatteries",
     "UpdateLowVoltageThreshold",
@@ -119,13 +137,16 @@ inline const char * const *EnumNamesUpdateUnion() {
     "UpdateMaxSpeed",
     "UpdateMaxCurrent",
     "UpdateMaxTorque",
+    "UpdateMotorKp",
+    "UpdateMotorKi",
+    "UpdateCrsfLinkStatsTimeout",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameUpdateUnion(UpdateUnion e) {
-  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateMaxTorque)) return "";
+  if (::flatbuffers::IsOutRange(e, UpdateUnion_NONE, UpdateUnion_UpdateCrsfLinkStatsTimeout)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesUpdateUnion()[index];
 }
@@ -182,6 +203,18 @@ template<> struct UpdateUnionTraits<fbs::UpdateMaxTorque> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateMaxTorque;
 };
 
+template<> struct UpdateUnionTraits<fbs::UpdateMotorKp> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMotorKp;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateMotorKi> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMotorKi;
+};
+
+template<> struct UpdateUnionTraits<fbs::UpdateCrsfLinkStatsTimeout> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateCrsfLinkStatsTimeout;
+};
+
 template<typename T> struct UpdateUnionUnionTraits {
   static const UpdateUnion enum_value = UpdateUnion_NONE;
 };
@@ -232,6 +265,18 @@ template<> struct UpdateUnionUnionTraits<fbs::UpdateMaxCurrentT> {
 
 template<> struct UpdateUnionUnionTraits<fbs::UpdateMaxTorqueT> {
   static const UpdateUnion enum_value = UpdateUnion_UpdateMaxTorque;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateMotorKpT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMotorKp;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateMotorKiT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateMotorKi;
+};
+
+template<> struct UpdateUnionUnionTraits<fbs::UpdateCrsfLinkStatsTimeoutT> {
+  static const UpdateUnion enum_value = UpdateUnion_UpdateCrsfLinkStatsTimeout;
 };
 
 struct UpdateUnionUnion {
@@ -359,6 +404,30 @@ struct UpdateUnionUnion {
   const fbs::UpdateMaxTorqueT *AsUpdateMaxTorque() const {
     return type == UpdateUnion_UpdateMaxTorque ?
       reinterpret_cast<const fbs::UpdateMaxTorqueT *>(value) : nullptr;
+  }
+  fbs::UpdateMotorKpT *AsUpdateMotorKp() {
+    return type == UpdateUnion_UpdateMotorKp ?
+      reinterpret_cast<fbs::UpdateMotorKpT *>(value) : nullptr;
+  }
+  const fbs::UpdateMotorKpT *AsUpdateMotorKp() const {
+    return type == UpdateUnion_UpdateMotorKp ?
+      reinterpret_cast<const fbs::UpdateMotorKpT *>(value) : nullptr;
+  }
+  fbs::UpdateMotorKiT *AsUpdateMotorKi() {
+    return type == UpdateUnion_UpdateMotorKi ?
+      reinterpret_cast<fbs::UpdateMotorKiT *>(value) : nullptr;
+  }
+  const fbs::UpdateMotorKiT *AsUpdateMotorKi() const {
+    return type == UpdateUnion_UpdateMotorKi ?
+      reinterpret_cast<const fbs::UpdateMotorKiT *>(value) : nullptr;
+  }
+  fbs::UpdateCrsfLinkStatsTimeoutT *AsUpdateCrsfLinkStatsTimeout() {
+    return type == UpdateUnion_UpdateCrsfLinkStatsTimeout ?
+      reinterpret_cast<fbs::UpdateCrsfLinkStatsTimeoutT *>(value) : nullptr;
+  }
+  const fbs::UpdateCrsfLinkStatsTimeoutT *AsUpdateCrsfLinkStatsTimeout() const {
+    return type == UpdateUnion_UpdateCrsfLinkStatsTimeout ?
+      reinterpret_cast<const fbs::UpdateCrsfLinkStatsTimeoutT *>(value) : nullptr;
   }
 };
 
@@ -987,6 +1056,162 @@ inline ::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(
 
 ::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMaxTorqueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct UpdateMotorKpT : public ::flatbuffers::NativeTable {
+  typedef UpdateMotorKp TableType;
+  float motor_kp = 0.0f;
+};
+
+struct UpdateMotorKp FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateMotorKpT NativeTableType;
+  typedef UpdateMotorKpBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MOTOR_KP = 4
+  };
+  float motor_kp() const {
+    return GetField<float>(VT_MOTOR_KP, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MOTOR_KP, 4) &&
+           verifier.EndTable();
+  }
+  UpdateMotorKpT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateMotorKpT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateMotorKp> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKpT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateMotorKpBuilder {
+  typedef UpdateMotorKp Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_motor_kp(float motor_kp) {
+    fbb_.AddElement<float>(UpdateMotorKp::VT_MOTOR_KP, motor_kp, 0.0f);
+  }
+  explicit UpdateMotorKpBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateMotorKp> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateMotorKp>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateMotorKp> CreateUpdateMotorKp(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float motor_kp = 0.0f) {
+  UpdateMotorKpBuilder builder_(_fbb);
+  builder_.add_motor_kp(motor_kp);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateMotorKp> CreateUpdateMotorKp(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKpT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateMotorKiT : public ::flatbuffers::NativeTable {
+  typedef UpdateMotorKi TableType;
+  float motor_ki = 0.0f;
+};
+
+struct UpdateMotorKi FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateMotorKiT NativeTableType;
+  typedef UpdateMotorKiBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MOTOR_KI = 4
+  };
+  float motor_ki() const {
+    return GetField<float>(VT_MOTOR_KI, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_MOTOR_KI, 4) &&
+           verifier.EndTable();
+  }
+  UpdateMotorKiT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateMotorKiT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateMotorKi> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKiT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateMotorKiBuilder {
+  typedef UpdateMotorKi Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_motor_ki(float motor_ki) {
+    fbb_.AddElement<float>(UpdateMotorKi::VT_MOTOR_KI, motor_ki, 0.0f);
+  }
+  explicit UpdateMotorKiBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateMotorKi> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateMotorKi>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateMotorKi> CreateUpdateMotorKi(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float motor_ki = 0.0f) {
+  UpdateMotorKiBuilder builder_(_fbb);
+  builder_.add_motor_ki(motor_ki);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateMotorKi> CreateUpdateMotorKi(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKiT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UpdateCrsfLinkStatsTimeoutT : public ::flatbuffers::NativeTable {
+  typedef UpdateCrsfLinkStatsTimeout TableType;
+  int32_t timeout_millis = 0;
+};
+
+struct UpdateCrsfLinkStatsTimeout FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UpdateCrsfLinkStatsTimeoutT NativeTableType;
+  typedef UpdateCrsfLinkStatsTimeoutBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TIMEOUT_MILLIS = 4
+  };
+  int32_t timeout_millis() const {
+    return GetField<int32_t>(VT_TIMEOUT_MILLIS, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_TIMEOUT_MILLIS, 4) &&
+           verifier.EndTable();
+  }
+  UpdateCrsfLinkStatsTimeoutT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UpdateCrsfLinkStatsTimeoutT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCrsfLinkStatsTimeoutT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UpdateCrsfLinkStatsTimeoutBuilder {
+  typedef UpdateCrsfLinkStatsTimeout Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_timeout_millis(int32_t timeout_millis) {
+    fbb_.AddElement<int32_t>(UpdateCrsfLinkStatsTimeout::VT_TIMEOUT_MILLIS, timeout_millis, 0);
+  }
+  explicit UpdateCrsfLinkStatsTimeoutBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> CreateUpdateCrsfLinkStatsTimeout(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t timeout_millis = 0) {
+  UpdateCrsfLinkStatsTimeoutBuilder builder_(_fbb);
+  builder_.add_timeout_millis(timeout_millis);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> CreateUpdateCrsfLinkStatsTimeout(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCrsfLinkStatsTimeoutT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct UpdateT : public ::flatbuffers::NativeTable {
   typedef Update TableType;
   fbs::UpdateUnionUnion update{};
@@ -1041,6 +1266,15 @@ struct Update FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const fbs::UpdateMaxTorque *update_as_UpdateMaxTorque() const {
     return update_type() == fbs::UpdateUnion_UpdateMaxTorque ? static_cast<const fbs::UpdateMaxTorque *>(update()) : nullptr;
+  }
+  const fbs::UpdateMotorKp *update_as_UpdateMotorKp() const {
+    return update_type() == fbs::UpdateUnion_UpdateMotorKp ? static_cast<const fbs::UpdateMotorKp *>(update()) : nullptr;
+  }
+  const fbs::UpdateMotorKi *update_as_UpdateMotorKi() const {
+    return update_type() == fbs::UpdateUnion_UpdateMotorKi ? static_cast<const fbs::UpdateMotorKi *>(update()) : nullptr;
+  }
+  const fbs::UpdateCrsfLinkStatsTimeout *update_as_UpdateCrsfLinkStatsTimeout() const {
+    return update_type() == fbs::UpdateUnion_UpdateCrsfLinkStatsTimeout ? static_cast<const fbs::UpdateCrsfLinkStatsTimeout *>(update()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1100,6 +1334,18 @@ template<> inline const fbs::UpdateMaxCurrent *Update::update_as<fbs::UpdateMaxC
 
 template<> inline const fbs::UpdateMaxTorque *Update::update_as<fbs::UpdateMaxTorque>() const {
   return update_as_UpdateMaxTorque();
+}
+
+template<> inline const fbs::UpdateMotorKp *Update::update_as<fbs::UpdateMotorKp>() const {
+  return update_as_UpdateMotorKp();
+}
+
+template<> inline const fbs::UpdateMotorKi *Update::update_as<fbs::UpdateMotorKi>() const {
+  return update_as_UpdateMotorKi();
+}
+
+template<> inline const fbs::UpdateCrsfLinkStatsTimeout *Update::update_as<fbs::UpdateCrsfLinkStatsTimeout>() const {
+  return update_as_UpdateCrsfLinkStatsTimeout();
 }
 
 struct UpdateBuilder {
@@ -1447,6 +1693,84 @@ inline ::flatbuffers::Offset<UpdateMaxTorque> CreateUpdateMaxTorque(::flatbuffer
       _max_torque);
 }
 
+inline UpdateMotorKpT *UpdateMotorKp::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateMotorKpT>(new UpdateMotorKpT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateMotorKp::UnPackTo(UpdateMotorKpT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = motor_kp(); _o->motor_kp = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateMotorKp> UpdateMotorKp::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKpT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateMotorKp(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateMotorKp> CreateUpdateMotorKp(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKpT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateMotorKpT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _motor_kp = _o->motor_kp;
+  return fbs::CreateUpdateMotorKp(
+      _fbb,
+      _motor_kp);
+}
+
+inline UpdateMotorKiT *UpdateMotorKi::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateMotorKiT>(new UpdateMotorKiT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateMotorKi::UnPackTo(UpdateMotorKiT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = motor_ki(); _o->motor_ki = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateMotorKi> UpdateMotorKi::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKiT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateMotorKi(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateMotorKi> CreateUpdateMotorKi(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateMotorKiT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateMotorKiT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _motor_ki = _o->motor_ki;
+  return fbs::CreateUpdateMotorKi(
+      _fbb,
+      _motor_ki);
+}
+
+inline UpdateCrsfLinkStatsTimeoutT *UpdateCrsfLinkStatsTimeout::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UpdateCrsfLinkStatsTimeoutT>(new UpdateCrsfLinkStatsTimeoutT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UpdateCrsfLinkStatsTimeout::UnPackTo(UpdateCrsfLinkStatsTimeoutT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = timeout_millis(); _o->timeout_millis = _e; }
+}
+
+inline ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> UpdateCrsfLinkStatsTimeout::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCrsfLinkStatsTimeoutT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUpdateCrsfLinkStatsTimeout(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UpdateCrsfLinkStatsTimeout> CreateUpdateCrsfLinkStatsTimeout(::flatbuffers::FlatBufferBuilder &_fbb, const UpdateCrsfLinkStatsTimeoutT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UpdateCrsfLinkStatsTimeoutT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _timeout_millis = _o->timeout_millis;
+  return fbs::CreateUpdateCrsfLinkStatsTimeout(
+      _fbb,
+      _timeout_millis);
+}
+
 inline UpdateT *Update::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<UpdateT>(new UpdateT());
   UnPackTo(_o.get(), _resolver);
@@ -1529,6 +1853,18 @@ inline bool VerifyUpdateUnion(::flatbuffers::Verifier &verifier, const void *obj
       auto ptr = reinterpret_cast<const fbs::UpdateMaxTorque *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case UpdateUnion_UpdateMotorKp: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKp *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKi *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      auto ptr = reinterpret_cast<const fbs::UpdateCrsfLinkStatsTimeout *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -1596,6 +1932,18 @@ inline void *UpdateUnionUnion::UnPack(const void *obj, UpdateUnion type, const :
       auto ptr = reinterpret_cast<const fbs::UpdateMaxTorque *>(obj);
       return ptr->UnPack(resolver);
     }
+    case UpdateUnion_UpdateMotorKp: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKp *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKi *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      auto ptr = reinterpret_cast<const fbs::UpdateCrsfLinkStatsTimeout *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -1651,6 +1999,18 @@ inline ::flatbuffers::Offset<void> UpdateUnionUnion::Pack(::flatbuffers::FlatBuf
       auto ptr = reinterpret_cast<const fbs::UpdateMaxTorqueT *>(value);
       return CreateUpdateMaxTorque(_fbb, ptr, _rehasher).Union();
     }
+    case UpdateUnion_UpdateMotorKp: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKpT *>(value);
+      return CreateUpdateMotorKp(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      auto ptr = reinterpret_cast<const fbs::UpdateMotorKiT *>(value);
+      return CreateUpdateMotorKi(_fbb, ptr, _rehasher).Union();
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      auto ptr = reinterpret_cast<const fbs::UpdateCrsfLinkStatsTimeoutT *>(value);
+      return CreateUpdateCrsfLinkStatsTimeout(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -1703,6 +2063,18 @@ inline UpdateUnionUnion::UpdateUnionUnion(const UpdateUnionUnion &u) : type(u.ty
     }
     case UpdateUnion_UpdateMaxTorque: {
       value = new fbs::UpdateMaxTorqueT(*reinterpret_cast<fbs::UpdateMaxTorqueT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateMotorKp: {
+      value = new fbs::UpdateMotorKpT(*reinterpret_cast<fbs::UpdateMotorKpT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      value = new fbs::UpdateMotorKiT(*reinterpret_cast<fbs::UpdateMotorKiT *>(u.value));
+      break;
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      value = new fbs::UpdateCrsfLinkStatsTimeoutT(*reinterpret_cast<fbs::UpdateCrsfLinkStatsTimeoutT *>(u.value));
       break;
     }
     default:
@@ -1769,6 +2141,21 @@ inline void UpdateUnionUnion::Reset() {
     }
     case UpdateUnion_UpdateMaxTorque: {
       auto ptr = reinterpret_cast<fbs::UpdateMaxTorqueT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateMotorKp: {
+      auto ptr = reinterpret_cast<fbs::UpdateMotorKpT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      auto ptr = reinterpret_cast<fbs::UpdateMotorKiT *>(value);
+      delete ptr;
+      break;
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      auto ptr = reinterpret_cast<fbs::UpdateCrsfLinkStatsTimeoutT *>(value);
       delete ptr;
       break;
     }
