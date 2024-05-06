@@ -111,7 +111,17 @@ void TaskControlMotors::broadcastStatusUpdate() {
 
 void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
-  // cybergearL.enable_motor();
+  
+  // These checks are important because the motor doesn't have a speed limit
+  // that applies to the speed control mode.
+  if (speedL > maxSpeed || speedL < -maxSpeed) {
+    Serial.println("[WARN] Speed limit exceeded for left motor");
+    speedL = speedL > 0 ? maxSpeed : -maxSpeed;
+  } 
+  if (speedR > maxSpeed || speedR < -maxSpeed) {
+    Serial.println("[WARN] Speed limit exceeded for right motor");
+    speedR = speedR > 0 ? maxSpeed : -maxSpeed;
+  }
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
