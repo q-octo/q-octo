@@ -49,6 +49,16 @@ void TaskRC::loop() {
     taskMessage = {.type = DataManager::Type::STATE_RC, .as = {.rc = rc}};
     DataManager::receiveMessage(taskMessage);
   }
+
+  const bool hasReceiverTimedOut = currentMillis - lastReceiverUpdateMs >= RECEIVER_TIMEOUT_MS;  
+  if (receiverTimedOut != hasReceiverTimedOut) {
+    receiverTimedOut = hasReceiverTimedOut;
+    if (receiverTimedOut) {
+      onFailsafeActivated();
+    } else {
+      onFailsafeCleared();
+    }
+  }
 }
 
 void TaskRC::receiveMessage(const Message &message) {
@@ -72,8 +82,9 @@ void TaskRC::receiveMessage(const Message &message) {
 
 void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
   const uint32_t currentMillis = millis();
+  lastReceiverUpdateMs = currentMillis;
 #if DEBUG_LOG_RC_LINK_STATS
-  if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY) {
+  // if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY) {
     lastRcLinkStatsLogMs = currentMillis;
     Serial.print("Link Statistics: ");
     Serial.print("RSSI: ");
@@ -84,7 +95,7 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
     Serial.print(linkStatistics.snr);
     Serial.print(", Transmitter Power: ");
     Serial.println(linkStatistics.tx_power);
-  }
+  // }
 #endif
 }
 
@@ -135,26 +146,27 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
 }
 
 void TaskRC::onFailsafeActivated() {
-  if (isFailsafeActive) {
-    return;
-  }
-  isFailsafeActive = true;
   Serial.println("[WARN]: Failsafe detected.");
   taskMessage = {.type = DataManager::Type::TX_LOST};
   DataManager::receiveMessage(taskMessage);
 }
 
-void TaskRC::onFailsafeCleared() {
-  if (!isFailsafeActive) {
+void TaskRC::onFailsafeCleared() { 
+  if (isFailsafeActive) {
+    Serial.println("[WARN] attempted to clear failsafe but RC failsafe is still active");
     return;
   }
-  isFailsafeActive = false;
+  if (receiverTimedOut) {
+    Serial.println("[WARN] attempted to clear failsafe but receiver is still timed out");
+    return;
+  }
   Serial.println("[INFO]: Failsafe cleared.");
   taskMessage = {.type = DataManager::Type::TX_RESTORED};
   DataManager::receiveMessage(taskMessage);
 }
 
 void TaskRC::onFailsafe(const bool failsafe) {
+  isFailsafeActive = failsafe;
   if (failsafe) {
     onFailsafeActivated();
   } else {

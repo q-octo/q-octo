@@ -38,11 +38,17 @@ private:
   static void onFailsafeActivated();
 
   static void onFailsafeCleared();
+  static bool failsafeActive() { return isFailsafeActive || receiverTimedOut;}
 
 
   static inline DataManager::Message taskMessage;
   /* A flag to hold the fail-safe status. */
   static inline bool isFailsafeActive = false;
+  /// True if we haven't received a link stats update in the expected timeframe.
+  static inline bool receiverTimedOut = false;
+  static inline uint32_t lastReceiverUpdateMs = 0;
+  // Seems like we receive updates more frequently when the receiver is connected
+  static const uint32_t RECEIVER_TIMEOUT_MS = 2000;
 
   /* RC Channels data. */
   static inline int rcChannelCount = 8;
