@@ -18,7 +18,8 @@ struct StorageState
     // max = 27.0
     float motorCurrentLimit = 2.0f;
     // Max = 12.5
-    float motorTorqueLimit = 2.0f;
+    // TODO this doesn't seem to work!!
+    float motorTorqueLimit = 0.5f;
     // TODO use these
     float speedKp = 1.0f; // Default was 1
     float speedKi = 0.002f; // Default was 0.002

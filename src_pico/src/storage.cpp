@@ -1,6 +1,7 @@
 #include "storage.h"
 #include "task_rc.h"
 #include "CRC.h"
+#include "config.h"
 
 /**
  * Bear in mind that the Pi Pico does not have a real EEPROM.
@@ -17,6 +18,9 @@ void Storage::init()
         return;
     }
     EEPROM.begin(size);
+    if (CFG_DEBUG_WIPE_STORAGE) {
+        save();
+    }
     EEPROM.get(0, stateWithCRC);
     if (isCrcValid())
     {
