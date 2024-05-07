@@ -84,7 +84,7 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
   const uint32_t currentMillis = millis();
   lastReceiverUpdateMs = currentMillis;
 #if DEBUG_LOG_RC_LINK_STATS
-  // if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY) {
+  if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY) {
     lastRcLinkStatsLogMs = currentMillis;
     Serial.print("Link Statistics: ");
     Serial.print("RSSI: ");
@@ -95,7 +95,7 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
     Serial.print(linkStatistics.snr);
     Serial.print(", Transmitter Power: ");
     Serial.println(linkStatistics.tx_power);
-  // }
+  }
 #endif
 }
 
