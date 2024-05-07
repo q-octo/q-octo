@@ -6,7 +6,6 @@ import * as flatbuffers from 'flatbuffers';
 
 import { CompanionRxUnion, unionToCompanionRxUnion, unionListToCompanionRxUnion } from '../fbs/companion-rx-union.js';
 import { Robot, RobotT } from '../fbs/robot.js';
-import { SetWebServerEnabled, SetWebServerEnabledT } from '../fbs/set-web-server-enabled.js';
 
 
 export class CompanionRx implements flatbuffers.IUnpackableObject<CompanionRxT> {
@@ -98,7 +97,7 @@ unpackTo(_o: CompanionRxT): void {
 export class CompanionRxT implements flatbuffers.IGeneratedObject {
 constructor(
   public messageType: CompanionRxUnion = CompanionRxUnion.NONE,
-  public message: RobotT|SetWebServerEnabledT|null = null
+  public message: RobotT|null = null
 ){}
 
 

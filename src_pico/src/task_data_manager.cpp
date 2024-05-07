@@ -157,9 +157,37 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       state.displayMessages = message.as.displayMessages;
       broadcastStateUpdate();
     case UPDATE_MOTOR_SPEED_LIMIT:
-      // controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_SPEED_LIMIT;
-      // controlMotorsMessage.as = {.speedLimit = message.as.motorLimit};
-      // TaskControlMotors::receiveMessage(controlMotorsMessage);
+      controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_SPEED_LIMIT;
+      controlMotorsMessage.as = {.floatMotorParam = message.as.floatMotorParam};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
+    case UPDATE_MOTOR_CURRENT_LIMIT:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_CURRENT_LIMIT;
+      controlMotorsMessage.as = {.floatMotorParam = message.as.floatMotorParam};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
+    case UPDATE_MOTOR_TORQUE_LIMIT:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_TORQUE_LIMIT;
+      controlMotorsMessage.as = {.floatMotorParam = message.as.floatMotorParam};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
+    case UPDATE_MOTOR_SPEED_KP:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_SPEED_KP;
+      controlMotorsMessage.as = {.floatMotorParam = message.as.floatMotorParam};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
+    case UPDATE_MOTOR_SPEED_KI:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::UPDATE_SPEED_KI;
+      controlMotorsMessage.as = {.floatMotorParam = message.as.floatMotorParam};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      break;
+    case LEFT_MOTOR_PARAM_UPDATED:
+      state.leftMotorLimits = message.as.motorParams;
+      broadcastStateUpdate();
+      break;
+    case RIGHT_MOTOR_PARAM_UPDATED:
+      state.rightMotorLimits = message.as.motorParams;
+      broadcastStateUpdate();
       break;
     default:
       Serial.println("[ERROR] Unknown message type");

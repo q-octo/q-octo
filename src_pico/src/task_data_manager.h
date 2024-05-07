@@ -32,9 +32,13 @@ public:
     DISPLAY_MESSAGES,
     BUTTON_DOWN,
     BUTTON_UP,
-    UPDATE_MOTOR_SPEED_LIMIT,
+    UPDATE_MOTOR_SPEED_LIMIT, // Request to update a motor limit
     UPDATE_MOTOR_CURRENT_LIMIT,
     UPDATE_MOTOR_TORQUE_LIMIT,
+    UPDATE_MOTOR_SPEED_KP,
+    UPDATE_MOTOR_SPEED_KI,
+    LEFT_MOTOR_PARAM_UPDATED,
+    RIGHT_MOTOR_PARAM_UPDATED,
   } Type;
 
   typedef struct {
@@ -117,6 +121,19 @@ public:
   } Status;
 
   typedef struct {
+    float max_speed;
+    float max_current;
+    float max_torque;
+    float speed_kp;
+    float speed_ki;
+    unsigned long last_max_speed_update = 0;
+    unsigned long last_max_current_update = 0;
+    unsigned long last_max_torque_update = 0;
+    unsigned long last_speed_kp_update = 0;
+    unsigned long last_speed_ki_update = 0;
+  } TimestampedMotorLimits;
+
+  typedef struct {
     Type type;
     union {
       Motors motors;
@@ -131,7 +148,8 @@ public:
       DisplayButton displayButton;
       DisplayMessages displayMessages;
       PhysicalButton physicalButton;
-      float motorLimit;
+      float floatMotorParam;
+      TimestampedMotorLimits motorParams;
     } as;
   } Message;
 
@@ -141,9 +159,9 @@ public:
     RC rc;
     bool webServerEnabled;
     DisplayMessages displayMessages;
-    MotorLimitsT* leftMotorLimits = nullptr;
-    MotorLimitsT* rightMotorLimits = nullptr;
-  } State;
+    TimestampedMotorLimits leftMotorLimits;
+    TimestampedMotorLimits rightMotorLimits;
+  } State; 
 
   static void receiveMessage(const Message &message);
 

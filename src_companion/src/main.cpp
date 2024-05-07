@@ -46,13 +46,6 @@ void onReceiveSerialMessage(const CompanionRxT &message) {
   switch (msg.type) {
     case CompanionRxUnion_NONE:
       break;
-    case CompanionRxUnion_SetWebServerEnabled:
-      if (msg.AsSetWebServerEnabled()->enabled) {
-        webServer.start();
-      } else {
-        webServer.stop();
-      }
-      break;
     case CompanionRxUnion_Robot:
       display.updateState(*msg.AsRobot());
       webServer.updateState(*msg.AsRobot());

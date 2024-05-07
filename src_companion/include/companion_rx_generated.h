@@ -17,35 +17,28 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
 
 namespace fbs {
 
-struct SetWebServerEnabled;
-struct SetWebServerEnabledBuilder;
-struct SetWebServerEnabledT;
-
 struct CompanionRx;
 struct CompanionRxBuilder;
 struct CompanionRxT;
 
 enum CompanionRxUnion : uint8_t {
   CompanionRxUnion_NONE = 0,
-  CompanionRxUnion_SetWebServerEnabled = 1,
-  CompanionRxUnion_Robot = 2,
+  CompanionRxUnion_Robot = 1,
   CompanionRxUnion_MIN = CompanionRxUnion_NONE,
   CompanionRxUnion_MAX = CompanionRxUnion_Robot
 };
 
-inline const CompanionRxUnion (&EnumValuesCompanionRxUnion())[3] {
+inline const CompanionRxUnion (&EnumValuesCompanionRxUnion())[2] {
   static const CompanionRxUnion values[] = {
     CompanionRxUnion_NONE,
-    CompanionRxUnion_SetWebServerEnabled,
     CompanionRxUnion_Robot
   };
   return values;
 }
 
 inline const char * const *EnumNamesCompanionRxUnion() {
-  static const char * const names[4] = {
+  static const char * const names[3] = {
     "NONE",
-    "SetWebServerEnabled",
     "Robot",
     nullptr
   };
@@ -62,20 +55,12 @@ template<typename T> struct CompanionRxUnionTraits {
   static const CompanionRxUnion enum_value = CompanionRxUnion_NONE;
 };
 
-template<> struct CompanionRxUnionTraits<fbs::SetWebServerEnabled> {
-  static const CompanionRxUnion enum_value = CompanionRxUnion_SetWebServerEnabled;
-};
-
 template<> struct CompanionRxUnionTraits<fbs::Robot> {
   static const CompanionRxUnion enum_value = CompanionRxUnion_Robot;
 };
 
 template<typename T> struct CompanionRxUnionUnionTraits {
   static const CompanionRxUnion enum_value = CompanionRxUnion_NONE;
-};
-
-template<> struct CompanionRxUnionUnionTraits<fbs::SetWebServerEnabledT> {
-  static const CompanionRxUnion enum_value = CompanionRxUnion_SetWebServerEnabled;
 };
 
 template<> struct CompanionRxUnionUnionTraits<fbs::RobotT> {
@@ -112,14 +97,6 @@ struct CompanionRxUnionUnion {
   static void *UnPack(const void *obj, CompanionRxUnion type, const ::flatbuffers::resolver_function_t *resolver);
   ::flatbuffers::Offset<void> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
 
-  fbs::SetWebServerEnabledT *AsSetWebServerEnabled() {
-    return type == CompanionRxUnion_SetWebServerEnabled ?
-      reinterpret_cast<fbs::SetWebServerEnabledT *>(value) : nullptr;
-  }
-  const fbs::SetWebServerEnabledT *AsSetWebServerEnabled() const {
-    return type == CompanionRxUnion_SetWebServerEnabled ?
-      reinterpret_cast<const fbs::SetWebServerEnabledT *>(value) : nullptr;
-  }
   fbs::RobotT *AsRobot() {
     return type == CompanionRxUnion_Robot ?
       reinterpret_cast<fbs::RobotT *>(value) : nullptr;
@@ -132,58 +109,6 @@ struct CompanionRxUnionUnion {
 
 bool VerifyCompanionRxUnion(::flatbuffers::Verifier &verifier, const void *obj, CompanionRxUnion type);
 bool VerifyCompanionRxUnionVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
-
-struct SetWebServerEnabledT : public ::flatbuffers::NativeTable {
-  typedef SetWebServerEnabled TableType;
-  bool enabled = false;
-};
-
-struct SetWebServerEnabled FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef SetWebServerEnabledT NativeTableType;
-  typedef SetWebServerEnabledBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ENABLED = 4
-  };
-  bool enabled() const {
-    return GetField<uint8_t>(VT_ENABLED, 0) != 0;
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_ENABLED, 1) &&
-           verifier.EndTable();
-  }
-  SetWebServerEnabledT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(SetWebServerEnabledT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<SetWebServerEnabled> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SetWebServerEnabledT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct SetWebServerEnabledBuilder {
-  typedef SetWebServerEnabled Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_enabled(bool enabled) {
-    fbb_.AddElement<uint8_t>(SetWebServerEnabled::VT_ENABLED, static_cast<uint8_t>(enabled), 0);
-  }
-  explicit SetWebServerEnabledBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<SetWebServerEnabled> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<SetWebServerEnabled>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<SetWebServerEnabled> CreateSetWebServerEnabled(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    bool enabled = false) {
-  SetWebServerEnabledBuilder builder_(_fbb);
-  builder_.add_enabled(enabled);
-  return builder_.Finish();
-}
-
-::flatbuffers::Offset<SetWebServerEnabled> CreateSetWebServerEnabled(::flatbuffers::FlatBufferBuilder &_fbb, const SetWebServerEnabledT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct CompanionRxT : public ::flatbuffers::NativeTable {
   typedef CompanionRx TableType;
@@ -204,9 +129,6 @@ struct CompanionRx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetPointer<const void *>(VT_MESSAGE);
   }
   template<typename T> const T *message_as() const;
-  const fbs::SetWebServerEnabled *message_as_SetWebServerEnabled() const {
-    return message_type() == fbs::CompanionRxUnion_SetWebServerEnabled ? static_cast<const fbs::SetWebServerEnabled *>(message()) : nullptr;
-  }
   const fbs::Robot *message_as_Robot() const {
     return message_type() == fbs::CompanionRxUnion_Robot ? static_cast<const fbs::Robot *>(message()) : nullptr;
   }
@@ -221,10 +143,6 @@ struct CompanionRx FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   void UnPackTo(CompanionRxT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
   static ::flatbuffers::Offset<CompanionRx> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CompanionRxT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
-
-template<> inline const fbs::SetWebServerEnabled *CompanionRx::message_as<fbs::SetWebServerEnabled>() const {
-  return message_as_SetWebServerEnabled();
-}
 
 template<> inline const fbs::Robot *CompanionRx::message_as<fbs::Robot>() const {
   return message_as_Robot();
@@ -263,32 +181,6 @@ inline ::flatbuffers::Offset<CompanionRx> CreateCompanionRx(
 
 ::flatbuffers::Offset<CompanionRx> CreateCompanionRx(::flatbuffers::FlatBufferBuilder &_fbb, const CompanionRxT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-inline SetWebServerEnabledT *SetWebServerEnabled::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<SetWebServerEnabledT>(new SetWebServerEnabledT());
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void SetWebServerEnabled::UnPackTo(SetWebServerEnabledT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = enabled(); _o->enabled = _e; }
-}
-
-inline ::flatbuffers::Offset<SetWebServerEnabled> SetWebServerEnabled::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const SetWebServerEnabledT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateSetWebServerEnabled(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<SetWebServerEnabled> CreateSetWebServerEnabled(::flatbuffers::FlatBufferBuilder &_fbb, const SetWebServerEnabledT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const SetWebServerEnabledT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _enabled = _o->enabled;
-  return fbs::CreateSetWebServerEnabled(
-      _fbb,
-      _enabled);
-}
-
 inline CompanionRxT *CompanionRx::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<CompanionRxT>(new CompanionRxT());
   UnPackTo(_o.get(), _resolver);
@@ -323,10 +215,6 @@ inline bool VerifyCompanionRxUnion(::flatbuffers::Verifier &verifier, const void
     case CompanionRxUnion_NONE: {
       return true;
     }
-    case CompanionRxUnion_SetWebServerEnabled: {
-      auto ptr = reinterpret_cast<const fbs::SetWebServerEnabled *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
     case CompanionRxUnion_Robot: {
       auto ptr = reinterpret_cast<const fbs::Robot *>(obj);
       return verifier.VerifyTable(ptr);
@@ -350,10 +238,6 @@ inline bool VerifyCompanionRxUnionVector(::flatbuffers::Verifier &verifier, cons
 inline void *CompanionRxUnionUnion::UnPack(const void *obj, CompanionRxUnion type, const ::flatbuffers::resolver_function_t *resolver) {
   (void)resolver;
   switch (type) {
-    case CompanionRxUnion_SetWebServerEnabled: {
-      auto ptr = reinterpret_cast<const fbs::SetWebServerEnabled *>(obj);
-      return ptr->UnPack(resolver);
-    }
     case CompanionRxUnion_Robot: {
       auto ptr = reinterpret_cast<const fbs::Robot *>(obj);
       return ptr->UnPack(resolver);
@@ -365,10 +249,6 @@ inline void *CompanionRxUnionUnion::UnPack(const void *obj, CompanionRxUnion typ
 inline ::flatbuffers::Offset<void> CompanionRxUnionUnion::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher) const {
   (void)_rehasher;
   switch (type) {
-    case CompanionRxUnion_SetWebServerEnabled: {
-      auto ptr = reinterpret_cast<const fbs::SetWebServerEnabledT *>(value);
-      return CreateSetWebServerEnabled(_fbb, ptr, _rehasher).Union();
-    }
     case CompanionRxUnion_Robot: {
       auto ptr = reinterpret_cast<const fbs::RobotT *>(value);
       return CreateRobot(_fbb, ptr, _rehasher).Union();
@@ -379,10 +259,6 @@ inline ::flatbuffers::Offset<void> CompanionRxUnionUnion::Pack(::flatbuffers::Fl
 
 inline CompanionRxUnionUnion::CompanionRxUnionUnion(const CompanionRxUnionUnion &u) : type(u.type), value(nullptr) {
   switch (type) {
-    case CompanionRxUnion_SetWebServerEnabled: {
-      value = new fbs::SetWebServerEnabledT(*reinterpret_cast<fbs::SetWebServerEnabledT *>(u.value));
-      break;
-    }
     case CompanionRxUnion_Robot: {
       value = new fbs::RobotT(*reinterpret_cast<fbs::RobotT *>(u.value));
       break;
@@ -394,11 +270,6 @@ inline CompanionRxUnionUnion::CompanionRxUnionUnion(const CompanionRxUnionUnion 
 
 inline void CompanionRxUnionUnion::Reset() {
   switch (type) {
-    case CompanionRxUnion_SetWebServerEnabled: {
-      auto ptr = reinterpret_cast<fbs::SetWebServerEnabledT *>(value);
-      delete ptr;
-      break;
-    }
     case CompanionRxUnion_Robot: {
       auto ptr = reinterpret_cast<fbs::RobotT *>(value);
       delete ptr;

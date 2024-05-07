@@ -20,6 +20,11 @@ public:
     CAN_MESSAGE_MOTOR_R,
     FOLD_WHEELS,
     STATE_UPDATE,
+    UPDATE_SPEED_LIMIT,
+    UPDATE_CURRENT_LIMIT,
+    UPDATE_TORQUE_LIMIT,
+    UPDATE_SPEED_KI,
+    UPDATE_SPEED_KP,
   } MessageType;
 
   typedef struct {
@@ -29,6 +34,7 @@ public:
       DataManager::SetMotorSpeedCombined speedCombined;
       DataManager::CanMessage canMessage;
       DataManager::State state;
+      float floatMotorParam;
     } as;
   } Message;
 
@@ -55,8 +61,8 @@ private:
   static inline float maxSpeed;
   static inline float maxTorque;
   static inline float maxCurrent;
-  static inline MotorLimitsT leftMotorLimits;
-  static inline MotorLimitsT rightMotorLimits;
+  static inline DataManager::TimestampedMotorLimits leftMotorLimits;
+  static inline DataManager::TimestampedMotorLimits rightMotorLimits;
   static inline unsigned long lastLeftMotorParameterResponseMicros = 0;
   static inline unsigned long lastRightMotorParameterResponseMicros = 0;
   

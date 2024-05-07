@@ -29,11 +29,46 @@ void TaskControlMotors::loop() {
     broadcastStatusUpdate();
     lastStatusBroadcastMs = currentMillis;
   }
-
-  if (cybergearL.get_motor_param().stamp_usec > lastLeftMotorParameterResponseMicros) {
-    // TODO send this as a state update 
+  auto leftParams = cybergearL.get_motor_param();
+  auto rightParams = cybergearR.get_motor_param();
+  static DataManager::Message message;
+  if (leftParams.stamp_usec > lastLeftMotorParameterResponseMicros) {
     lastLeftMotorParameterResponseMicros = currentMicros;
+    leftMotorLimits = {
+      .max_speed = leftParams.limit_spd,
+      .max_current = leftParams.limit_cur,
+      .max_torque = leftParams.limit_torque,
+      .speed_kp = leftParams.spd_kp,
+      .speed_ki = leftParams.spd_ki,
+      .last_max_speed_update = leftParams.last_speed_update_usec,
+      .last_max_current_update = leftParams.last_current_update_usec,
+      .last_max_torque_update = leftParams.last_torque_update_usec,
+      .last_speed_kp_update = leftParams.last_speed_kp_update_usec,
+      .last_speed_ki_update = leftParams.last_speed_ki_update_usec,
+    };
+    message.type = DataManager::Type::LEFT_MOTOR_PARAM_UPDATED;
+    message.as.motorParams = leftMotorLimits;
+    DataManager::receiveMessage(message);
   }
+
+  if (rightParams.stamp_usec > lastRightMotorParameterResponseMicros) {
+    lastRightMotorParameterResponseMicros = currentMicros;
+    rightMotorLimits = {
+      .max_speed = rightParams.limit_spd,
+      .max_current = rightParams.limit_cur,
+      .max_torque = rightParams.limit_torque,
+      .speed_kp = rightParams.spd_kp,
+      .speed_ki = rightParams.spd_ki,
+      .last_max_speed_update = rightParams.last_speed_update_usec,
+      .last_max_current_update = rightParams.last_current_update_usec,
+      .last_max_torque_update = rightParams.last_torque_update_usec,
+      .last_speed_kp_update = rightParams.last_speed_kp_update_usec,
+      .last_speed_ki_update = rightParams.last_speed_ki_update_usec,
+    };
+    message.type = DataManager::Type::RIGHT_MOTOR_PARAM_UPDATED;
+    message.as.motorParams = rightMotorLimits;
+    DataManager::receiveMessage(message);
+  } 
 
 }
 
@@ -100,6 +135,37 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
       break;
     case STATE_UPDATE:
       handleStateUpdate();
+      break;
+    case UPDATE_SPEED_LIMIT:
+      cybergearL.set_limit_speed(message.as.floatMotorParam);
+      cybergearL.get_speed_limit();
+      cybergearR.set_limit_speed(message.as.floatMotorParam);
+      cybergearR.get_speed_limit();
+      break;
+    case UPDATE_CURRENT_LIMIT:
+      cybergearL.set_limit_current(message.as.floatMotorParam);
+      cybergearL.get_current_limit();
+      cybergearR.set_limit_current(message.as.floatMotorParam);
+      cybergearR.get_current_limit();
+      break;
+    case UPDATE_TORQUE_LIMIT:
+      cybergearL.set_limit_torque(message.as.floatMotorParam);
+      cybergearL.get_torque_limit();
+      cybergearR.set_limit_torque(message.as.floatMotorParam);
+      cybergearR.get_torque_limit();
+      break;
+    case UPDATE_SPEED_KI:
+      cybergearL.set_speed_ki(message.as.floatMotorParam);
+      cybergearL.get_speed_ki();
+      cybergearR.set_speed_ki(message.as.floatMotorParam);
+      cybergearR.get_speed_ki();
+      break;
+    case UPDATE_SPEED_KP:
+      cybergearL.set_speed_kp(message.as.floatMotorParam);
+      cybergearL.get_speed_kp();
+      cybergearR.set_speed_kp(message.as.floatMotorParam);
+      cybergearR.get_speed_kp();
+      break;
   }
 }
 

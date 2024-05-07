@@ -87,9 +87,10 @@ table Robot {
     motor_error_code: string; // Defaults not supported for strings
     enable_rover: bool = false;
     display_messages: DisplayMessages;
-    // Not sure if we'll use this
+    /// This will only occur if all physical switches are in the ON/ABSENT state.
     start_web_server_on_launch: bool = false;
     crsf_link_stats_timeout_millis: int = 2000;
+    web_server_enabled: bool = false;
 }
 
 // Define the root type and possible update types

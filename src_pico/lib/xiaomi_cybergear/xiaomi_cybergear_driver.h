@@ -55,6 +55,13 @@ struct XiaomiCyberGearMotorParameter
   float loc_kp;
   float spd_kp;
   float spd_ki;
+  unsigned long last_torque_update_usec = 0;
+  unsigned long last_speed_update_usec = 0;
+  unsigned long last_current_update_usec = 0;
+  unsigned long last_torque_update_usec = 0;
+  unsigned long last_speed_kp_update_usec = 0;
+  unsigned long last_speed_ki_update_usec = 0;
+  unsigned long last_vbus_update_usec = 0;
 };
 
 class XiaomiCyberGearDriver {
@@ -103,6 +110,8 @@ class XiaomiCyberGearDriver {
         void get_speed_limit();
         void get_current_limit();
         void get_torque_limit();
+        void get_speed_kp();
+        void get_speed_ki();
 
         /**
         * @brief Get the motor param object

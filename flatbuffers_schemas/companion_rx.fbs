@@ -6,12 +6,7 @@ namespace fbs;
 
 file_identifier "CNRX";
 
-table SetWebServerEnabled {
-    enabled: bool;
-}
-
 union CompanionRxUnion {
-    SetWebServerEnabled,
     Robot, // from robot_state.fbs
 }
 

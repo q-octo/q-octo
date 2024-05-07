@@ -177,6 +177,16 @@ void XiaomiCyberGearDriver::get_torque_limit()
   read_ram_data(ADDR_LIMIT_TORQUE);
 }
 
+void XiaomiCyberGearDriver::get_speed_kp()
+{
+  read_ram_data(ADDR_SPEED_KP);
+}
+
+void XiaomiCyberGearDriver::get_speed_ki()
+{
+  read_ram_data(ADDR_SPEED_KI);
+}
+
 void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
 {
     const uint8_t type = id >> 24;
@@ -230,23 +240,29 @@ void XiaomiCyberGearDriver::process_read_parameter_packet(const uint8_t * data)
   memcpy(&float_data, &data[4], sizeof(float));
 
   bool is_updated = true;
+  
+  const unsigned long currentMicros = micros();
 
   switch (index)
   {
     case ADDR_LIMIT_TORQUE:
       motor_param_.limit_torque = float_data;
+      motor_param_.last_torque_update_usec = currentMicros;
       Serial.printf("Receive ADDR_LIMIT_TORQUE = [%f]\n", float_data);
       break;
     case ADDR_LIMIT_SPEED:
       motor_param_.limit_spd = float_data;
+      motor_param_.last_speed_update_usec = currentMicros;
       Serial.printf("Receive ADDR_LIMIT_SPEED = [%f]\n", float_data);
       break;
     case ADDR_LIMIT_CURRENT:
       motor_param_.limit_cur = float_data;
+      motor_param_.last_current_update_usec = currentMicros;
       Serial.printf("Receive ADDR_LIMIT_CURRENT = [%f]\n", float_data);
       break;
     case ADDR_VBUS:
       motor_param_.vbus = float_data;
+      motor_param_.last_vbus_update_usec = currentMicros;
       Serial.printf("Receive ADDR_VBUS = [%f]\n", float_data);
       break;
     default:
