@@ -48,6 +48,7 @@ private:
 
     WebServer *webServer = nullptr;
     WebSocketsServer *webSocket = nullptr;
+    DNSServer *dnsServer = nullptr;
     flatbuffers::FlatBufferBuilder fbb;
     bool webServerIsRunning = false;
     uint32_t lastWebSocketRestart = 0;

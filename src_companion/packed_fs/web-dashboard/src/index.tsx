@@ -20,7 +20,7 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 			<div className="md:flex md:space-x-4">
 				{/* Motor 1 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm mb-4 md:mb-0 flex-1 md:mr-2">
-					<h3 className="text-lg font-bold mb-2">Motor 1</h3>
+					<h3 className="text-lg font-bold mb-2">Left Motor</h3>
 					<p className="mb-1">Temp: <span className="font-medium">{rover.motors.motor1.temperature}°C</span></p>
 					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor1.rps} RPM</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor1.angle} °</span></p>
@@ -30,7 +30,7 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 				{/* Motor 2 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm flex-1">
-					<h3 className="text-lg font-bold mb-2">Motor 2</h3>
+					<h3 className="text-lg font-bold mb-2">Right Motor</h3>
 					<p className="mb-1">Temp: <span className="font-medium">{rover.motors.motor2.temperature} °C</span></p>
 					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor2.rps} RPM</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor2.angle} °</span></p>
@@ -206,7 +206,7 @@ export function App() {
 		},
 		batteries: -1,
 		control_source: "RC",
-		status: "NOT_X",
+		status: "NO_TX",
 		voltage: -1,
 		current: -1,
 		rssi: -1,
