@@ -38,7 +38,7 @@ void setup() {
     // Wait for serial connection to be established
     while (!Serial);
   }
-  delay(1000); // Wait for a second
+  delay(2000); // Wait for motors to receive power.
   Serial.println("Live on core 0");
 
   Storage::init(); // Intentionally initialised first

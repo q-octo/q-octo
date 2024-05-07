@@ -61,6 +61,8 @@ void QOctoWebServer::start()
     webServer = new WebServer(80);
     webServer->on("/", [this]()
                   { handleRoot(); });
+    webServer->onNotFound([this]()
+                          { handleRoot(); });
     const struct packed_file *p;
     for (p = packed_files; p->name != nullptr; p++)
     {
@@ -88,6 +90,9 @@ void QOctoWebServer::start()
         MDNS.addService("ws", "tcp", 81);
     }
 
+    dnsServer = new DNSServer();
+    dnsServer->start(53, "*", apIP);
+
     webServerIsRunning = true;
 }
 
@@ -108,6 +113,13 @@ void QOctoWebServer::stop()
     Serial.println("Stopping web server");
     MDNS.close();
     Serial.println("mDNS responder stopped");
+    
+    if (dnsServer != nullptr) {
+        dnsServer->stop();
+        delete dnsServer;
+        dnsServer = nullptr;
+        Serial.println("DNS server stopped");
+    }
 
     if (webSocket != nullptr)
     {
@@ -144,6 +156,7 @@ void QOctoWebServer::loop()
     webServer->handleClient();
     webSocket->loop();
     MDNS.update();
+    dnsServer->processNextRequest();
     if (pendingBroadcast && millis() - lastWebSocketBroadcast > WEBSOCKET_BROADCAST_FREQ)
     {
         broadcastData();

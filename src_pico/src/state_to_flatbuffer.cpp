@@ -23,7 +23,7 @@ Status serialiseSystemStatus(const DataManager::Status &systemStatus) {
 }
 
 void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
-  const Storage::State &storageState = Storage::getState();
+  const StorageState &storageState = Storage::getState();
   robot.batteries = storageState.batteryCount;
   // TODO get control source
   robot.control_source = ControlSource_RC;

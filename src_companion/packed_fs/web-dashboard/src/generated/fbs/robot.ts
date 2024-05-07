@@ -136,8 +136,13 @@ startWebServerOnLaunch():boolean {
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
 }
 
+crsfLinkStatsTimeoutMillis():number {
+  const offset = this.bb!.__offset(this.bb_pos, 44);
+  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 2000;
+}
+
 static startRobot(builder:flatbuffers.Builder) {
-  builder.startObject(20);
+  builder.startObject(21);
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
@@ -220,6 +225,10 @@ static addStartWebServerOnLaunch(builder:flatbuffers.Builder, startWebServerOnLa
   builder.addFieldInt8(19, +startWebServerOnLaunch, +false);
 }
 
+static addCrsfLinkStatsTimeoutMillis(builder:flatbuffers.Builder, crsfLinkStatsTimeoutMillis:number) {
+  builder.addFieldInt32(20, crsfLinkStatsTimeoutMillis, 2000);
+}
+
 static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -255,7 +264,8 @@ unpack(): RobotT {
     this.motorErrorCode(),
     this.enableRover(),
     (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null),
-    this.startWebServerOnLaunch()
+    this.startWebServerOnLaunch(),
+    this.crsfLinkStatsTimeoutMillis()
   );
 }
 
@@ -281,6 +291,7 @@ unpackTo(_o: RobotT): void {
   _o.enableRover = this.enableRover();
   _o.displayMessages = (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null);
   _o.startWebServerOnLaunch = this.startWebServerOnLaunch();
+  _o.crsfLinkStatsTimeoutMillis = this.crsfLinkStatsTimeoutMillis();
 }
 }
 
@@ -305,7 +316,8 @@ constructor(
   public motorErrorCode: string|Uint8Array|null = null,
   public enableRover: boolean = false,
   public displayMessages: DisplayMessagesT|null = null,
-  public startWebServerOnLaunch: boolean = false
+  public startWebServerOnLaunch: boolean = false,
+  public crsfLinkStatsTimeoutMillis: number = 2000
 ){}
 
 
@@ -338,6 +350,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Robot.addEnableRover(builder, this.enableRover);
   Robot.addDisplayMessages(builder, displayMessages);
   Robot.addStartWebServerOnLaunch(builder, this.startWebServerOnLaunch);
+  Robot.addCrsfLinkStatsTimeoutMillis(builder, this.crsfLinkStatsTimeoutMillis);
 
   return Robot.endRobot(builder);
 }

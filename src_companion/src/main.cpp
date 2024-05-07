@@ -4,7 +4,8 @@
 #include "web_server.h"
 #include "serial.h"
 
-#define WAIT_FOR_USB_SERIAL 1
+#define WAIT_FOR_USB_SERIAL 0
+#define DEBUG_ENABLE_WIFI_ON_LAUNCH 0
 
 void toggleAButton();
 
@@ -28,6 +29,9 @@ void setup() {
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
   QOctoSerial::init(onReceiveSerialMessage);
+#if DEBUG_ENABLE_WIFI_ON_LAUNCH
+  webServer.start();
+#endif
 }
 
 void loop() {

@@ -9,7 +9,7 @@ void TaskControlMotors::init() {
     return;
   }
 
-  Storage::State &state = Storage::getState();
+  StorageState &state = Storage::getState();
   maxSpeed = state.motorSpeedLimit;
   maxCurrent = state.motorCurrentLimit;
   maxTorque = state.motorTorqueLimit;
@@ -38,21 +38,28 @@ void TaskControlMotors::loop() {
 }
 
 void TaskControlMotors::handleStateUpdate() {
-    Storage::State &state = Storage::getState();
+    StorageState &state = Storage::getState();
     if (state.motorSpeedLimit != maxSpeed) {
       maxSpeed = state.motorSpeedLimit;
       cybergearL.set_limit_speed(maxSpeed);
       cybergearR.set_limit_speed(maxSpeed);
+      Serial.print("Speed limit: ");
+      Serial.println(maxSpeed);
     }
     if (state.motorCurrentLimit != maxCurrent) {
       maxCurrent = state.motorCurrentLimit;
       cybergearL.set_limit_current(maxCurrent);
       cybergearR.set_limit_current(maxCurrent);
+      cybergearR.set_limit_current(maxCurrent);
+      Serial.print("Current limit: ");
+      Serial.println(maxCurrent);
     }
     if (state.motorTorqueLimit != maxTorque) {
       maxTorque = state.motorTorqueLimit;
       cybergearL.set_limit_torque(maxTorque);
       cybergearR.set_limit_torque(maxTorque);
+      Serial.print("Torque limit: ");
+      Serial.println(maxTorque);
     } 
 }
 
@@ -73,12 +80,12 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
       cybergearR.stop_motor();
       break;
     case TaskControlMotors::SET_SPEED_COMBINED:
-      setSpeedCombined(message.as.speedCombined.rpm,
+      setSpeedCombined(message.as.speedCombined.speed,
                        message.as.speedCombined.direction);
       break;
     case TaskControlMotors::SET_SPEED_INDIVIDUAL:
-      setSpeedIndividual(message.as.speedIndividual.rpmL,
-                         message.as.speedIndividual.rpmR);
+      setSpeedIndividual(message.as.speedIndividual.leftSpeed,
+                         message.as.speedIndividual.rightSpeed);
       break;
     case TaskControlMotors::CAN_MESSAGE_MOTOR_L:
       cybergearL.process_message(message.as.canMessage.id,
@@ -102,15 +109,15 @@ void TaskControlMotors::broadcastStatusUpdate() {
   DataManager::Motors motors = {
           .left =
                   {
-                          .temperature = statusL.temperature,
+                          .temperature = statusL.temperature / 10.0f,
                           .RPM = statusL.speed,
                           .torque = statusL.torque,
                           .position = statusL.position,
                   },
           .right =
                   {
-                          // .temperature = statusR.temperature,
-                          .temperature = static_cast<uint16_t>((millis() % 24)),
+                          // .temperature = statusR.temperature / 10.0f,
+                          .temperature = static_cast<float>((millis() % 24)),
                           .RPM = statusR.speed,
                           .torque = statusR.torque,
                           .position = statusR.position,
@@ -123,31 +130,44 @@ void TaskControlMotors::broadcastStatusUpdate() {
 
 void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
   // Serial.printf("Setting speed L: %f R: %f\n", speedL, speedR);
-  // cybergearL.enable_motor();
+  
+  if (abs(maxSpeed) > 30 || abs(maxSpeed) > 30) {
+    Serial.println("[WARN] max speed is configured out of range!");
+    Serial.println("Not setting speed.");
+    return;
+  }
+  
+  // These checks are important because the motor doesn't have a speed limit
+  // that applies to the speed control mode.
+  if (speedL > maxSpeed || speedL < -maxSpeed) {
+    Serial.println("[WARN] Speed limit exceeded for left motor");
+    speedL = speedL > 0 ? maxSpeed : -maxSpeed;
+  } 
+  if (speedR > maxSpeed || speedR < -maxSpeed) {
+    Serial.println("[WARN] Speed limit exceeded for right motor");
+    speedR = speedR > 0 ? maxSpeed : -maxSpeed;
+  }
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
 
-void TaskControlMotors::setSpeedCombined(float speed, float direction) { 
-  // Speed is between -30 and 30 rad/s
-  // Direction is between -1 and 1 (full left to full right)
-  // TODO implement mixing
-  setSpeedIndividual(speed, -speed);
+void TaskControlMotors::setSpeedCombined(float speed, float direction) {
+    // Speed is between -30 and 30 rad/s
+    // Direction is between -1 and 1 (full left to full right)
+    float scaledSpeed = speed / maxSpeed;
+    float left = (scaledSpeed - direction) * maxSpeed;
+    float right = (scaledSpeed + direction) * maxSpeed;
+    setSpeedIndividual(left, -right);
 }
 
 void TaskControlMotors::initMotors() {
-  // Command + 3 x ram write + command (for each motor)
-  // Seems like we only get two responses back though, so are we sending
-  // the messages too fast? The motor needs 500us between messages
-  cybergearL.stop_motor();
-  cybergearL.set_run_mode(MODE_SPEED);
+  cybergearL.init_motor(MODE_SPEED);
   cybergearL.set_limit_speed(maxSpeed);
   cybergearL.set_limit_current(maxCurrent);
   cybergearL.set_limit_torque(maxTorque);
   cybergearL.enable_motor();
 
-  cybergearR.stop_motor();
-  cybergearR.set_run_mode(MODE_SPEED);
+  cybergearR.init_motor(MODE_SPEED);
   cybergearR.set_limit_speed(maxSpeed);
   cybergearR.set_limit_current(maxCurrent);
   cybergearR.set_limit_torque(maxTorque);
@@ -155,6 +175,10 @@ void TaskControlMotors::initMotors() {
   Serial.println("Motors initialised");
   Serial.print("Speed limit: ");
   Serial.println(maxSpeed);
+  Serial.print("Current limit: ");
+  Serial.println(maxCurrent);
+  Serial.print("Torque limit: ");
+  Serial.println(maxTorque);
 }
 
 void TaskControlMotors::debugPrintMotorStatus() {

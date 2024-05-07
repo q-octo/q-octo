@@ -227,6 +227,8 @@ struct MotorLimitsT : public ::flatbuffers::NativeTable {
   float max_speed = -1.0f;
   float max_current = -1.0f;
   float max_torque = -1.0f;
+  float speed_kp = 1.0f;
+  float speed_ki = 0.002f;
 };
 
 struct MotorLimits FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -235,7 +237,9 @@ struct MotorLimits FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MAX_SPEED = 4,
     VT_MAX_CURRENT = 6,
-    VT_MAX_TORQUE = 8
+    VT_MAX_TORQUE = 8,
+    VT_SPEED_KP = 10,
+    VT_SPEED_KI = 12
   };
   float max_speed() const {
     return GetField<float>(VT_MAX_SPEED, -1.0f);
@@ -246,11 +250,19 @@ struct MotorLimits FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float max_torque() const {
     return GetField<float>(VT_MAX_TORQUE, -1.0f);
   }
+  float speed_kp() const {
+    return GetField<float>(VT_SPEED_KP, 1.0f);
+  }
+  float speed_ki() const {
+    return GetField<float>(VT_SPEED_KI, 0.002f);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<float>(verifier, VT_MAX_SPEED, 4) &&
            VerifyField<float>(verifier, VT_MAX_CURRENT, 4) &&
            VerifyField<float>(verifier, VT_MAX_TORQUE, 4) &&
+           VerifyField<float>(verifier, VT_SPEED_KP, 4) &&
+           VerifyField<float>(verifier, VT_SPEED_KI, 4) &&
            verifier.EndTable();
   }
   MotorLimitsT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -271,6 +283,12 @@ struct MotorLimitsBuilder {
   void add_max_torque(float max_torque) {
     fbb_.AddElement<float>(MotorLimits::VT_MAX_TORQUE, max_torque, -1.0f);
   }
+  void add_speed_kp(float speed_kp) {
+    fbb_.AddElement<float>(MotorLimits::VT_SPEED_KP, speed_kp, 1.0f);
+  }
+  void add_speed_ki(float speed_ki) {
+    fbb_.AddElement<float>(MotorLimits::VT_SPEED_KI, speed_ki, 0.002f);
+  }
   explicit MotorLimitsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -286,8 +304,12 @@ inline ::flatbuffers::Offset<MotorLimits> CreateMotorLimits(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float max_speed = -1.0f,
     float max_current = -1.0f,
-    float max_torque = -1.0f) {
+    float max_torque = -1.0f,
+    float speed_kp = 1.0f,
+    float speed_ki = 0.002f) {
   MotorLimitsBuilder builder_(_fbb);
+  builder_.add_speed_ki(speed_ki);
+  builder_.add_speed_kp(speed_kp);
   builder_.add_max_torque(max_torque);
   builder_.add_max_current(max_current);
   builder_.add_max_speed(max_speed);
@@ -709,6 +731,7 @@ struct RobotT : public ::flatbuffers::NativeTable {
   bool enable_rover = false;
   std::unique_ptr<fbs::DisplayMessagesT> display_messages{};
   bool start_web_server_on_launch = false;
+  int32_t crsf_link_stats_timeout_millis = 2000;
   RobotT() = default;
   RobotT(const RobotT &o);
   RobotT(RobotT&&) FLATBUFFERS_NOEXCEPT = default;
@@ -738,7 +761,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_MOTOR_ERROR_CODE = 36,
     VT_ENABLE_ROVER = 38,
     VT_DISPLAY_MESSAGES = 40,
-    VT_START_WEB_SERVER_ON_LAUNCH = 42
+    VT_START_WEB_SERVER_ON_LAUNCH = 42,
+    VT_CRSF_LINK_STATS_TIMEOUT_MILLIS = 44
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -800,6 +824,9 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool start_web_server_on_launch() const {
     return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
   }
+  int32_t crsf_link_stats_timeout_millis() const {
+    return GetField<int32_t>(VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 2000);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_BATTERIES, 4) &&
@@ -828,6 +855,7 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_DISPLAY_MESSAGES) &&
            verifier.VerifyTable(display_messages()) &&
            VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
+           VerifyField<int32_t>(verifier, VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 4) &&
            verifier.EndTable();
   }
   RobotT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -899,6 +927,9 @@ struct RobotBuilder {
   void add_start_web_server_on_launch(bool start_web_server_on_launch) {
     fbb_.AddElement<uint8_t>(Robot::VT_START_WEB_SERVER_ON_LAUNCH, static_cast<uint8_t>(start_web_server_on_launch), 0);
   }
+  void add_crsf_link_stats_timeout_millis(int32_t crsf_link_stats_timeout_millis) {
+    fbb_.AddElement<int32_t>(Robot::VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, crsf_link_stats_timeout_millis, 2000);
+  }
   explicit RobotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -931,8 +962,10 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     ::flatbuffers::Offset<::flatbuffers::String> motor_error_code = 0,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
-    bool start_web_server_on_launch = false) {
+    bool start_web_server_on_launch = false,
+    int32_t crsf_link_stats_timeout_millis = 2000) {
   RobotBuilder builder_(_fbb);
+  builder_.add_crsf_link_stats_timeout_millis(crsf_link_stats_timeout_millis);
   builder_.add_display_messages(display_messages);
   builder_.add_motor_error_code(motor_error_code);
   builder_.add_right_motor_fold_angle(right_motor_fold_angle);
@@ -977,7 +1010,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     const char *motor_error_code = nullptr,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
-    bool start_web_server_on_launch = false) {
+    bool start_web_server_on_launch = false,
+    int32_t crsf_link_stats_timeout_millis = 2000) {
   auto motor_error_code__ = motor_error_code ? _fbb.CreateString(motor_error_code) : 0;
   return fbs::CreateRobot(
       _fbb,
@@ -1000,7 +1034,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       motor_error_code__,
       enable_rover,
       display_messages,
-      start_web_server_on_launch);
+      start_web_server_on_launch,
+      crsf_link_stats_timeout_millis);
 }
 
 ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -1052,6 +1087,8 @@ inline void MotorLimits::UnPackTo(MotorLimitsT *_o, const ::flatbuffers::resolve
   { auto _e = max_speed(); _o->max_speed = _e; }
   { auto _e = max_current(); _o->max_current = _e; }
   { auto _e = max_torque(); _o->max_torque = _e; }
+  { auto _e = speed_kp(); _o->speed_kp = _e; }
+  { auto _e = speed_ki(); _o->speed_ki = _e; }
 }
 
 inline ::flatbuffers::Offset<MotorLimits> MotorLimits::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const MotorLimitsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -1065,11 +1102,15 @@ inline ::flatbuffers::Offset<MotorLimits> CreateMotorLimits(::flatbuffers::FlatB
   auto _max_speed = _o->max_speed;
   auto _max_current = _o->max_current;
   auto _max_torque = _o->max_torque;
+  auto _speed_kp = _o->speed_kp;
+  auto _speed_ki = _o->speed_ki;
   return fbs::CreateMotorLimits(
       _fbb,
       _max_speed,
       _max_current,
-      _max_torque);
+      _max_torque,
+      _speed_kp,
+      _speed_ki);
 }
 
 inline MotorsT::MotorsT(const MotorsT &o)
@@ -1256,7 +1297,8 @@ inline RobotT::RobotT(const RobotT &o)
         motor_error_code(o.motor_error_code),
         enable_rover(o.enable_rover),
         display_messages((o.display_messages) ? new fbs::DisplayMessagesT(*o.display_messages) : nullptr),
-        start_web_server_on_launch(o.start_web_server_on_launch) {
+        start_web_server_on_launch(o.start_web_server_on_launch),
+        crsf_link_stats_timeout_millis(o.crsf_link_stats_timeout_millis) {
 }
 
 inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
@@ -1280,6 +1322,7 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(enable_rover, o.enable_rover);
   std::swap(display_messages, o.display_messages);
   std::swap(start_web_server_on_launch, o.start_web_server_on_launch);
+  std::swap(crsf_link_stats_timeout_millis, o.crsf_link_stats_timeout_millis);
   return *this;
 }
 
@@ -1312,6 +1355,7 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = enable_rover(); _o->enable_rover = _e; }
   { auto _e = display_messages(); if (_e) { if(_o->display_messages) { _e->UnPackTo(_o->display_messages.get(), _resolver); } else { _o->display_messages = std::unique_ptr<fbs::DisplayMessagesT>(_e->UnPack(_resolver)); } } else if (_o->display_messages) { _o->display_messages.reset(); } }
   { auto _e = start_web_server_on_launch(); _o->start_web_server_on_launch = _e; }
+  { auto _e = crsf_link_stats_timeout_millis(); _o->crsf_link_stats_timeout_millis = _e; }
 }
 
 inline ::flatbuffers::Offset<Robot> Robot::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -1342,6 +1386,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _enable_rover = _o->enable_rover;
   auto _display_messages = _o->display_messages ? CreateDisplayMessages(_fbb, _o->display_messages.get(), _rehasher) : 0;
   auto _start_web_server_on_launch = _o->start_web_server_on_launch;
+  auto _crsf_link_stats_timeout_millis = _o->crsf_link_stats_timeout_millis;
   return fbs::CreateRobot(
       _fbb,
       _batteries,
@@ -1363,7 +1408,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _motor_error_code,
       _enable_rover,
       _display_messages,
-      _start_web_server_on_launch);
+      _start_web_server_on_launch,
+      _crsf_link_stats_timeout_millis);
 }
 
 inline const fbs::Robot *GetRobot(const void *buf) {

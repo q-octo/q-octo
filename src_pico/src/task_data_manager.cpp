@@ -54,6 +54,15 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case STATE_MOTORS:
       state.motors = message.as.motors;
       broadcastStateUpdate();
+      // TODO remove this temporary code used to test the transmitter
+      rcMessage.type = TaskRC::MessageType::BATTERY;
+      rcMessage.as.battery = {
+        .voltage = 12.0f,
+        .current = 13.0f,
+        .fuel = 14,
+        .percent = 15
+      };
+      TaskRC::receiveMessage(rcMessage);
       break;
     case STATE_RC:
       state.rc = message.as.rc;
@@ -66,7 +75,6 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       setWebServerEnabled(false);
       break;
     case TOGGLE_WEB_SERVER_ENABLED:
-      // plz don't deadlock :)
       setWebServerEnabled(!state.webServerEnabled);
       break;
     case ENABLE_MOTORS:

@@ -21,6 +21,8 @@ table MotorLimits {
     max_speed: float = -1;
     max_current: float = -1;
     max_torque: float = -1;
+    speed_kp: float = 1.0;
+    speed_ki: float = 0.002;
 }
 
 // Define a table for the motors group
@@ -85,8 +87,9 @@ table Robot {
     motor_error_code: string; // Defaults not supported for strings
     enable_rover: bool = false;
     display_messages: DisplayMessages;
+    // Not sure if we'll use this
     start_web_server_on_launch: bool = false;
-
+    crsf_link_stats_timeout_millis: int = 2000;
 }
 
 // Define the root type and possible update types

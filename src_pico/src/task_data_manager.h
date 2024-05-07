@@ -39,13 +39,13 @@ public:
 
   typedef struct {
     struct {
-      uint16_t temperature;
+      float temperature;
       float RPM;
       float torque;
       float position;
     } left;
     struct {
-      uint16_t temperature;
+      float temperature;
       float RPM;
       float torque;
       float position;
@@ -74,12 +74,12 @@ public:
   } Diagnostics;
 
   typedef struct {
-    float rpmL;
-    float rpmR;
+    float leftSpeed;
+    float rightSpeed;
   } SetMotorSpeedIndividual;
 
   typedef struct {
-    float rpm;
+    float speed;
     float direction;
   } SetMotorSpeedCombined;
 

@@ -5,11 +5,12 @@ static const int CFG_ENABLE_CAN = 1;
 static const int CFG_ENABLE_MOTORS = 1;
 static const int CFG_ENABLE_RC = 1;
 static const int CFG_ENABLE_POWER_MONITOR = 0;
-static const int CFG_ENABLE_COMPANION = 0;
+static const int CFG_ENABLE_COMPANION = 1;
 static const int CFG_ENABLE_ONBOARD_COMPUTER = 0;
 static const int CFG_WAIT_FOR_USB_SERIAL = 0;
 
 static const int CFG_DEBUG_LIST_TASKS = 0;
+static const int CFG_DEBUG_WIPE_STORAGE = 1;
 
 // Pins
 static const int CFG_RC_UART_TX = 0;
