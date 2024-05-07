@@ -14,6 +14,22 @@ void TaskControlMotors::init() {
   maxCurrent = state.motorCurrentLimit;
   maxTorque = state.motorTorqueLimit;
 
+  leftMotorLimits = {
+    .last_max_speed_update = 0,
+    .last_max_current_update = 0,
+    .last_max_torque_update = 0,
+    .last_speed_kp_update = 0,
+    .last_speed_ki_update = 0,
+  };
+
+  rightMotorLimits = {
+    .last_max_speed_update = 0,
+    .last_max_current_update = 0,
+    .last_max_torque_update = 0,
+    .last_speed_kp_update = 0,
+    .last_speed_ki_update = 0,
+  };
+
   initMotors();
   Serial.println("Motor class init complete");
 }

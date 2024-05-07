@@ -58,7 +58,6 @@ struct XiaomiCyberGearMotorParameter
   unsigned long last_torque_update_usec = 0;
   unsigned long last_speed_update_usec = 0;
   unsigned long last_current_update_usec = 0;
-  unsigned long last_torque_update_usec = 0;
   unsigned long last_speed_kp_update_usec = 0;
   unsigned long last_speed_ki_update_usec = 0;
   unsigned long last_vbus_update_usec = 0;

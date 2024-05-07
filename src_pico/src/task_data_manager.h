@@ -126,11 +126,11 @@ public:
     float max_torque;
     float speed_kp;
     float speed_ki;
-    unsigned long last_max_speed_update = 0;
-    unsigned long last_max_current_update = 0;
-    unsigned long last_max_torque_update = 0;
-    unsigned long last_speed_kp_update = 0;
-    unsigned long last_speed_ki_update = 0;
+    unsigned long last_max_speed_update;
+    unsigned long last_max_current_update;
+    unsigned long last_max_torque_update;
+    unsigned long last_speed_kp_update;
+    unsigned long last_speed_ki_update;
   } TimestampedMotorLimits;
 
   typedef struct {

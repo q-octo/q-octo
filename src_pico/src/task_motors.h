@@ -61,8 +61,8 @@ private:
   static inline float maxSpeed;
   static inline float maxTorque;
   static inline float maxCurrent;
-  static inline DataManager::TimestampedMotorLimits leftMotorLimits;
-  static inline DataManager::TimestampedMotorLimits rightMotorLimits;
+  static inline DataManager::TimestampedMotorLimits leftMotorLimits{};
+  static inline DataManager::TimestampedMotorLimits rightMotorLimits{};
   static inline unsigned long lastLeftMotorParameterResponseMicros = 0;
   static inline unsigned long lastRightMotorParameterResponseMicros = 0;
   
