@@ -3,22 +3,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
 import { Robot, RobotT } from '../fbs/robot.js';
-import { SetWebServerEnabled, SetWebServerEnabledT } from '../fbs/set-web-server-enabled.js';
 
 
 export enum CompanionRxUnion {
   NONE = 0,
-  SetWebServerEnabled = 1,
-  Robot = 2
+  Robot = 1
 }
 
 export function unionToCompanionRxUnion(
   type: CompanionRxUnion,
-  accessor: (obj:Robot|SetWebServerEnabled) => Robot|SetWebServerEnabled|null
-): Robot|SetWebServerEnabled|null {
+  accessor: (obj:Robot) => Robot|null
+): Robot|null {
   switch(CompanionRxUnion[type]) {
     case 'NONE': return null; 
-    case 'SetWebServerEnabled': return accessor(new SetWebServerEnabled())! as SetWebServerEnabled;
     case 'Robot': return accessor(new Robot())! as Robot;
     default: return null;
   }
@@ -26,12 +23,11 @@ export function unionToCompanionRxUnion(
 
 export function unionListToCompanionRxUnion(
   type: CompanionRxUnion, 
-  accessor: (index: number, obj:Robot|SetWebServerEnabled) => Robot|SetWebServerEnabled|null, 
+  accessor: (index: number, obj:Robot) => Robot|null, 
   index: number
-): Robot|SetWebServerEnabled|null {
+): Robot|null {
   switch(CompanionRxUnion[type]) {
     case 'NONE': return null; 
-    case 'SetWebServerEnabled': return accessor(index, new SetWebServerEnabled())! as SetWebServerEnabled;
     case 'Robot': return accessor(index, new Robot())! as Robot;
     default: return null;
   }

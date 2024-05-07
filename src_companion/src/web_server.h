@@ -27,6 +27,14 @@ public:
       state = robot;
       fbb.Reset();
       FinishRobotBuffer(fbb, Robot::Pack(fbb, &state));
+      
+      if (webServerIsRunning != state.web_server_enabled) {
+        if (state.web_server_enabled) {
+          start();
+        } else {
+          stop();
+        }
+      }
     }
 
     bool getWebServerIsRunning() { return webServerIsRunning; }

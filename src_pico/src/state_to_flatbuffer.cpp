@@ -45,9 +45,7 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   CrsfDataT crsfData{};
   crsfData.telemetry = std::make_unique<CrsfTelemetryT>(crsfTelemetry);
   crsfData.channels = std::make_unique<CrsfChannels>(crsfChannels);
-  // TODO set this
-  crsfData.failsafe = false;
-
+  crsfData.failsafe = robotState.rc.failsafe;
   robot.crsf_data = std::make_unique<CrsfDataT>(crsfData);
 
   robot.low_voltage_threshold = storageState.lowVoltageThreshold;
@@ -92,20 +90,15 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
 
   robot.display_messages = std::make_unique<DisplayMessagesT>(displayMessages);
 
-  // robot.max_speed = storageState.motorSpeedLimit;
-  // robot.max_current = storageState.motorCurrentLimit;
-  // robot.max_torque = storageState.motorTorqueLimit;
-  
-  // TODO set these limits
   MotorLimitsT leftMotorLimits{
-    .max_speed = -1,
-    .max_current = -1,
-    .max_torque = -1
+    .max_speed = robotState.leftMotorLimits.last_max_speed_update > 0 ? robotState.leftMotorLimits.max_speed : -1,
+    .max_current = robotState.leftMotorLimits.last_max_current_update > 0 ? robotState.leftMotorLimits.max_current : -1,
+    .max_torque = robotState.leftMotorLimits.last_max_torque_update > 0 ? robotState.leftMotorLimits.max_torque : -1,
   };
   MotorLimitsT rightMotorLimits{
-    .max_speed = -1,
-    .max_current = -1,
-    .max_torque = -1
+    .max_speed = robotState.rightMotorLimits.last_max_speed_update > 0 ? robotState.rightMotorLimits.max_speed : -1,
+    .max_current = robotState.rightMotorLimits.last_max_current_update > 0 ? robotState.rightMotorLimits.max_current : -1,
+    .max_torque = robotState.rightMotorLimits.last_max_torque_update > 0 ? robotState.rightMotorLimits.max_torque : -1,
   };
   robot.left_motor_limits = std::make_unique<MotorLimitsT>(leftMotorLimits);
   robot.right_motor_limits = std::make_unique<MotorLimitsT>(rightMotorLimits);

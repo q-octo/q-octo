@@ -123,16 +123,28 @@ void Companion::handleUpdateMessage(const Update &update) {
       Storage::save();
       break;
     case UpdateUnion_UpdateMaxSpeed: {
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_SPEED_LIMIT,
+              .as = {.floatMotorParam = update.update_as_UpdateMaxSpeed()->max_speed()}};
+      DataManager::receiveMessage(taskMessage);
       state.motorSpeedLimit = update.update_as_UpdateMaxSpeed()->max_speed();
       Storage::save();
       break;
     }
     case UpdateUnion_UpdateMaxCurrent: {
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_CURRENT_LIMIT,
+              .as = {.floatMotorParam = update.update_as_UpdateMaxCurrent()->max_current()}};
+      DataManager::receiveMessage(taskMessage);
       state.motorCurrentLimit = update.update_as_UpdateMaxCurrent()->max_current();
       Storage::save();
       break;
     }
     case UpdateUnion_UpdateMaxTorque: {
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_TORQUE_LIMIT,
+              .as = {.floatMotorParam = update.update_as_UpdateMaxTorque()->max_torque()}};
+      DataManager::receiveMessage(taskMessage);
       state.motorTorqueLimit = update.update_as_UpdateMaxTorque()->max_torque();
       Storage::save();
       break;

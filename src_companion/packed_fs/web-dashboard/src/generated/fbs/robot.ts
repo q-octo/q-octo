@@ -131,6 +131,9 @@ displayMessages(obj?:DisplayMessages):DisplayMessages|null {
   return offset ? (obj || new DisplayMessages()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
+/**
+ * This will only occur if all physical switches are in the ON/ABSENT state.
+ */
 startWebServerOnLaunch():boolean {
   const offset = this.bb!.__offset(this.bb_pos, 42);
   return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
@@ -141,8 +144,13 @@ crsfLinkStatsTimeoutMillis():number {
   return offset ? this.bb!.readInt32(this.bb_pos + offset) : 2000;
 }
 
+webServerEnabled():boolean {
+  const offset = this.bb!.__offset(this.bb_pos, 46);
+  return offset ? !!this.bb!.readInt8(this.bb_pos + offset) : false;
+}
+
 static startRobot(builder:flatbuffers.Builder) {
-  builder.startObject(21);
+  builder.startObject(22);
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
@@ -229,6 +237,10 @@ static addCrsfLinkStatsTimeoutMillis(builder:flatbuffers.Builder, crsfLinkStatsT
   builder.addFieldInt32(20, crsfLinkStatsTimeoutMillis, 2000);
 }
 
+static addWebServerEnabled(builder:flatbuffers.Builder, webServerEnabled:boolean) {
+  builder.addFieldInt8(21, +webServerEnabled, +false);
+}
+
 static endRobot(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
@@ -265,7 +277,8 @@ unpack(): RobotT {
     this.enableRover(),
     (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null),
     this.startWebServerOnLaunch(),
-    this.crsfLinkStatsTimeoutMillis()
+    this.crsfLinkStatsTimeoutMillis(),
+    this.webServerEnabled()
   );
 }
 
@@ -292,6 +305,7 @@ unpackTo(_o: RobotT): void {
   _o.displayMessages = (this.displayMessages() !== null ? this.displayMessages()!.unpack() : null);
   _o.startWebServerOnLaunch = this.startWebServerOnLaunch();
   _o.crsfLinkStatsTimeoutMillis = this.crsfLinkStatsTimeoutMillis();
+  _o.webServerEnabled = this.webServerEnabled();
 }
 }
 
@@ -317,7 +331,8 @@ constructor(
   public enableRover: boolean = false,
   public displayMessages: DisplayMessagesT|null = null,
   public startWebServerOnLaunch: boolean = false,
-  public crsfLinkStatsTimeoutMillis: number = 2000
+  public crsfLinkStatsTimeoutMillis: number = 2000,
+  public webServerEnabled: boolean = false
 ){}
 
 
@@ -351,6 +366,7 @@ pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   Robot.addDisplayMessages(builder, displayMessages);
   Robot.addStartWebServerOnLaunch(builder, this.startWebServerOnLaunch);
   Robot.addCrsfLinkStatsTimeoutMillis(builder, this.crsfLinkStatsTimeoutMillis);
+  Robot.addWebServerEnabled(builder, this.webServerEnabled);
 
   return Robot.endRobot(builder);
 }

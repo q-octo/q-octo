@@ -732,6 +732,7 @@ struct RobotT : public ::flatbuffers::NativeTable {
   std::unique_ptr<fbs::DisplayMessagesT> display_messages{};
   bool start_web_server_on_launch = false;
   int32_t crsf_link_stats_timeout_millis = 2000;
+  bool web_server_enabled = false;
   RobotT() = default;
   RobotT(const RobotT &o);
   RobotT(RobotT&&) FLATBUFFERS_NOEXCEPT = default;
@@ -762,7 +763,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ENABLE_ROVER = 38,
     VT_DISPLAY_MESSAGES = 40,
     VT_START_WEB_SERVER_ON_LAUNCH = 42,
-    VT_CRSF_LINK_STATS_TIMEOUT_MILLIS = 44
+    VT_CRSF_LINK_STATS_TIMEOUT_MILLIS = 44,
+    VT_WEB_SERVER_ENABLED = 46
   };
   int32_t batteries() const {
     return GetField<int32_t>(VT_BATTERIES, 4);
@@ -821,11 +823,15 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const fbs::DisplayMessages *display_messages() const {
     return GetPointer<const fbs::DisplayMessages *>(VT_DISPLAY_MESSAGES);
   }
+  /// This will only occur if all physical switches are in the ON/ABSENT state.
   bool start_web_server_on_launch() const {
     return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
   }
   int32_t crsf_link_stats_timeout_millis() const {
     return GetField<int32_t>(VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 2000);
+  }
+  bool web_server_enabled() const {
+    return GetField<uint8_t>(VT_WEB_SERVER_ENABLED, 0) != 0;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -856,6 +862,7 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(display_messages()) &&
            VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
            VerifyField<int32_t>(verifier, VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 4) &&
+           VerifyField<uint8_t>(verifier, VT_WEB_SERVER_ENABLED, 1) &&
            verifier.EndTable();
   }
   RobotT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -930,6 +937,9 @@ struct RobotBuilder {
   void add_crsf_link_stats_timeout_millis(int32_t crsf_link_stats_timeout_millis) {
     fbb_.AddElement<int32_t>(Robot::VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, crsf_link_stats_timeout_millis, 2000);
   }
+  void add_web_server_enabled(bool web_server_enabled) {
+    fbb_.AddElement<uint8_t>(Robot::VT_WEB_SERVER_ENABLED, static_cast<uint8_t>(web_server_enabled), 0);
+  }
   explicit RobotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -963,7 +973,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
     bool start_web_server_on_launch = false,
-    int32_t crsf_link_stats_timeout_millis = 2000) {
+    int32_t crsf_link_stats_timeout_millis = 2000,
+    bool web_server_enabled = false) {
   RobotBuilder builder_(_fbb);
   builder_.add_crsf_link_stats_timeout_millis(crsf_link_stats_timeout_millis);
   builder_.add_display_messages(display_messages);
@@ -982,6 +993,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_voltage(voltage);
   builder_.add_motors(motors);
   builder_.add_batteries(batteries);
+  builder_.add_web_server_enabled(web_server_enabled);
   builder_.add_start_web_server_on_launch(start_web_server_on_launch);
   builder_.add_enable_rover(enable_rover);
   builder_.add_status(status);
@@ -1011,7 +1023,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
     bool start_web_server_on_launch = false,
-    int32_t crsf_link_stats_timeout_millis = 2000) {
+    int32_t crsf_link_stats_timeout_millis = 2000,
+    bool web_server_enabled = false) {
   auto motor_error_code__ = motor_error_code ? _fbb.CreateString(motor_error_code) : 0;
   return fbs::CreateRobot(
       _fbb,
@@ -1035,7 +1048,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
       enable_rover,
       display_messages,
       start_web_server_on_launch,
-      crsf_link_stats_timeout_millis);
+      crsf_link_stats_timeout_millis,
+      web_server_enabled);
 }
 
 ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -1298,7 +1312,8 @@ inline RobotT::RobotT(const RobotT &o)
         enable_rover(o.enable_rover),
         display_messages((o.display_messages) ? new fbs::DisplayMessagesT(*o.display_messages) : nullptr),
         start_web_server_on_launch(o.start_web_server_on_launch),
-        crsf_link_stats_timeout_millis(o.crsf_link_stats_timeout_millis) {
+        crsf_link_stats_timeout_millis(o.crsf_link_stats_timeout_millis),
+        web_server_enabled(o.web_server_enabled) {
 }
 
 inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
@@ -1323,6 +1338,7 @@ inline RobotT &RobotT::operator=(RobotT o) FLATBUFFERS_NOEXCEPT {
   std::swap(display_messages, o.display_messages);
   std::swap(start_web_server_on_launch, o.start_web_server_on_launch);
   std::swap(crsf_link_stats_timeout_millis, o.crsf_link_stats_timeout_millis);
+  std::swap(web_server_enabled, o.web_server_enabled);
   return *this;
 }
 
@@ -1356,6 +1372,7 @@ inline void Robot::UnPackTo(RobotT *_o, const ::flatbuffers::resolver_function_t
   { auto _e = display_messages(); if (_e) { if(_o->display_messages) { _e->UnPackTo(_o->display_messages.get(), _resolver); } else { _o->display_messages = std::unique_ptr<fbs::DisplayMessagesT>(_e->UnPack(_resolver)); } } else if (_o->display_messages) { _o->display_messages.reset(); } }
   { auto _e = start_web_server_on_launch(); _o->start_web_server_on_launch = _e; }
   { auto _e = crsf_link_stats_timeout_millis(); _o->crsf_link_stats_timeout_millis = _e; }
+  { auto _e = web_server_enabled(); _o->web_server_enabled = _e; }
 }
 
 inline ::flatbuffers::Offset<Robot> Robot::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const RobotT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -1387,6 +1404,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
   auto _display_messages = _o->display_messages ? CreateDisplayMessages(_fbb, _o->display_messages.get(), _rehasher) : 0;
   auto _start_web_server_on_launch = _o->start_web_server_on_launch;
   auto _crsf_link_stats_timeout_millis = _o->crsf_link_stats_timeout_millis;
+  auto _web_server_enabled = _o->web_server_enabled;
   return fbs::CreateRobot(
       _fbb,
       _batteries,
@@ -1409,7 +1427,8 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(::flatbuffers::FlatBufferBuilder
       _enable_rover,
       _display_messages,
       _start_web_server_on_launch,
-      _crsf_link_stats_timeout_millis);
+      _crsf_link_stats_timeout_millis,
+      _web_server_enabled);
 }
 
 inline const fbs::Robot *GetRobot(const void *buf) {
