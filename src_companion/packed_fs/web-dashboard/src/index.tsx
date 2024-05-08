@@ -16,13 +16,13 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 	return (
 		<div className="bg-white p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md mb-8">
-			<h2 className="text-xl sm:text-2xl font-bold mb-4">Current Values</h2>
+			<h2 className="text-xl sm:text-2xl font-bold mb-4">Q-Octo Dashboard</h2>
 			<div className="md:flex md:space-x-4">
 				{/* Motor 1 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm mb-4 md:mb-0 flex-1 md:mr-2">
 					<h3 className="text-lg font-bold mb-2">Left Motor</h3>
-					<p className="mb-1">Temp: <span className="font-medium">{rover.motors.motor1.temperature}°C</span></p>
-					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor1.rps} RPM</span></p>
+					<p className="mb-1">Temperature: <span className="font-medium">{rover.motors.motor1.temperature}°C</span></p>
+					<p className="mb-1">Speed: <span className="font-medium">{rover.motors.motor1.rps} (rad/s)</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor1.angle} °</span></p>
 					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
 					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor1.torque_limit}Nm</span></p>
@@ -31,8 +31,8 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 				{/* Motor 2 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm flex-1">
 					<h3 className="text-lg font-bold mb-2">Right Motor</h3>
-					<p className="mb-1">Temp: <span className="font-medium">{rover.motors.motor2.temperature} °C</span></p>
-					<p className="mb-1">RPM: <span className="font-medium">{rover.motors.motor2.rps} RPM</span></p>
+					<p className="mb-1">Temperature: <span className="font-medium">{rover.motors.motor2.temperature} °C</span></p>
+					<p className="mb-1">Speed: <span className="font-medium">{rover.motors.motor2.rps} (rad/s)</span></p>
 					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor2.angle} °</span></p>
 					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
 					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor2.torque_limit}Nm</span></p>
@@ -54,7 +54,7 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
 					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{rover.rssi} dBm</span></p>
-					<p class="text-base sm:text-sm">Link 📻: <span class="font-medium">{rover.linkQualityThreshold} %</span></p>
+					<p class="text-base sm:text-sm">Link Quality 📻: <span class="font-medium">{rover.linkQualityThreshold} %</span></p>
 				</div>
 
 			</div>
@@ -124,7 +124,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			{/* Number of batteries */}
 			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateBatteries, e)} className="mb-4">
 				<label htmlFor={`${UpdateUnion.UpdateBatteries}`} className="block text-sm font-medium text-gray-700">
-					Number of batteries
+					Number of batteries (1-4)
 				</label>
 				<div className="mt-1 flex rounded-md shadow-sm">
 					<input type="number" id={`${UpdateUnion.UpdateBatteries}`} name={`${UpdateUnion.UpdateBatteries}`} className={`${formColour('bats')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md`} required
@@ -170,7 +170,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			{/* Torque Limit */}
 			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateMaxTorque, e)} className="mb-4">
 				<label htmlFor="torqueLimit" className="block text-sm font-medium text-gray-700">
-					Torque Limit Left
+					Torque Limit (0-12.5Nm)
 				</label>
 				<div className="mt-1 flex rounded-md shadow-sm">
 					<input type="number" step="0.1" id={`${UpdateUnion.UpdateMaxTorque}`} name={`${UpdateUnion.UpdateMaxTorque}`} className={`${formColour('torqueLimitLeft')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required`}
