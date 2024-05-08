@@ -5,7 +5,7 @@
 #include "serial.h"
 
 #define WAIT_FOR_USB_SERIAL 0
-#define DEBUG_ENABLE_WIFI_ON_LAUNCH 0
+#define DEBUG_ENABLE_WIFI_ON_LAUNCH 1
 
 void toggleAButton();
 

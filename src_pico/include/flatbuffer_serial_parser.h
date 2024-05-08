@@ -14,12 +14,20 @@ public:
   }
 
   uint8_t buffer[4096] = {0};
+  static const uint8_t START_BYTE = 0xC8;
 
-  bool parseMessage() {
+  bool parseMessage() { 
     while (serial.available()) {
+      if (offset < 0) {
+        if (serial.read() == START_BYTE) {
+          offset = 0;
+        }
+        continue;
+      }
+
       if (offset >= sizeof(buffer)) {
-        Serial.println("[ERROR] Buffer overflow.");
-        dropRemainingBytes();
+        Serial.printf("[ERROR] Buffer overflow. offset: %d\n", offset);
+        reset();
         return false;
       }
 
@@ -31,8 +39,8 @@ public:
       if (offset == 4) {
         remainingBytes = flatbuffers::GetPrefixedSize(buffer);
         if (remainingBytes + 4 > sizeof(buffer)) {
-          Serial.println("[ERROR] Message too large.");
-          dropRemainingBytes();
+          Serial.printf("[ERROR] Message too large: %d\n", remainingBytes);
+          reset();
           return false;
         }
       }
@@ -43,12 +51,11 @@ public:
       }
 
       flatbuffers::Verifier verifier(buffer, offset);
+      reset();
       if (verify(verifier)) {
-        reset();
         return true;
       } else {
         Serial.println("[WARN] received invalid message, dropping remaining bytes.");
-        dropRemainingBytes();
         return false;
       }
     }
@@ -59,18 +66,11 @@ public:
 private:
   HardwareSerial &serial;
   const VerifyCallback verify;
-  int offset = 0;
+  int offset = -1;
   uint32_t remainingBytes = 0;
 
-  void dropRemainingBytes() {
-    while (serial.available()) {
-      serial.read();
-    }
-    reset();
-  }
-
   void reset() {
-    offset = 0;
+    offset = -1;
     remainingBytes = 0;
   }
 };

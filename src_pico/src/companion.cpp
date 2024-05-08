@@ -188,14 +188,18 @@ void Companion::sendStateToCompanion(const DataManager::State &state) {
     return;
   }
   msSinceLastBroadcast = currentMillis;
-  Serial.println("Sending state to companion");
+  Serial.printf("Sending state to companion: %d\n", fbb.GetSize());
   serialiseState(state);
   static SendSerialData data = {
           .target = COMPANION,
           .data = fbb.GetBufferPointer(),
           .size = fbb.GetSize()
   };
-  xQueueSend(SerialTask::queue, &data, 0);
+  companionSerial.write(FlatbufferSerialParser::START_BYTE);
+  if (!companionSerial.write(fbb.GetBufferPointer(), fbb.GetSize())) {
+    Serial.println("FAILED to send to companion");
+  }
+  // xQueueSend(SerialTask::queue, &data, 0);
 }
 
 void Companion::serialiseState(const DataManager::State &state) {

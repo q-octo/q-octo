@@ -39,6 +39,7 @@ void QOctoSerial::serializeButtonPressed(Button button) {
 void QOctoSerial::sendButtonPressed(Button button) {
     Serial.println("Sending button pressed");
     serializeButtonPressed(button);
+    Serial1.write(FlatbufferSerialParser::START_BYTE);
     Serial1.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
 
