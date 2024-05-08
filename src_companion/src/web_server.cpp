@@ -75,6 +75,7 @@ void QOctoWebServer::start()
     webSocket = new WebSocketsServer(81);
     webSocket->onEvent([this](uint8_t num, WStype_t type, uint8_t *payload, size_t length)
                        { webSocketEvent(num, type, payload, length); });
+    webSocket->begin();
     Serial.println("Web socket server started");
 
     // Setup MDNS responder (creates rover.local domain within the AP)
@@ -210,12 +211,12 @@ void QOctoWebServer::webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload
     case WStype_TEXT:
     {
         // This is unexpected.
-        Serial.printf("[%u] get Text: %s\n", num, payload);
+        Serial.printf("[%u] got Text: %s\n", num, payload);
         break;
     }
     case WStype_BIN:
     {
-        Serial.printf("[%u] get binary length: %u\n", num, length);
+        Serial.printf("[%u] got binary length: %u\n", num, length);
         hexdump(payload, length);
         processRemoteBinaryUpdate(payload, length);
         break;

@@ -36,6 +36,7 @@ public:
       //     stop();
       //   }
       // }
+      pendingBroadcast = true;
     }
 
     bool getWebServerIsRunning() { return webServerIsRunning; }
