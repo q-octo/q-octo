@@ -1,8 +1,9 @@
 #include "config.h"
 #include <Arduino.h>
 #include "storage.h"
+#include "serial.h"
 
-// #include <FreeRTOS.h> // Enables FreeRTOS and multicore support
+#include <FreeRTOS.h> // Enables FreeRTOS and multicore support
 // #include <task.h>     // Enables FreeRTOS tasks
 
 #include "task_motors.h"
@@ -75,6 +76,14 @@ void loop() {
   // It appears that a task labelled CORE0 runs this loop in a task
   // So if this loop never blocks, no other task on core 0 will run!
   //  vTaskDelay(pdMS_TO_TICKS(1));
+}
+
+void setup1() {
+  SerialTask::init();
+}
+
+void loop1() { 
+  SerialTask::loop();
 }
 
 void initTasks() {

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "computer.h"
 #include "config.h"
+#include "serial.h"
 
 void Computer::init() {
   if (!CFG_ENABLE_ONBOARD_COMPUTER) {
@@ -94,7 +95,12 @@ void Computer::sendTaskMessage(const DataManager::Message &message) {
 void Computer::sendStateToComputer(const DataManager::State &state) {
   Serial.println("Sending state to onboard computer");
   serialiseState(state);
-  computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
+  static SendSerialData serialData = {
+          .target = ONBOARD_COMPUTER,
+          .data = fbb.GetBufferPointer(),
+          .size = fbb.GetSize()
+  };
+  xQueueSend(SerialTask::queue, &serialData, 0);
 }
 
 Button Computer::serialiseDisplayButton(const DataManager::DisplayButton &displayButton) {
@@ -114,7 +120,12 @@ void Computer::sendDisplayButtonToComputer(const DataManager::DisplayButton &dis
   auto displayButtonOffset = CreateButtonPressed(fbb, serialiseDisplayButton(displayButton));
   auto message = CreateOnboardComputerRx(fbb, OnboardComputerRxUnion_ButtonPressed, displayButtonOffset.Union());
   FinishSizePrefixedOnboardComputerRxBuffer(fbb, message);
-  computerSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
+  static SendSerialData serialData = {
+          .target = ONBOARD_COMPUTER,
+          .data = fbb.GetBufferPointer(),
+          .size = fbb.GetSize()
+  };
+  xQueueSend(SerialTask::queue, &serialData, 0);
 }
 
 void Computer::serialiseState(const DataManager::State &state) {

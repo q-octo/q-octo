@@ -2,6 +2,7 @@
 #include "companion.h"
 #include "config.h"
 #include "storage.h"
+#include "serial.h"
 
 void Companion::init() {
   if (!CFG_ENABLE_COMPANION) {
@@ -30,6 +31,9 @@ void Companion::receiveMessage(const Message &message) {
 }
 
 void Companion::loop() {
+  if (!CFG_ENABLE_COMPANION) {
+    return;
+  }
   parseIncomingSerialData();
 }
 
@@ -186,7 +190,12 @@ void Companion::sendStateToCompanion(const DataManager::State &state) {
   msSinceLastBroadcast = currentMillis;
   Serial.println("Sending state to companion");
   serialiseState(state);
-  companionSerial.write(fbb.GetBufferPointer(), fbb.GetSize());
+  static SendSerialData data = {
+          .target = COMPANION,
+          .data = fbb.GetBufferPointer(),
+          .size = fbb.GetSize()
+  };
+  xQueueSend(SerialTask::queue, &data, 0);
 }
 
 void Companion::serialiseState(const DataManager::State &state) {
