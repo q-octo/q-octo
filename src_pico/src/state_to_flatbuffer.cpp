@@ -56,6 +56,7 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   robot.right_motor_fold_angle = storageState.rightMotorFoldAngle;
   
   robot.start_web_server_on_launch = storageState.startWebServerOnLaunch;
+  robot.web_server_enabled = robotState.webServerEnabled;
   
   // TODO set these
   robot.motor_error_code = "";

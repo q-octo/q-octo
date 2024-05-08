@@ -153,36 +153,61 @@ void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message
       handleStateUpdate();
       break;
     case UPDATE_SPEED_LIMIT:
-      cybergearL.set_limit_speed(message.as.floatMotorParam);
-      cybergearL.get_speed_limit();
-      cybergearR.set_limit_speed(message.as.floatMotorParam);
-      cybergearR.get_speed_limit();
+      setSpeedLimit(message.as.floatMotorParam);
       break;
     case UPDATE_CURRENT_LIMIT:
-      cybergearL.set_limit_current(message.as.floatMotorParam);
-      cybergearL.get_current_limit();
-      cybergearR.set_limit_current(message.as.floatMotorParam);
-      cybergearR.get_current_limit();
+      setCurrentLimit(message.as.floatMotorParam);
       break;
     case UPDATE_TORQUE_LIMIT:
-      cybergearL.set_limit_torque(message.as.floatMotorParam);
-      cybergearL.get_torque_limit();
-      cybergearR.set_limit_torque(message.as.floatMotorParam);
-      cybergearR.get_torque_limit();
+      setTorqueLimit(message.as.floatMotorParam);
       break;
     case UPDATE_SPEED_KI:
-      cybergearL.set_speed_ki(message.as.floatMotorParam);
-      cybergearL.get_speed_ki();
-      cybergearR.set_speed_ki(message.as.floatMotorParam);
-      cybergearR.get_speed_ki();
+      setSpeedKi(message.as.floatMotorParam);
       break;
     case UPDATE_SPEED_KP:
-      cybergearL.set_speed_kp(message.as.floatMotorParam);
-      cybergearL.get_speed_kp();
-      cybergearR.set_speed_kp(message.as.floatMotorParam);
-      cybergearR.get_speed_kp();
+      setSpeedKp(message.as.floatMotorParam); 
       break;
   }
+}
+
+void TaskControlMotors::setSpeedLimit(float speedLimit) {
+  cybergearL.set_limit_speed(speedLimit);
+  cybergearR.set_limit_speed(speedLimit);
+  delayMicroseconds(500);
+  cybergearL.get_speed_limit();
+  cybergearR.get_speed_limit();
+}
+
+void TaskControlMotors::setCurrentLimit(float currentLimit) {
+  cybergearL.set_limit_current(currentLimit);
+  cybergearR.set_limit_current(currentLimit);
+  delayMicroseconds(500);
+  cybergearL.get_current_limit();
+  cybergearR.get_current_limit();
+}
+
+void TaskControlMotors::setTorqueLimit(float torqueLimit) {
+  cybergearL.set_limit_torque(torqueLimit);
+  cybergearR.set_limit_torque(torqueLimit);
+  delayMicroseconds(500);
+  cybergearL.get_torque_limit();
+  cybergearR.get_torque_limit();
+}
+
+void TaskControlMotors::setSpeedKi(float speedKi) {
+  cybergearL.set_speed_ki(speedKi);
+  cybergearR.set_speed_ki(speedKi);
+  delayMicroseconds(500);
+  cybergearL.get_speed_ki();
+  cybergearR.get_speed_ki();
+}
+
+void TaskControlMotors::setSpeedKp(float speedKp) {
+  cybergearL.set_speed_kp(speedKp);
+  cybergearR.set_speed_kp(speedKp);
+  delayMicroseconds(500);
+  cybergearL.get_speed_kp();
+  cybergearR.get_speed_kp();
 }
 
 void TaskControlMotors::broadcastStatusUpdate() {
@@ -229,6 +254,8 @@ void TaskControlMotors::setSpeedIndividual(float speedL, float speedR) {
     Serial.println("[WARN] Speed limit exceeded for right motor");
     speedR = speedR > 0 ? maxSpeed : -maxSpeed;
   }
+  setCurrentLimit(maxCurrent);
+  setTorqueLimit(maxTorque);
   cybergearL.set_speed_ref(speedL);
   cybergearR.set_speed_ref(speedR);
 }
@@ -244,23 +271,15 @@ void TaskControlMotors::setSpeedCombined(float speed, float direction) {
 
 void TaskControlMotors::initMotors() {
   cybergearL.init_motor(MODE_SPEED);
-  cybergearL.set_limit_speed(maxSpeed);
-  cybergearL.set_limit_current(maxCurrent);
-  cybergearL.set_limit_torque(maxTorque);
-  cybergearL.enable_motor();
-
   cybergearR.init_motor(MODE_SPEED);
-  cybergearR.set_limit_speed(maxSpeed);
-  cybergearR.set_limit_current(maxCurrent);
-  cybergearR.set_limit_torque(maxTorque);
+  setSpeedLimit(maxSpeed);
+  delayMicroseconds(500);
+  setCurrentLimit(maxCurrent);
+  delayMicroseconds(500);
+  setTorqueLimit(maxTorque);
+  delayMicroseconds(500);
+  cybergearL.enable_motor();
   cybergearR.enable_motor();
-  Serial.println("Motors initialised");
-  Serial.print("Speed limit: ");
-  Serial.println(maxSpeed);
-  Serial.print("Current limit: ");
-  Serial.println(maxCurrent);
-  Serial.print("Torque limit: ");
-  Serial.println(maxTorque);
 }
 
 void TaskControlMotors::debugPrintMotorStatus() {

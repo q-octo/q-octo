@@ -94,12 +94,12 @@ void Display::paintPage1()
     graphics.text("WIFI:", Point(topBar.x + 110, topBar.y), topBar.w);
     int wifiwidth = graphics.measure_text("WIFI:", 2, 1, false);
 
-    if (!webServerIsRunningState) {
-        SET_PEN_RED();
-        graphics.text("OFF", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
-    } else {
+    if (state.web_server_enabled) {
         SET_PEN_GREEN();
         graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
+    } else {
+        SET_PEN_RED();
+        graphics.text("OFF", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
     }
 
     // Middle1 - Status Code in the center

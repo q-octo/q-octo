@@ -47,9 +47,7 @@ public:
     {
     }
     void loop();
-    void updateState(const RobotT& robot) { state = robot; }
-    bool webServerIsRunningState = false;
-    void setWebServerIsRunning(bool running) { webServerIsRunningState = running; }
+    void updateState(const RobotT& robot) { state = robot; } 
 
 private:
     void repaintDisplay();

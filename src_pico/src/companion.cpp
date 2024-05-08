@@ -16,12 +16,6 @@ void Companion::receiveMessage(const Message &message) {
     return;
   }
   switch (message.type) {
-    case ENABLE_WEB_SERVER:
-      Serial.println("Enable web server");
-      break;
-    case DISABLE_WEB_SERVER:
-      Serial.println("Disable web server");
-      break;
     case STATE_UPDATE:
       Serial.println("State update");
       DataManager::State state = message.as.state;
@@ -51,15 +45,18 @@ void Companion::parseIncomingSerialData() {
 }
 
 void Companion::handleCompanionTx(const CompanionTx &companionMessage) {
+  Serial.println("GOT COMPANION MESSAGE");
   switch (companionMessage.message_type()) {
     case CompanionTxUnion::CompanionTxUnion_NONE:
       break;
     case CompanionTxUnion::CompanionTxUnion_Update: {
+      Serial.println("GOT UPDATE MESSAGE");
       auto update = companionMessage.message_as_Update();
       handleUpdateMessage(*update);
       break;
     }
     case CompanionTxUnion::CompanionTxUnion_ButtonPressed: {
+      Serial.println("GOT BUTTON PRESSED MESSAGE");
       auto buttonPressed = companionMessage.message_as_ButtonPressed();
       handleButtonPressedMessage(*buttonPressed);
       break;

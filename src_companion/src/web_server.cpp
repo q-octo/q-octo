@@ -1,4 +1,6 @@
 #include "web_server.h"
+#include "companion_tx_generated.h"
+#include "serial.h"
 
 // Putting this in the header file breaks the build
 #include "packed_fs.h"
@@ -189,7 +191,7 @@ void QOctoWebServer::handleRoot()
 
 void QOctoWebServer::processRemoteBinaryUpdate(uint8_t *payload, size_t length)
 {
-    // TODO(niall) forward this byte array to the main pico
+    QOctoSerial::sendUpdateMessage(payload, length);
 }
 
 void QOctoWebServer::webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)

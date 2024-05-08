@@ -38,10 +38,7 @@ void DataManager::broadcastStateUpdate() {
 }
 
 void DataManager::setWebServerEnabled(bool enabled) {
-  state.webServerEnabled = enabled;
-  companionMessage.type = enabled ? Companion::MessageType::ENABLE_WEB_SERVER
-                                  : Companion::MessageType::DISABLE_WEB_SERVER;
-  Companion::receiveMessage(companionMessage);
+  state.webServerEnabled = enabled; 
   broadcastStateUpdate();
 }
 

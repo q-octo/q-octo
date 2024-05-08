@@ -49,6 +49,11 @@ private:
   static void setSpeedIndividual(float speedL, float speedR);
   static void setSpeedCombined(float speed, float direction);
   static void broadcastStatusUpdate();
+  static void setSpeedLimit(float speedLimit);
+  static void setCurrentLimit(float currentLimit);
+  static void setTorqueLimit(float torqueLimit);
+  static void setSpeedKi(float speedKi);
+  static void setSpeedKp(float speedKp);
 
   static void initMotors();
   static void handleStateUpdate();

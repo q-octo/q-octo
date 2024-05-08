@@ -20,8 +20,6 @@ class Companion
 public:
   enum MessageType
   {
-    ENABLE_WEB_SERVER,
-    DISABLE_WEB_SERVER,
     STATE_UPDATE
   };
 

@@ -28,14 +28,13 @@ public:
       fbb.Reset();
       FinishRobotBuffer(fbb, Robot::Pack(fbb, &state));
       
-      // TODO enable this
-      // if (webServerIsRunning != state.web_server_enabled) {
-      //   if (state.web_server_enabled) {
-      //     start();
-      //   } else {
-      //     stop();
-      //   }
-      // }
+      if (webServerIsRunning != state.web_server_enabled) {
+        if (state.web_server_enabled) {
+          start();
+        } else {
+          stop();
+        }
+      }
       pendingBroadcast = true;
     }
 

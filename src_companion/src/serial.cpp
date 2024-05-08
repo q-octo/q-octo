@@ -39,8 +39,24 @@ void QOctoSerial::serializeButtonPressed(Button button) {
 void QOctoSerial::sendButtonPressed(Button button) {
     Serial.println("Sending button pressed");
     serializeButtonPressed(button);
+    
     Serial1.write(FlatbufferSerialParser::START_BYTE);
     Serial1.write(fbb.GetBufferPointer(), fbb.GetSize());
+}
+
+void QOctoSerial::sendUpdateMessage(uint8_t *data, size_t length) {
+  Serial.println("Forwarding web server update message");
+  fbb.Reset();
+
+  UpdateT update;
+  GetUpdate(data)->UnPackTo(&update);
+
+  auto updateOffset = CreateUpdate(fbb, &update);
+  auto message = CreateCompanionTx(fbb, CompanionTxUnion::CompanionTxUnion_Update, updateOffset.Union());
+  FinishSizePrefixedCompanionTxBuffer(fbb, message);
+
+  Serial1.write(FlatbufferSerialParser::START_BYTE);
+  Serial1.write(fbb.GetBufferPointer(), fbb.GetSize());
 }
 
 bool QOctoSerial::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier) {

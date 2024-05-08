@@ -14,7 +14,7 @@ table ButtonPressed {
 
 union CompanionTxUnion {
     ButtonPressed,
-    Update,
+    Update, // from ws_update.fbs
 }
 
 table CompanionTx {

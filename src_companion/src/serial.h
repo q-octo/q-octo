@@ -15,6 +15,7 @@ public:
     static void loop();
     static void serializeButtonPressed(fbs::Button button);
     static void sendButtonPressed(fbs::Button button);
+    static void sendUpdateMessage(uint8_t *data, size_t length);
 private:
     static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);
     static inline FlatbufferSerialParser parser = FlatbufferSerialParser(Serial1, verifyIncomingFlatbuffer);
