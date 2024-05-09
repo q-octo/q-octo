@@ -16,7 +16,7 @@ struct StorageState
     // Max = 30.0, only applies to position control mode!!
     float motorSpeedLimit = 20.0f;
     // max = 27.0
-    float motorCurrentLimit = 0.5f;
+    float motorCurrentLimit = 1.0f;
     // Max = 12.5
     // TODO this doesn't seem to work!!
     float motorTorqueLimit = 12.5f;
