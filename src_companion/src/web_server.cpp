@@ -7,7 +7,7 @@
 
 #define AUTO_RESTART_WEBSOCKETS 0
 #define RESTART_WEBSOCKETS_FREQUENCY (1000 * 15) // 15 seconds
-#define WEBSOCKET_BROADCAST_FREQ 500
+#define WEBSOCKET_BROADCAST_FREQ 32
 
 const char *QOctoWebServer::textToMIMEType(const char *text)
 {
@@ -104,6 +104,7 @@ void QOctoWebServer::broadcastData()
     Serial.println("Broadcasting data");
     webSocket->broadcastBIN(fbb.GetBufferPointer(), fbb.GetSize());
     lastWebSocketBroadcast = millis();
+    pendingBroadcast = false;
 }
 
 void QOctoWebServer::sendDataToClient(uint8_t num)
