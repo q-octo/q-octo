@@ -46,6 +46,7 @@ public:
 
     {
     }
+    void init();
     void loop();
     void updateState(const RobotT& robot) { state = robot; } 
 
@@ -79,8 +80,6 @@ private:
 
     RobotT state = RobotT();
 
-    // Internal state
-    // TODO phase this out in favor of the Robot object
     bool ledState = false;
 
     void paintStack(const std::vector<std::string> &items);

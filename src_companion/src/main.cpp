@@ -29,6 +29,7 @@ void setup() {
   delay(1000); // Wait for a second
   Serial.println("Live on COMPANION PICO core 0");
   QOctoSerial::init(onReceiveSerialMessage);
+  display.init();
 #if DEBUG_ENABLE_WIFI_ON_LAUNCH
   webServer.start();
 #endif

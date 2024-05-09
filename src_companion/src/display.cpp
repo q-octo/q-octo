@@ -9,18 +9,20 @@
 #define SET_PEN_BLACK() graphics.set_pen(0, 0, 0);
 #define SET_PEN_WHITE() graphics.set_pen(255, 255, 255);
 
+void Display::init() {
+  st7789.set_backlight(255);
+  led.set_brightness(0); // Turn LED off.
+}
+
 void Display::loop()
 {
   static unsigned long lastBlinkMillis = 0;
   static unsigned long lastRepaintMillis = 0;
 
-  st7789.set_backlight(255);
-  led.set_brightness(0); // Turn LED off.
 
   // Display is 240x135 pixels
 
   // Blink the LED every second to show that the data is live
-  // TODO blink this red if the status is not OK.
   const uint32_t currentMillis = millis();
   if (currentMillis - lastBlinkMillis >= 1000)
   {
@@ -59,7 +61,15 @@ void Display::loop()
 
 void Display::blinkLED()
 {
-  led.set_rgb(76, 176, 80); // Green
+  const bool stateOK = state.status == Status_OK;
+  if (stateOK)
+  {
+      led.set_rgb(0, 255, 0); // Green
+  }
+  else
+  {
+      led.set_rgb(255, 0, 0); // Red
+  }
   led.set_brightness(ledState ? 0 : 100);
   ledState = !ledState;
 }
