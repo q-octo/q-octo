@@ -113,7 +113,7 @@ public:
   } PhysicalButton;
 
   typedef enum {
-    OK,
+    OK = 0,
     LOW_BATTERY,
     NO_TX_SIGNAL,
     MOTOR_ERROR,

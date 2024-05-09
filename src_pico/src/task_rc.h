@@ -39,6 +39,7 @@ private:
 
   static void onFailsafeCleared();
   static bool failsafeActive() { return isFailsafeActive || receiverTimedOut;}
+  static void sendStateAsTelem(const DataManager::State &state);
 
 
   static inline DataManager::Message taskMessage;

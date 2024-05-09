@@ -1,6 +1,7 @@
 #include "config.h"
 #include <Arduino.h> // Always include this first
 #include "task_rc.h"
+#include "system_status.h"
 
 #define DEBUG_LOG_RC_CHANNELS 1
 #define DEBUG_LOG_RC_LINK_STATS 1
@@ -73,11 +74,42 @@ void TaskRC::receiveMessage(const Message &message) {
       break;
     case STATE_UPDATE:
       setThresholds();
+      sendStateAsTelem(message.as.state);
       break;
     default:
       Serial.println("[ERROR] unknown message type");
       break;
   }
+}
+
+void TaskRC::sendStateAsTelem(const DataManager::State &state) {
+  const size_t payloadSize = 9;
+  uint8_t buffer[payloadSize] = {0};
+  buffer[0] = state.webServerEnabled;
+  buffer[1] = 1; // TODO set this
+  // Manual, obc, flight con
+  buffer[2] = 0; // TODO set this
+  buffer[3] = SystemStatus::getStatus();
+  auto speedLimit = static_cast<uint16_t>(max(state.leftMotorLimits.max_speed, state.rightMotorLimits.max_speed) * 10);
+  // Big endian
+  buffer[4] = (speedLimit >> 8) & 0xFF;
+  buffer[5] = speedLimit & 0xFF;
+  uint16_t currentLimit = static_cast<uint16_t>(max(state.leftMotorLimits.max_current, state.rightMotorLimits.max_current) * 10);
+  buffer[6] = (currentLimit >> 8) & 0xFF;
+  buffer[7] = currentLimit & 0xFF;
+  buffer[8] = static_cast<uint8_t>(max(state.leftMotorLimits.max_torque, state.rightMotorLimits.max_torque) * 10);
+  /*
+  crsfPayload = {
+  0,    -- Wifi
+  0,    -- Armed
+  0,    -- Control Source
+  -1,    -- Status
+  0x00, 0x00, -- Speed Limit
+  0x00, 0x00, -- Current Limit
+  0,    -- Torque Limit
+}
+  */
+  crsf_telem_set_custom_payload(buffer, payloadSize);
 }
 
 void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {

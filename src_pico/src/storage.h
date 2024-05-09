@@ -14,12 +14,12 @@ struct StorageState
     uint8_t linkQualityThreshold = 70;
     bool startWebServerOnLaunch = false;
     // Max = 30.0, only applies to position control mode!!
-    float motorSpeedLimit = 12.0f;
+    float motorSpeedLimit = 20.0f;
     // max = 27.0
-    float motorCurrentLimit = 2.0f;
+    float motorCurrentLimit = 0.5f;
     // Max = 12.5
     // TODO this doesn't seem to work!!
-    float motorTorqueLimit = 0.5f;
+    float motorTorqueLimit = 12.5f;
     // TODO use these
     float speedKp = 1.0f; // Default was 1
     float speedKi = 0.002f; // Default was 0.002
