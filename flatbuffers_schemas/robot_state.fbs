@@ -53,8 +53,23 @@ table CrsfTelemetry {
   tx_power: ushort = 0;
 }
 
-struct CrsfChannels {
-  data: [ushort:16];
+table CrsfChannels {
+  c1: ushort = 0;
+  c2: ushort = 0;
+  c3: ushort = 0;
+  c4: ushort = 0;
+  c5: ushort = 0;
+  c6: ushort = 0;
+  c7: ushort = 0;
+  c8: ushort = 0;
+  c9: ushort = 0;
+  c10: ushort = 0;
+  c11: ushort = 0;
+  c12: ushort = 0;
+  c13: ushort = 0;
+  c14: ushort = 0;
+  c15: ushort = 0;
+  c16: ushort = 0;
 }
 
 table CrsfData {

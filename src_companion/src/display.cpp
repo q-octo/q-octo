@@ -321,7 +321,23 @@ void Display::paintPage2() {
         items.push_back("No CRSF data.");
     } else {
         // Process channel data
-        auto channelData = state.crsf_data->channels->data();
+        uint16_t channelData[16];
+        channelData[0] = state.crsf_data->channels->c1;
+        channelData[1] = state.crsf_data->channels->c2;
+        channelData[2] = state.crsf_data->channels->c3;
+        channelData[3] = state.crsf_data->channels->c4;
+        channelData[4] = state.crsf_data->channels->c5;
+        channelData[5] = state.crsf_data->channels->c6;
+        channelData[6] = state.crsf_data->channels->c7;
+        channelData[7] = state.crsf_data->channels->c8;
+        channelData[8] = state.crsf_data->channels->c9;
+        channelData[9] = state.crsf_data->channels->c10;
+        channelData[10] = state.crsf_data->channels->c11;
+        channelData[11] = state.crsf_data->channels->c12;
+        channelData[12] = state.crsf_data->channels->c13;
+        channelData[13] = state.crsf_data->channels->c14;
+        channelData[14] = state.crsf_data->channels->c15;
+        channelData[15] = state.crsf_data->channels->c16;
         std::ostringstream oss;
 
         // Construct lines for channel data groups
@@ -329,7 +345,7 @@ void Display::paintPage2() {
             int baseIndex = i * 4;
             oss << std::to_string(baseIndex + 1) << "-" << std::to_string(baseIndex + 4);
             for (int j = 0; j < 4; j++) {
-                oss << " " << channelData[baseIndex + j].data();
+                oss << " " << channelData[baseIndex + j];
             }
             items.push_back(oss.str());
             oss.str(""); // Clear for next group

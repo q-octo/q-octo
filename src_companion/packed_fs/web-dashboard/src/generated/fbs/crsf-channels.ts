@@ -15,47 +15,270 @@ export class CrsfChannels implements flatbuffers.IUnpackableObject<CrsfChannelsT
   return this;
 }
 
-data(index: number):number|null {
-    return this.bb!.readUint16(this.bb_pos + 0 + index * 2);
+static getRootAsCrsfChannels(bb:flatbuffers.ByteBuffer, obj?:CrsfChannels):CrsfChannels {
+  return (obj || new CrsfChannels()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-static sizeOf():number {
-  return 32;
+static getSizePrefixedRootAsCrsfChannels(bb:flatbuffers.ByteBuffer, obj?:CrsfChannels):CrsfChannels {
+  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+  return (obj || new CrsfChannels()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-static createCrsfChannels(builder:flatbuffers.Builder, data: number[]|null):flatbuffers.Offset {
-  builder.prep(2, 32);
-
-  for (let i = 15; i >= 0; --i) {
-    builder.writeInt16((data?.[i] ?? 0));
-
-  }
-
-  return builder.offset();
+c1():number {
+  const offset = this.bb!.__offset(this.bb_pos, 4);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
 }
 
+c2():number {
+  const offset = this.bb!.__offset(this.bb_pos, 6);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c3():number {
+  const offset = this.bb!.__offset(this.bb_pos, 8);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c4():number {
+  const offset = this.bb!.__offset(this.bb_pos, 10);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c5():number {
+  const offset = this.bb!.__offset(this.bb_pos, 12);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c6():number {
+  const offset = this.bb!.__offset(this.bb_pos, 14);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c7():number {
+  const offset = this.bb!.__offset(this.bb_pos, 16);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c8():number {
+  const offset = this.bb!.__offset(this.bb_pos, 18);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c9():number {
+  const offset = this.bb!.__offset(this.bb_pos, 20);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c10():number {
+  const offset = this.bb!.__offset(this.bb_pos, 22);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c11():number {
+  const offset = this.bb!.__offset(this.bb_pos, 24);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c12():number {
+  const offset = this.bb!.__offset(this.bb_pos, 26);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c13():number {
+  const offset = this.bb!.__offset(this.bb_pos, 28);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c14():number {
+  const offset = this.bb!.__offset(this.bb_pos, 30);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c15():number {
+  const offset = this.bb!.__offset(this.bb_pos, 32);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+c16():number {
+  const offset = this.bb!.__offset(this.bb_pos, 34);
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 0;
+}
+
+static startCrsfChannels(builder:flatbuffers.Builder) {
+  builder.startObject(16);
+}
+
+static addC1(builder:flatbuffers.Builder, c1:number) {
+  builder.addFieldInt16(0, c1, 0);
+}
+
+static addC2(builder:flatbuffers.Builder, c2:number) {
+  builder.addFieldInt16(1, c2, 0);
+}
+
+static addC3(builder:flatbuffers.Builder, c3:number) {
+  builder.addFieldInt16(2, c3, 0);
+}
+
+static addC4(builder:flatbuffers.Builder, c4:number) {
+  builder.addFieldInt16(3, c4, 0);
+}
+
+static addC5(builder:flatbuffers.Builder, c5:number) {
+  builder.addFieldInt16(4, c5, 0);
+}
+
+static addC6(builder:flatbuffers.Builder, c6:number) {
+  builder.addFieldInt16(5, c6, 0);
+}
+
+static addC7(builder:flatbuffers.Builder, c7:number) {
+  builder.addFieldInt16(6, c7, 0);
+}
+
+static addC8(builder:flatbuffers.Builder, c8:number) {
+  builder.addFieldInt16(7, c8, 0);
+}
+
+static addC9(builder:flatbuffers.Builder, c9:number) {
+  builder.addFieldInt16(8, c9, 0);
+}
+
+static addC10(builder:flatbuffers.Builder, c10:number) {
+  builder.addFieldInt16(9, c10, 0);
+}
+
+static addC11(builder:flatbuffers.Builder, c11:number) {
+  builder.addFieldInt16(10, c11, 0);
+}
+
+static addC12(builder:flatbuffers.Builder, c12:number) {
+  builder.addFieldInt16(11, c12, 0);
+}
+
+static addC13(builder:flatbuffers.Builder, c13:number) {
+  builder.addFieldInt16(12, c13, 0);
+}
+
+static addC14(builder:flatbuffers.Builder, c14:number) {
+  builder.addFieldInt16(13, c14, 0);
+}
+
+static addC15(builder:flatbuffers.Builder, c15:number) {
+  builder.addFieldInt16(14, c15, 0);
+}
+
+static addC16(builder:flatbuffers.Builder, c16:number) {
+  builder.addFieldInt16(15, c16, 0);
+}
+
+static endCrsfChannels(builder:flatbuffers.Builder):flatbuffers.Offset {
+  const offset = builder.endObject();
+  return offset;
+}
+
+static createCrsfChannels(builder:flatbuffers.Builder, c1:number, c2:number, c3:number, c4:number, c5:number, c6:number, c7:number, c8:number, c9:number, c10:number, c11:number, c12:number, c13:number, c14:number, c15:number, c16:number):flatbuffers.Offset {
+  CrsfChannels.startCrsfChannels(builder);
+  CrsfChannels.addC1(builder, c1);
+  CrsfChannels.addC2(builder, c2);
+  CrsfChannels.addC3(builder, c3);
+  CrsfChannels.addC4(builder, c4);
+  CrsfChannels.addC5(builder, c5);
+  CrsfChannels.addC6(builder, c6);
+  CrsfChannels.addC7(builder, c7);
+  CrsfChannels.addC8(builder, c8);
+  CrsfChannels.addC9(builder, c9);
+  CrsfChannels.addC10(builder, c10);
+  CrsfChannels.addC11(builder, c11);
+  CrsfChannels.addC12(builder, c12);
+  CrsfChannels.addC13(builder, c13);
+  CrsfChannels.addC14(builder, c14);
+  CrsfChannels.addC15(builder, c15);
+  CrsfChannels.addC16(builder, c16);
+  return CrsfChannels.endCrsfChannels(builder);
+}
 
 unpack(): CrsfChannelsT {
   return new CrsfChannelsT(
-    this.bb!.createScalarList<number>(this.data.bind(this), 16)
+    this.c1(),
+    this.c2(),
+    this.c3(),
+    this.c4(),
+    this.c5(),
+    this.c6(),
+    this.c7(),
+    this.c8(),
+    this.c9(),
+    this.c10(),
+    this.c11(),
+    this.c12(),
+    this.c13(),
+    this.c14(),
+    this.c15(),
+    this.c16()
   );
 }
 
 
 unpackTo(_o: CrsfChannelsT): void {
-  _o.data = this.bb!.createScalarList<number>(this.data.bind(this), 16);
+  _o.c1 = this.c1();
+  _o.c2 = this.c2();
+  _o.c3 = this.c3();
+  _o.c4 = this.c4();
+  _o.c5 = this.c5();
+  _o.c6 = this.c6();
+  _o.c7 = this.c7();
+  _o.c8 = this.c8();
+  _o.c9 = this.c9();
+  _o.c10 = this.c10();
+  _o.c11 = this.c11();
+  _o.c12 = this.c12();
+  _o.c13 = this.c13();
+  _o.c14 = this.c14();
+  _o.c15 = this.c15();
+  _o.c16 = this.c16();
 }
 }
 
 export class CrsfChannelsT implements flatbuffers.IGeneratedObject {
 constructor(
-  public data: (number)[] = []
+  public c1: number = 0,
+  public c2: number = 0,
+  public c3: number = 0,
+  public c4: number = 0,
+  public c5: number = 0,
+  public c6: number = 0,
+  public c7: number = 0,
+  public c8: number = 0,
+  public c9: number = 0,
+  public c10: number = 0,
+  public c11: number = 0,
+  public c12: number = 0,
+  public c13: number = 0,
+  public c14: number = 0,
+  public c15: number = 0,
+  public c16: number = 0
 ){}
 
 
 pack(builder:flatbuffers.Builder): flatbuffers.Offset {
   return CrsfChannels.createCrsfChannels(builder,
-    this.data
+    this.c1,
+    this.c2,
+    this.c3,
+    this.c4,
+    this.c5,
+    this.c6,
+    this.c7,
+    this.c8,
+    this.c9,
+    this.c10,
+    this.c11,
+    this.c12,
+    this.c13,
+    this.c14,
+    this.c15,
+    this.c16
   );
 }
 }

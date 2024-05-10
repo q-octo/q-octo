@@ -36,6 +36,8 @@ struct CrsfTelemetryBuilder;
 struct CrsfTelemetryT;
 
 struct CrsfChannels;
+struct CrsfChannelsBuilder;
+struct CrsfChannelsT;
 
 struct CrsfData;
 struct CrsfDataBuilder;
@@ -119,23 +121,6 @@ inline const char *EnumNameStatus(Status e) {
   const size_t index = static_cast<size_t>(e);
   return EnumNamesStatus()[index];
 }
-
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) CrsfChannels FLATBUFFERS_FINAL_CLASS {
- private:
-  uint16_t data_[16];
-
- public:
-  CrsfChannels()
-      : data_() {
-  }
-  CrsfChannels(::flatbuffers::span<const uint16_t, 16> _data) {
-    ::flatbuffers::CastToArray(data_).CopyFromSpan(_data);
-  }
-  const ::flatbuffers::Array<uint16_t, 16> *data() const {
-    return &::flatbuffers::CastToArray(data_);
-  }
-};
-FLATBUFFERS_STRUCT_END(CrsfChannels, 32);
 
 struct MotorT : public ::flatbuffers::NativeTable {
   typedef Motor TableType;
@@ -628,9 +613,226 @@ inline ::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(
 
 ::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfTelemetryT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CrsfChannelsT : public ::flatbuffers::NativeTable {
+  typedef CrsfChannels TableType;
+  uint16_t c1 = 0;
+  uint16_t c2 = 0;
+  uint16_t c3 = 0;
+  uint16_t c4 = 0;
+  uint16_t c5 = 0;
+  uint16_t c6 = 0;
+  uint16_t c7 = 0;
+  uint16_t c8 = 0;
+  uint16_t c9 = 0;
+  uint16_t c10 = 0;
+  uint16_t c11 = 0;
+  uint16_t c12 = 0;
+  uint16_t c13 = 0;
+  uint16_t c14 = 0;
+  uint16_t c15 = 0;
+  uint16_t c16 = 0;
+};
+
+struct CrsfChannels FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef CrsfChannelsT NativeTableType;
+  typedef CrsfChannelsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_C1 = 4,
+    VT_C2 = 6,
+    VT_C3 = 8,
+    VT_C4 = 10,
+    VT_C5 = 12,
+    VT_C6 = 14,
+    VT_C7 = 16,
+    VT_C8 = 18,
+    VT_C9 = 20,
+    VT_C10 = 22,
+    VT_C11 = 24,
+    VT_C12 = 26,
+    VT_C13 = 28,
+    VT_C14 = 30,
+    VT_C15 = 32,
+    VT_C16 = 34
+  };
+  uint16_t c1() const {
+    return GetField<uint16_t>(VT_C1, 0);
+  }
+  uint16_t c2() const {
+    return GetField<uint16_t>(VT_C2, 0);
+  }
+  uint16_t c3() const {
+    return GetField<uint16_t>(VT_C3, 0);
+  }
+  uint16_t c4() const {
+    return GetField<uint16_t>(VT_C4, 0);
+  }
+  uint16_t c5() const {
+    return GetField<uint16_t>(VT_C5, 0);
+  }
+  uint16_t c6() const {
+    return GetField<uint16_t>(VT_C6, 0);
+  }
+  uint16_t c7() const {
+    return GetField<uint16_t>(VT_C7, 0);
+  }
+  uint16_t c8() const {
+    return GetField<uint16_t>(VT_C8, 0);
+  }
+  uint16_t c9() const {
+    return GetField<uint16_t>(VT_C9, 0);
+  }
+  uint16_t c10() const {
+    return GetField<uint16_t>(VT_C10, 0);
+  }
+  uint16_t c11() const {
+    return GetField<uint16_t>(VT_C11, 0);
+  }
+  uint16_t c12() const {
+    return GetField<uint16_t>(VT_C12, 0);
+  }
+  uint16_t c13() const {
+    return GetField<uint16_t>(VT_C13, 0);
+  }
+  uint16_t c14() const {
+    return GetField<uint16_t>(VT_C14, 0);
+  }
+  uint16_t c15() const {
+    return GetField<uint16_t>(VT_C15, 0);
+  }
+  uint16_t c16() const {
+    return GetField<uint16_t>(VT_C16, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_C1, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C2, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C3, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C4, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C5, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C6, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C7, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C8, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C9, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C10, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C11, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C12, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C13, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C14, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C15, 2) &&
+           VerifyField<uint16_t>(verifier, VT_C16, 2) &&
+           verifier.EndTable();
+  }
+  CrsfChannelsT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CrsfChannelsT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<CrsfChannels> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfChannelsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CrsfChannelsBuilder {
+  typedef CrsfChannels Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_c1(uint16_t c1) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C1, c1, 0);
+  }
+  void add_c2(uint16_t c2) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C2, c2, 0);
+  }
+  void add_c3(uint16_t c3) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C3, c3, 0);
+  }
+  void add_c4(uint16_t c4) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C4, c4, 0);
+  }
+  void add_c5(uint16_t c5) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C5, c5, 0);
+  }
+  void add_c6(uint16_t c6) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C6, c6, 0);
+  }
+  void add_c7(uint16_t c7) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C7, c7, 0);
+  }
+  void add_c8(uint16_t c8) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C8, c8, 0);
+  }
+  void add_c9(uint16_t c9) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C9, c9, 0);
+  }
+  void add_c10(uint16_t c10) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C10, c10, 0);
+  }
+  void add_c11(uint16_t c11) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C11, c11, 0);
+  }
+  void add_c12(uint16_t c12) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C12, c12, 0);
+  }
+  void add_c13(uint16_t c13) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C13, c13, 0);
+  }
+  void add_c14(uint16_t c14) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C14, c14, 0);
+  }
+  void add_c15(uint16_t c15) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C15, c15, 0);
+  }
+  void add_c16(uint16_t c16) {
+    fbb_.AddElement<uint16_t>(CrsfChannels::VT_C16, c16, 0);
+  }
+  explicit CrsfChannelsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<CrsfChannels> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<CrsfChannels>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<CrsfChannels> CreateCrsfChannels(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t c1 = 0,
+    uint16_t c2 = 0,
+    uint16_t c3 = 0,
+    uint16_t c4 = 0,
+    uint16_t c5 = 0,
+    uint16_t c6 = 0,
+    uint16_t c7 = 0,
+    uint16_t c8 = 0,
+    uint16_t c9 = 0,
+    uint16_t c10 = 0,
+    uint16_t c11 = 0,
+    uint16_t c12 = 0,
+    uint16_t c13 = 0,
+    uint16_t c14 = 0,
+    uint16_t c15 = 0,
+    uint16_t c16 = 0) {
+  CrsfChannelsBuilder builder_(_fbb);
+  builder_.add_c16(c16);
+  builder_.add_c15(c15);
+  builder_.add_c14(c14);
+  builder_.add_c13(c13);
+  builder_.add_c12(c12);
+  builder_.add_c11(c11);
+  builder_.add_c10(c10);
+  builder_.add_c9(c9);
+  builder_.add_c8(c8);
+  builder_.add_c7(c7);
+  builder_.add_c6(c6);
+  builder_.add_c5(c5);
+  builder_.add_c4(c4);
+  builder_.add_c3(c3);
+  builder_.add_c2(c2);
+  builder_.add_c1(c1);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<CrsfChannels> CreateCrsfChannels(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfChannelsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct CrsfDataT : public ::flatbuffers::NativeTable {
   typedef CrsfData TableType;
-  std::unique_ptr<fbs::CrsfChannels> channels{};
+  std::unique_ptr<fbs::CrsfChannelsT> channels{};
   std::unique_ptr<fbs::CrsfTelemetryT> telemetry{};
   bool failsafe = true;
   CrsfDataT() = default;
@@ -648,7 +850,7 @@ struct CrsfData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_FAILSAFE = 8
   };
   const fbs::CrsfChannels *channels() const {
-    return GetStruct<const fbs::CrsfChannels *>(VT_CHANNELS);
+    return GetPointer<const fbs::CrsfChannels *>(VT_CHANNELS);
   }
   /// Telemetry data associated with the RC frame
   const fbs::CrsfTelemetry *telemetry() const {
@@ -660,7 +862,8 @@ struct CrsfData FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<fbs::CrsfChannels>(verifier, VT_CHANNELS, 2) &&
+           VerifyOffset(verifier, VT_CHANNELS) &&
+           verifier.VerifyTable(channels()) &&
            VerifyOffset(verifier, VT_TELEMETRY) &&
            verifier.VerifyTable(telemetry()) &&
            VerifyField<uint8_t>(verifier, VT_FAILSAFE, 1) &&
@@ -675,8 +878,8 @@ struct CrsfDataBuilder {
   typedef CrsfData Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_channels(const fbs::CrsfChannels *channels) {
-    fbb_.AddStruct(CrsfData::VT_CHANNELS, channels);
+  void add_channels(::flatbuffers::Offset<fbs::CrsfChannels> channels) {
+    fbb_.AddOffset(CrsfData::VT_CHANNELS, channels);
   }
   void add_telemetry(::flatbuffers::Offset<fbs::CrsfTelemetry> telemetry) {
     fbb_.AddOffset(CrsfData::VT_TELEMETRY, telemetry);
@@ -697,7 +900,7 @@ struct CrsfDataBuilder {
 
 inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const fbs::CrsfChannels *channels = nullptr,
+    ::flatbuffers::Offset<fbs::CrsfChannels> channels = 0,
     ::flatbuffers::Offset<fbs::CrsfTelemetry> telemetry = 0,
     bool failsafe = true) {
   CrsfDataBuilder builder_(_fbb);
@@ -1246,8 +1449,79 @@ inline ::flatbuffers::Offset<CrsfTelemetry> CreateCrsfTelemetry(::flatbuffers::F
       _tx_power);
 }
 
+inline CrsfChannelsT *CrsfChannels::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<CrsfChannelsT>(new CrsfChannelsT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CrsfChannels::UnPackTo(CrsfChannelsT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = c1(); _o->c1 = _e; }
+  { auto _e = c2(); _o->c2 = _e; }
+  { auto _e = c3(); _o->c3 = _e; }
+  { auto _e = c4(); _o->c4 = _e; }
+  { auto _e = c5(); _o->c5 = _e; }
+  { auto _e = c6(); _o->c6 = _e; }
+  { auto _e = c7(); _o->c7 = _e; }
+  { auto _e = c8(); _o->c8 = _e; }
+  { auto _e = c9(); _o->c9 = _e; }
+  { auto _e = c10(); _o->c10 = _e; }
+  { auto _e = c11(); _o->c11 = _e; }
+  { auto _e = c12(); _o->c12 = _e; }
+  { auto _e = c13(); _o->c13 = _e; }
+  { auto _e = c14(); _o->c14 = _e; }
+  { auto _e = c15(); _o->c15 = _e; }
+  { auto _e = c16(); _o->c16 = _e; }
+}
+
+inline ::flatbuffers::Offset<CrsfChannels> CrsfChannels::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfChannelsT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCrsfChannels(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<CrsfChannels> CreateCrsfChannels(::flatbuffers::FlatBufferBuilder &_fbb, const CrsfChannelsT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const CrsfChannelsT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _c1 = _o->c1;
+  auto _c2 = _o->c2;
+  auto _c3 = _o->c3;
+  auto _c4 = _o->c4;
+  auto _c5 = _o->c5;
+  auto _c6 = _o->c6;
+  auto _c7 = _o->c7;
+  auto _c8 = _o->c8;
+  auto _c9 = _o->c9;
+  auto _c10 = _o->c10;
+  auto _c11 = _o->c11;
+  auto _c12 = _o->c12;
+  auto _c13 = _o->c13;
+  auto _c14 = _o->c14;
+  auto _c15 = _o->c15;
+  auto _c16 = _o->c16;
+  return fbs::CreateCrsfChannels(
+      _fbb,
+      _c1,
+      _c2,
+      _c3,
+      _c4,
+      _c5,
+      _c6,
+      _c7,
+      _c8,
+      _c9,
+      _c10,
+      _c11,
+      _c12,
+      _c13,
+      _c14,
+      _c15,
+      _c16);
+}
+
 inline CrsfDataT::CrsfDataT(const CrsfDataT &o)
-      : channels((o.channels) ? new fbs::CrsfChannels(*o.channels) : nullptr),
+      : channels((o.channels) ? new fbs::CrsfChannelsT(*o.channels) : nullptr),
         telemetry((o.telemetry) ? new fbs::CrsfTelemetryT(*o.telemetry) : nullptr),
         failsafe(o.failsafe) {
 }
@@ -1268,7 +1542,7 @@ inline CrsfDataT *CrsfData::UnPack(const ::flatbuffers::resolver_function_t *_re
 inline void CrsfData::UnPackTo(CrsfDataT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = channels(); if (_e) _o->channels = std::unique_ptr<fbs::CrsfChannels>(new fbs::CrsfChannels(*_e)); }
+  { auto _e = channels(); if (_e) { if(_o->channels) { _e->UnPackTo(_o->channels.get(), _resolver); } else { _o->channels = std::unique_ptr<fbs::CrsfChannelsT>(_e->UnPack(_resolver)); } } else if (_o->channels) { _o->channels.reset(); } }
   { auto _e = telemetry(); if (_e) { if(_o->telemetry) { _e->UnPackTo(_o->telemetry.get(), _resolver); } else { _o->telemetry = std::unique_ptr<fbs::CrsfTelemetryT>(_e->UnPack(_resolver)); } } else if (_o->telemetry) { _o->telemetry.reset(); } }
   { auto _e = failsafe(); _o->failsafe = _e; }
 }
@@ -1281,7 +1555,7 @@ inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(::flatbuffers::FlatBufferB
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const CrsfDataT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _channels = _o->channels ? _o->channels.get() : nullptr;
+  auto _channels = _o->channels ? CreateCrsfChannels(_fbb, _o->channels.get(), _rehasher) : 0;
   auto _telemetry = _o->telemetry ? CreateCrsfTelemetry(_fbb, _o->telemetry.get(), _rehasher) : 0;
   auto _failsafe = _o->failsafe;
   return fbs::CreateCrsfData(

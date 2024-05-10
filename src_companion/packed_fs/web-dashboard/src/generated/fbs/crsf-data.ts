@@ -28,7 +28,7 @@ static getSizePrefixedRootAsCrsfData(bb:flatbuffers.ByteBuffer, obj?:CrsfData):C
 
 channels(obj?:CrsfChannels):CrsfChannels|null {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? (obj || new CrsfChannels()).__init(this.bb_pos + offset, this.bb!) : null;
+  return offset ? (obj || new CrsfChannels()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 /**
@@ -52,7 +52,7 @@ static startCrsfData(builder:flatbuffers.Builder) {
 }
 
 static addChannels(builder:flatbuffers.Builder, channelsOffset:flatbuffers.Offset) {
-  builder.addFieldStruct(0, channelsOffset, 0);
+  builder.addFieldOffset(0, channelsOffset, 0);
 }
 
 static addTelemetry(builder:flatbuffers.Builder, telemetryOffset:flatbuffers.Offset) {
@@ -94,10 +94,11 @@ constructor(
 
 
 pack(builder:flatbuffers.Builder): flatbuffers.Offset {
+  const channels = (this.channels !== null ? this.channels!.pack(builder) : 0);
   const telemetry = (this.telemetry !== null ? this.telemetry!.pack(builder) : 0);
 
   CrsfData.startCrsfData(builder);
-  CrsfData.addChannels(builder, (this.channels !== null ? this.channels!.pack(builder) : 0));
+  CrsfData.addChannels(builder, channels);
   CrsfData.addTelemetry(builder, telemetry);
   CrsfData.addFailsafe(builder, this.failsafe);
 

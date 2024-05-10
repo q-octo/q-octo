@@ -69,7 +69,7 @@ public:
     uint8_t linkQuality;
     int8_t signalNoiseRatio;
     uint16_t tx_power;
-    uint16_t channels[16];
+    uint16_t *channels;
     bool failsafe;
   } RC;
 
@@ -170,7 +170,7 @@ public:
   }
 
   static void init() {
-    static std::string defaultMessage = "TEST MSG";
+    static std::string defaultMessage = "";
     state.displayMessages = {
       .message1 = &defaultMessage,
       .message2 = &defaultMessage,
@@ -180,6 +180,7 @@ public:
       .message6 = &defaultMessage,
       .message7 = &defaultMessage,
     };
+    state.rc.channels = nullptr;
   }
 
 private:

@@ -38,13 +38,29 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
     .snr = robotState.rc.signalNoiseRatio,
     .tx_power = robotState.rc.tx_power
   };
-  
-  ::flatbuffers::span<const uint16_t, 16> data_span(robotState.rc.channels);
-  const CrsfChannels crsfChannels(data_span);
+  CrsfChannelsT crsfChannels{};
+  if (robotState.rc.channels != nullptr) {
+    crsfChannels.c1 = robotState.rc.channels[0];
+    crsfChannels.c2 = robotState.rc.channels[1];
+    crsfChannels.c3 = robotState.rc.channels[2];
+    crsfChannels.c4 = robotState.rc.channels[3];
+    crsfChannels.c5 = robotState.rc.channels[4];
+    crsfChannels.c6 = robotState.rc.channels[5];
+    crsfChannels.c7 = robotState.rc.channels[6];
+    crsfChannels.c8 = robotState.rc.channels[7];
+    crsfChannels.c9 = robotState.rc.channels[8];
+    crsfChannels.c10 = robotState.rc.channels[9];
+    crsfChannels.c11 = robotState.rc.channels[10];
+    crsfChannels.c12 = robotState.rc.channels[11];
+    crsfChannels.c13 = robotState.rc.channels[12];
+    crsfChannels.c14 = robotState.rc.channels[13];
+    crsfChannels.c15 = robotState.rc.channels[14];
+    crsfChannels.c16 = robotState.rc.channels[15];
+  }
 
   CrsfDataT crsfData{};
   crsfData.telemetry = std::make_unique<CrsfTelemetryT>(crsfTelemetry);
-  crsfData.channels = std::make_unique<CrsfChannels>(crsfChannels);
+  crsfData.channels = std::make_unique<CrsfChannelsT>(crsfChannels);
   crsfData.failsafe = robotState.rc.failsafe;
   robot.crsf_data = std::make_unique<CrsfDataT>(crsfData);
 

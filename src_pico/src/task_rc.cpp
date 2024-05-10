@@ -44,9 +44,9 @@ void TaskRC::loop() {
             .linkQuality = lastLinkStats.link_quality,
             .signalNoiseRatio = lastLinkStats.snr,
             .tx_power = lastLinkStats.tx_power,
+            .channels = &lastChannels[0],
             .failsafe = isFailsafeActive,
     };
-    memcpy(rc.channels, lastChannels, sizeof(lastChannels));
     taskMessage = {.type = DataManager::Type::STATE_RC, .as = {.rc = rc}};
     DataManager::receiveMessage(taskMessage);
   }
