@@ -51,8 +51,9 @@ public:
     void updateState(const RobotT& robot) { state = robot; } 
 
 private:
+    void paintStack(const std::vector<std::string> &items);
+    std::string fmtFloat(const float& number, const int& precision = 2);
     void repaintDisplay();
-    void paintStack(std::vector<std::string> &items);
     void paintPage1();
     void paintPage2();
     void paintPage3();
@@ -81,6 +82,5 @@ private:
     RobotT state = RobotT();
 
     bool ledState = false;
-
-    void paintStack(const std::vector<std::string> &items);
+ 
 };
