@@ -305,15 +305,15 @@ void Display::paintPage2() {
     } else {
         // Format and construct lines for motor info
         std::ostringstream oss;
-        oss << "L MOT " << state.motors->motor1->temperature << "°C "
-            << fmtFloat(state.motors->motor1->rps) << "rad/s "
-            << state.motors->motor1->angle << "°";
+        oss << "L MOT: " << fmtFloat(state.motors->motor1->temperature, 1) << "°C "
+            << fmtFloat(state.motors->motor1->rps, 1) << "rad/s "
+            << fmtFloat(state.motors->motor1->angle, 1) << "°";
         items.push_back(oss.str());
         oss.str("");
 
-        oss << "R MOT: " << state.motors->motor2->temperature << "°C "
-            << fmtFloat(state.motors->motor2->rps) << "rad/s "
-            << state.motors->motor2->angle << "°";
+        oss << "R MOT: " << fmtFloat(state.motors->motor2->temperature, 1) << "°C "
+            << fmtFloat(state.motors->motor2->rps, 1) << "rad/s "
+            << fmtFloat(state.motors->motor2->angle, 1) << "°";
         items.push_back(oss.str());
     }
 

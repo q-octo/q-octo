@@ -196,6 +196,7 @@ void Companion::sendStateToCompanion(const DataManager::State &state) {
   if (!companionSerial.write(fbb.GetBufferPointer(), fbb.GetSize())) {
     Serial.println("FAILED to send to companion");
   }
+  // Serial.printf("Took %d ms to send to companion\n", millis() - currentMillis);
   // xQueueSend(SerialTask::queue, &data, 0);
 }
 

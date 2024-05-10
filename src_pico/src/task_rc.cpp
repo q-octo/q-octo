@@ -38,7 +38,6 @@ void TaskRC::loop() {
   const uint32_t currentMillis = millis();
   if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
     lastBroadcastMs = currentMillis;
-    lastLinkStats = lastLinkStats;
     DataManager::RC rc = {
             .rssi = lastLinkStats.rssi,
             .linkQuality = lastLinkStats.link_quality,
@@ -115,6 +114,7 @@ void TaskRC::sendStateAsTelem(const DataManager::State &state) {
 void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
   const uint32_t currentMillis = millis();
   lastReceiverUpdateMs = currentMillis;
+  lastLinkStats = linkStatistics;
 #if DEBUG_LOG_RC_LINK_STATS
   if (currentMillis - lastRcLinkStatsLogMs >= RC_LINK_STATS_LOG_FREQUENCY) {
     lastRcLinkStatsLogMs = currentMillis;

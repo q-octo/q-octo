@@ -12,7 +12,7 @@ struct StorageState
     uint8_t rightMotorFoldAngle = 0;
     uint8_t rssiThreshold = 105;
     uint8_t linkQualityThreshold = 70;
-    bool startWebServerOnLaunch = false;
+    bool startWebServerOnLaunch = true;
     // Max = 30.0, only applies to position control mode!!
     float motorSpeedLimit = 20.0f;
     // max = 27.0
