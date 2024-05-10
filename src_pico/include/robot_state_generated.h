@@ -711,7 +711,7 @@ inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(
 
 struct RobotT : public ::flatbuffers::NativeTable {
   typedef Robot TableType;
-  int32_t batteries = 4;
+  uint8_t batteries = 4;
   fbs::ControlSource control_source = fbs::ControlSource_RC;
   fbs::Status status = fbs::Status_OK;
   std::unique_ptr<fbs::MotorsT> motors{};
@@ -723,15 +723,15 @@ struct RobotT : public ::flatbuffers::NativeTable {
   std::unique_ptr<fbs::MotorLimitsT> right_motor_limits{};
   float low_voltage_threshold = 12.0f;
   float critical_voltage_threshold = 16.0f;
-  int32_t rssi_threshold = 0;
-  int32_t link_quality_threshold = 0;
-  int32_t left_motor_fold_angle = 0;
-  int32_t right_motor_fold_angle = 0;
+  uint8_t rssi_threshold = 0;
+  uint8_t link_quality_threshold = 0;
+  uint8_t left_motor_fold_angle = 0;
+  uint8_t right_motor_fold_angle = 0;
   std::string motor_error_code{};
   bool enable_rover = false;
   std::unique_ptr<fbs::DisplayMessagesT> display_messages{};
   bool start_web_server_on_launch = false;
-  int32_t crsf_link_stats_timeout_millis = 2000;
+  uint16_t crsf_link_stats_timeout_millis = 2000;
   bool web_server_enabled = false;
   RobotT() = default;
   RobotT(const RobotT &o);
@@ -766,8 +766,8 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CRSF_LINK_STATS_TIMEOUT_MILLIS = 44,
     VT_WEB_SERVER_ENABLED = 46
   };
-  int32_t batteries() const {
-    return GetField<int32_t>(VT_BATTERIES, 4);
+  uint8_t batteries() const {
+    return GetField<uint8_t>(VT_BATTERIES, 4);
   }
   fbs::ControlSource control_source() const {
     return static_cast<fbs::ControlSource>(GetField<int8_t>(VT_CONTROL_SOURCE, 3));
@@ -802,17 +802,17 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float critical_voltage_threshold() const {
     return GetField<float>(VT_CRITICAL_VOLTAGE_THRESHOLD, 16.0f);
   }
-  int32_t rssi_threshold() const {
-    return GetField<int32_t>(VT_RSSI_THRESHOLD, 0);
+  uint8_t rssi_threshold() const {
+    return GetField<uint8_t>(VT_RSSI_THRESHOLD, 0);
   }
-  int32_t link_quality_threshold() const {
-    return GetField<int32_t>(VT_LINK_QUALITY_THRESHOLD, 0);
+  uint8_t link_quality_threshold() const {
+    return GetField<uint8_t>(VT_LINK_QUALITY_THRESHOLD, 0);
   }
-  int32_t left_motor_fold_angle() const {
-    return GetField<int32_t>(VT_LEFT_MOTOR_FOLD_ANGLE, 0);
+  uint8_t left_motor_fold_angle() const {
+    return GetField<uint8_t>(VT_LEFT_MOTOR_FOLD_ANGLE, 0);
   }
-  int32_t right_motor_fold_angle() const {
-    return GetField<int32_t>(VT_RIGHT_MOTOR_FOLD_ANGLE, 0);
+  uint8_t right_motor_fold_angle() const {
+    return GetField<uint8_t>(VT_RIGHT_MOTOR_FOLD_ANGLE, 0);
   }
   const ::flatbuffers::String *motor_error_code() const {
     return GetPointer<const ::flatbuffers::String *>(VT_MOTOR_ERROR_CODE);
@@ -827,15 +827,15 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool start_web_server_on_launch() const {
     return GetField<uint8_t>(VT_START_WEB_SERVER_ON_LAUNCH, 0) != 0;
   }
-  int32_t crsf_link_stats_timeout_millis() const {
-    return GetField<int32_t>(VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 2000);
+  uint16_t crsf_link_stats_timeout_millis() const {
+    return GetField<uint16_t>(VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 2000);
   }
   bool web_server_enabled() const {
     return GetField<uint8_t>(VT_WEB_SERVER_ENABLED, 0) != 0;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_BATTERIES, 4) &&
+           VerifyField<uint8_t>(verifier, VT_BATTERIES, 1) &&
            VerifyField<int8_t>(verifier, VT_CONTROL_SOURCE, 1) &&
            VerifyField<int8_t>(verifier, VT_STATUS, 1) &&
            VerifyOffset(verifier, VT_MOTORS) &&
@@ -851,17 +851,17 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            verifier.VerifyTable(right_motor_limits()) &&
            VerifyField<float>(verifier, VT_LOW_VOLTAGE_THRESHOLD, 4) &&
            VerifyField<float>(verifier, VT_CRITICAL_VOLTAGE_THRESHOLD, 4) &&
-           VerifyField<int32_t>(verifier, VT_RSSI_THRESHOLD, 4) &&
-           VerifyField<int32_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 4) &&
-           VerifyField<int32_t>(verifier, VT_LEFT_MOTOR_FOLD_ANGLE, 4) &&
-           VerifyField<int32_t>(verifier, VT_RIGHT_MOTOR_FOLD_ANGLE, 4) &&
+           VerifyField<uint8_t>(verifier, VT_RSSI_THRESHOLD, 1) &&
+           VerifyField<uint8_t>(verifier, VT_LINK_QUALITY_THRESHOLD, 1) &&
+           VerifyField<uint8_t>(verifier, VT_LEFT_MOTOR_FOLD_ANGLE, 1) &&
+           VerifyField<uint8_t>(verifier, VT_RIGHT_MOTOR_FOLD_ANGLE, 1) &&
            VerifyOffset(verifier, VT_MOTOR_ERROR_CODE) &&
            verifier.VerifyString(motor_error_code()) &&
            VerifyField<uint8_t>(verifier, VT_ENABLE_ROVER, 1) &&
            VerifyOffset(verifier, VT_DISPLAY_MESSAGES) &&
            verifier.VerifyTable(display_messages()) &&
            VerifyField<uint8_t>(verifier, VT_START_WEB_SERVER_ON_LAUNCH, 1) &&
-           VerifyField<int32_t>(verifier, VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 4) &&
+           VerifyField<uint16_t>(verifier, VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, 2) &&
            VerifyField<uint8_t>(verifier, VT_WEB_SERVER_ENABLED, 1) &&
            verifier.EndTable();
   }
@@ -874,8 +874,8 @@ struct RobotBuilder {
   typedef Robot Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_batteries(int32_t batteries) {
-    fbb_.AddElement<int32_t>(Robot::VT_BATTERIES, batteries, 4);
+  void add_batteries(uint8_t batteries) {
+    fbb_.AddElement<uint8_t>(Robot::VT_BATTERIES, batteries, 4);
   }
   void add_control_source(fbs::ControlSource control_source) {
     fbb_.AddElement<int8_t>(Robot::VT_CONTROL_SOURCE, static_cast<int8_t>(control_source), 3);
@@ -910,17 +910,17 @@ struct RobotBuilder {
   void add_critical_voltage_threshold(float critical_voltage_threshold) {
     fbb_.AddElement<float>(Robot::VT_CRITICAL_VOLTAGE_THRESHOLD, critical_voltage_threshold, 16.0f);
   }
-  void add_rssi_threshold(int32_t rssi_threshold) {
-    fbb_.AddElement<int32_t>(Robot::VT_RSSI_THRESHOLD, rssi_threshold, 0);
+  void add_rssi_threshold(uint8_t rssi_threshold) {
+    fbb_.AddElement<uint8_t>(Robot::VT_RSSI_THRESHOLD, rssi_threshold, 0);
   }
-  void add_link_quality_threshold(int32_t link_quality_threshold) {
-    fbb_.AddElement<int32_t>(Robot::VT_LINK_QUALITY_THRESHOLD, link_quality_threshold, 0);
+  void add_link_quality_threshold(uint8_t link_quality_threshold) {
+    fbb_.AddElement<uint8_t>(Robot::VT_LINK_QUALITY_THRESHOLD, link_quality_threshold, 0);
   }
-  void add_left_motor_fold_angle(int32_t left_motor_fold_angle) {
-    fbb_.AddElement<int32_t>(Robot::VT_LEFT_MOTOR_FOLD_ANGLE, left_motor_fold_angle, 0);
+  void add_left_motor_fold_angle(uint8_t left_motor_fold_angle) {
+    fbb_.AddElement<uint8_t>(Robot::VT_LEFT_MOTOR_FOLD_ANGLE, left_motor_fold_angle, 0);
   }
-  void add_right_motor_fold_angle(int32_t right_motor_fold_angle) {
-    fbb_.AddElement<int32_t>(Robot::VT_RIGHT_MOTOR_FOLD_ANGLE, right_motor_fold_angle, 0);
+  void add_right_motor_fold_angle(uint8_t right_motor_fold_angle) {
+    fbb_.AddElement<uint8_t>(Robot::VT_RIGHT_MOTOR_FOLD_ANGLE, right_motor_fold_angle, 0);
   }
   void add_motor_error_code(::flatbuffers::Offset<::flatbuffers::String> motor_error_code) {
     fbb_.AddOffset(Robot::VT_MOTOR_ERROR_CODE, motor_error_code);
@@ -934,8 +934,8 @@ struct RobotBuilder {
   void add_start_web_server_on_launch(bool start_web_server_on_launch) {
     fbb_.AddElement<uint8_t>(Robot::VT_START_WEB_SERVER_ON_LAUNCH, static_cast<uint8_t>(start_web_server_on_launch), 0);
   }
-  void add_crsf_link_stats_timeout_millis(int32_t crsf_link_stats_timeout_millis) {
-    fbb_.AddElement<int32_t>(Robot::VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, crsf_link_stats_timeout_millis, 2000);
+  void add_crsf_link_stats_timeout_millis(uint16_t crsf_link_stats_timeout_millis) {
+    fbb_.AddElement<uint16_t>(Robot::VT_CRSF_LINK_STATS_TIMEOUT_MILLIS, crsf_link_stats_timeout_millis, 2000);
   }
   void add_web_server_enabled(bool web_server_enabled) {
     fbb_.AddElement<uint8_t>(Robot::VT_WEB_SERVER_ENABLED, static_cast<uint8_t>(web_server_enabled), 0);
@@ -953,7 +953,7 @@ struct RobotBuilder {
 
 inline ::flatbuffers::Offset<Robot> CreateRobot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t batteries = 4,
+    uint8_t batteries = 4,
     fbs::ControlSource control_source = fbs::ControlSource_RC,
     fbs::Status status = fbs::Status_OK,
     ::flatbuffers::Offset<fbs::Motors> motors = 0,
@@ -965,24 +965,19 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
     ::flatbuffers::Offset<fbs::MotorLimits> right_motor_limits = 0,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
-    int32_t rssi_threshold = 0,
-    int32_t link_quality_threshold = 0,
-    int32_t left_motor_fold_angle = 0,
-    int32_t right_motor_fold_angle = 0,
+    uint8_t rssi_threshold = 0,
+    uint8_t link_quality_threshold = 0,
+    uint8_t left_motor_fold_angle = 0,
+    uint8_t right_motor_fold_angle = 0,
     ::flatbuffers::Offset<::flatbuffers::String> motor_error_code = 0,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
     bool start_web_server_on_launch = false,
-    int32_t crsf_link_stats_timeout_millis = 2000,
+    uint16_t crsf_link_stats_timeout_millis = 2000,
     bool web_server_enabled = false) {
   RobotBuilder builder_(_fbb);
-  builder_.add_crsf_link_stats_timeout_millis(crsf_link_stats_timeout_millis);
   builder_.add_display_messages(display_messages);
   builder_.add_motor_error_code(motor_error_code);
-  builder_.add_right_motor_fold_angle(right_motor_fold_angle);
-  builder_.add_left_motor_fold_angle(left_motor_fold_angle);
-  builder_.add_link_quality_threshold(link_quality_threshold);
-  builder_.add_rssi_threshold(rssi_threshold);
   builder_.add_critical_voltage_threshold(critical_voltage_threshold);
   builder_.add_low_voltage_threshold(low_voltage_threshold);
   builder_.add_right_motor_limits(right_motor_limits);
@@ -992,18 +987,23 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
   builder_.add_current(current);
   builder_.add_voltage(voltage);
   builder_.add_motors(motors);
-  builder_.add_batteries(batteries);
+  builder_.add_crsf_link_stats_timeout_millis(crsf_link_stats_timeout_millis);
   builder_.add_web_server_enabled(web_server_enabled);
   builder_.add_start_web_server_on_launch(start_web_server_on_launch);
   builder_.add_enable_rover(enable_rover);
+  builder_.add_right_motor_fold_angle(right_motor_fold_angle);
+  builder_.add_left_motor_fold_angle(left_motor_fold_angle);
+  builder_.add_link_quality_threshold(link_quality_threshold);
+  builder_.add_rssi_threshold(rssi_threshold);
   builder_.add_status(status);
   builder_.add_control_source(control_source);
+  builder_.add_batteries(batteries);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t batteries = 4,
+    uint8_t batteries = 4,
     fbs::ControlSource control_source = fbs::ControlSource_RC,
     fbs::Status status = fbs::Status_OK,
     ::flatbuffers::Offset<fbs::Motors> motors = 0,
@@ -1015,15 +1015,15 @@ inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     ::flatbuffers::Offset<fbs::MotorLimits> right_motor_limits = 0,
     float low_voltage_threshold = 12.0f,
     float critical_voltage_threshold = 16.0f,
-    int32_t rssi_threshold = 0,
-    int32_t link_quality_threshold = 0,
-    int32_t left_motor_fold_angle = 0,
-    int32_t right_motor_fold_angle = 0,
+    uint8_t rssi_threshold = 0,
+    uint8_t link_quality_threshold = 0,
+    uint8_t left_motor_fold_angle = 0,
+    uint8_t right_motor_fold_angle = 0,
     const char *motor_error_code = nullptr,
     bool enable_rover = false,
     ::flatbuffers::Offset<fbs::DisplayMessages> display_messages = 0,
     bool start_web_server_on_launch = false,
-    int32_t crsf_link_stats_timeout_millis = 2000,
+    uint16_t crsf_link_stats_timeout_millis = 2000,
     bool web_server_enabled = false) {
   auto motor_error_code__ = motor_error_code ? _fbb.CreateString(motor_error_code) : 0;
   return fbs::CreateRobot(

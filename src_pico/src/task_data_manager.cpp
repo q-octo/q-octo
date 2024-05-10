@@ -20,7 +20,6 @@ this task so that their queue does not overflow.
 
 // These remain as global variables rather than static inline class variables because this would cause circular imports
 // in the header files.
-DataManager::State state{};
 Companion::Message companionMessage{};
 Computer::Message computerMessage{};
 TaskRC::Message rcMessage{};

@@ -68,7 +68,7 @@ table CrsfData {
 
 // Define the main table for your data structure
 table Robot {
-    batteries: int = 4;
+    batteries: ubyte = 4;
     control_source: ControlSource = RC;
     status: Status = OK;
     motors: Motors;
@@ -80,16 +80,16 @@ table Robot {
     right_motor_limits: MotorLimits;
     low_voltage_threshold: float = 12.0;
     critical_voltage_threshold: float = 16.0;
-    rssi_threshold: int = 0;
-    link_quality_threshold: int = 0;
-    left_motor_fold_angle: int;
-    right_motor_fold_angle: int;
+    rssi_threshold: ubyte = 0;
+    link_quality_threshold: ubyte = 0;
+    left_motor_fold_angle: ubyte;
+    right_motor_fold_angle: ubyte;
     motor_error_code: string; // Defaults not supported for strings
     enable_rover: bool = false;
     display_messages: DisplayMessages;
     /// This will only occur if all physical switches are in the ON/ABSENT state.
     start_web_server_on_launch: bool = false;
-    crsf_link_stats_timeout_millis: int = 2000;
+    crsf_link_stats_timeout_millis: ushort = 2000;
     web_server_enabled: bool = false;
 }
 

@@ -36,7 +36,7 @@ static bufferHasIdentifier(bb:flatbuffers.ByteBuffer):boolean {
 
 batteries():number {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 4;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : 4;
 }
 
 controlSource():ControlSource {
@@ -96,22 +96,22 @@ criticalVoltageThreshold():number {
 
 rssiThreshold():number {
   const offset = this.bb!.__offset(this.bb_pos, 28);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : 0;
 }
 
 linkQualityThreshold():number {
   const offset = this.bb!.__offset(this.bb_pos, 30);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : 0;
 }
 
 leftMotorFoldAngle():number {
   const offset = this.bb!.__offset(this.bb_pos, 32);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : 0;
 }
 
 rightMotorFoldAngle():number {
   const offset = this.bb!.__offset(this.bb_pos, 34);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 0;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : 0;
 }
 
 motorErrorCode():string|null
@@ -141,7 +141,7 @@ startWebServerOnLaunch():boolean {
 
 crsfLinkStatsTimeoutMillis():number {
   const offset = this.bb!.__offset(this.bb_pos, 44);
-  return offset ? this.bb!.readInt32(this.bb_pos + offset) : 2000;
+  return offset ? this.bb!.readUint16(this.bb_pos + offset) : 2000;
 }
 
 webServerEnabled():boolean {
@@ -154,7 +154,7 @@ static startRobot(builder:flatbuffers.Builder) {
 }
 
 static addBatteries(builder:flatbuffers.Builder, batteries:number) {
-  builder.addFieldInt32(0, batteries, 4);
+  builder.addFieldInt8(0, batteries, 4);
 }
 
 static addControlSource(builder:flatbuffers.Builder, controlSource:ControlSource) {
@@ -202,19 +202,19 @@ static addCriticalVoltageThreshold(builder:flatbuffers.Builder, criticalVoltageT
 }
 
 static addRssiThreshold(builder:flatbuffers.Builder, rssiThreshold:number) {
-  builder.addFieldInt32(12, rssiThreshold, 0);
+  builder.addFieldInt8(12, rssiThreshold, 0);
 }
 
 static addLinkQualityThreshold(builder:flatbuffers.Builder, linkQualityThreshold:number) {
-  builder.addFieldInt32(13, linkQualityThreshold, 0);
+  builder.addFieldInt8(13, linkQualityThreshold, 0);
 }
 
 static addLeftMotorFoldAngle(builder:flatbuffers.Builder, leftMotorFoldAngle:number) {
-  builder.addFieldInt32(14, leftMotorFoldAngle, 0);
+  builder.addFieldInt8(14, leftMotorFoldAngle, 0);
 }
 
 static addRightMotorFoldAngle(builder:flatbuffers.Builder, rightMotorFoldAngle:number) {
-  builder.addFieldInt32(15, rightMotorFoldAngle, 0);
+  builder.addFieldInt8(15, rightMotorFoldAngle, 0);
 }
 
 static addMotorErrorCode(builder:flatbuffers.Builder, motorErrorCodeOffset:flatbuffers.Offset) {
@@ -234,7 +234,7 @@ static addStartWebServerOnLaunch(builder:flatbuffers.Builder, startWebServerOnLa
 }
 
 static addCrsfLinkStatsTimeoutMillis(builder:flatbuffers.Builder, crsfLinkStatsTimeoutMillis:number) {
-  builder.addFieldInt32(20, crsfLinkStatsTimeoutMillis, 2000);
+  builder.addFieldInt16(20, crsfLinkStatsTimeoutMillis, 2000);
 }
 
 static addWebServerEnabled(builder:flatbuffers.Builder, webServerEnabled:boolean) {

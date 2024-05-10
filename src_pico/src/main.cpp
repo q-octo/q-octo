@@ -14,6 +14,7 @@
 #include "task_can.h"
 #include "task_power_monitor.h"
 #include "buttons.h"
+#include "task_data_manager.h"
 
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -43,6 +44,7 @@ void setup() {
   Serial.println("Live on core 0");
 
   Storage::init(); // Intentionally initialised first
+  DataManager::init();
   TaskCAN::init();
   TaskRC::init();
   TaskPowerMonitor::init();

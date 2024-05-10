@@ -18,8 +18,7 @@ void Companion::receiveMessage(const Message &message) {
   switch (message.type) {
     case STATE_UPDATE:
       Serial.println("State update");
-      DataManager::State state = message.as.state;
-      sendStateToCompanion(state);
+      pendingBroadcast = true;
       break;
   }
 }
@@ -29,6 +28,12 @@ void Companion::loop() {
     return;
   }
   parseIncomingSerialData();
+
+  const uint32_t currentMillis = millis();
+  
+  if (pendingBroadcast && currentMillis - msSinceLastBroadcast > 500) {
+    sendStateToCompanion(DataManager::getState());
+  }
 }
 
 bool Companion::verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier) {
@@ -177,14 +182,9 @@ void Companion::handleButtonPressedMessage(const ButtonPressed &buttonPressed) {
 }
 
 void Companion::sendStateToCompanion(const DataManager::State &state) {
-
   uint32_t currentMillis = millis();
-  if (currentMillis - msSinceLastBroadcast < 500) {
-    Serial.println("Not sending state to companion, too soon");
-    Serial.println(currentMillis - msSinceLastBroadcast);
-    return;
-  }
   msSinceLastBroadcast = currentMillis;
+  pendingBroadcast = false;
   Serial.printf("Sending state to companion: %d\n", fbb.GetSize());
   serialiseState(state);
   static SendSerialData data = {

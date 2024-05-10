@@ -52,4 +52,5 @@ private:
   static inline flatbuffers::FlatBufferBuilder fbb = flatbuffers::FlatBufferBuilder(2048);
   static inline FlatbufferSerialParser fbSerialParser = FlatbufferSerialParser(companionSerial, verifyIncomingFlatbuffer);
   static inline uint32_t msSinceLastBroadcast = 0;
+  static inline bool pendingBroadcast = false;
 };

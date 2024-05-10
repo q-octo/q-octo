@@ -165,10 +165,29 @@ public:
 
   static void receiveMessage(const Message &message);
 
+  static State& getState() {
+    return state;
+  }
+
+  static void init() {
+    static std::string defaultMessage = "TEST MSG";
+    state.displayMessages = {
+      .message1 = &defaultMessage,
+      .message2 = &defaultMessage,
+      .message3 = &defaultMessage,
+      .message4 = &defaultMessage,
+      .message5 = &defaultMessage,
+      .message6 = &defaultMessage,
+      .message7 = &defaultMessage,
+    };
+  }
+
 private:
   static void broadcastStateUpdate();
 
   static void setWebServerEnabled(bool enabled);
+
+  static inline State state{};
 
 
 };
