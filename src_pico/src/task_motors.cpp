@@ -223,8 +223,7 @@ void TaskControlMotors::broadcastStatusUpdate() {
                   },
           .right =
                   {
-                          // .temperature = statusR.temperature / 10.0f,
-                          .temperature = static_cast<float>((millis() % 24)),
+                          .temperature = statusR.temperature / 10.0f,
                           .RPM = statusR.speed,
                           .torque = statusR.torque,
                           .position = statusR.position,

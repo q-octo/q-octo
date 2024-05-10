@@ -80,6 +80,7 @@ private:
   static inline float lastDirection = 0;
   static inline link_statistics_t lastLinkStats = {0};
   static inline uint16_t lastChannels[16] = {0};
+  static inline uint16_t lastChannelsUs[16] = {0};
 
   static inline StorageState &state = Storage::getState();
 

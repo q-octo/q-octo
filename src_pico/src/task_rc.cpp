@@ -44,7 +44,7 @@ void TaskRC::loop() {
             .linkQuality = lastLinkStats.link_quality,
             .signalNoiseRatio = lastLinkStats.snr,
             .tx_power = lastLinkStats.tx_power,
-            .channels = &lastChannels[0],
+            .channels = &lastChannelsUs[0],
             .failsafe = isFailsafeActive,
     };
     taskMessage = {.type = DataManager::Type::STATE_RC, .as = {.rc = rc}};
@@ -133,6 +133,9 @@ void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
 
 void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   memcpy(lastChannels, channels, sizeof(lastChannels));
+  for (int i = 0; i < 16; i++) {
+    lastChannelsUs[i] = TICKS_TO_US(channels[i]);
+  }
 #if DEBUG_LOG_RC_CHANNELS
   const uint32_t currentMillis = millis();
   if (currentMillis - lastRcChannelsLogMs >= RC_CHANNELS_LOG_FREQUENCY) {
