@@ -1,9 +1,9 @@
 #include "config.h"
 #include "task_watchdog.h"
 
-#define WATCHDOG_TIMEOUT 200
+#define WATCHDOG_TIMEOUT 250
 #define LOG_MEMORY_FREQUENCY 3000
-#define HEALTH_CHECK_FREQUENCY 100
+#define HEALTH_CHECK_FREQUENCY 150
 
 void Watchdog::init() {
   if (!CFG_ENABLE_WATCHDOG) {

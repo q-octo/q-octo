@@ -1,6 +1,6 @@
 #pragma once
 
-static const int CFG_ENABLE_WATCHDOG = 0;
+static const int CFG_ENABLE_WATCHDOG = 1;
 static const int CFG_ENABLE_CAN = 1;
 static const int CFG_ENABLE_MOTORS = 1;
 static const int CFG_ENABLE_RC = 1;
