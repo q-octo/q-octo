@@ -6,6 +6,7 @@
 #include "companion.h"
 #include "computer.h"
 #include "system_status.h"
+#include "wifi_state.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -70,8 +71,8 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case DISABLE_WEB_SERVER:
       setWebServerEnabled(false);
       break;
-    case TOGGLE_WEB_SERVER_ENABLED:
-      setWebServerEnabled(!state.webServerEnabled);
+    case DISPLAY_WEB_SERVER_BTN_PRESSED:
+      WifiState::onWifiButtonPress();
       break;
     case ENABLE_MOTORS:
       break;
@@ -90,11 +91,13 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case TX_LOST:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      WifiState::onTxFailsafed();
       broadcastStateUpdate();
       break;
     case TX_RESTORED:
       controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
+      WifiState::onTxFailsafeCleared();
       broadcastStateUpdate();
       break;
     case CAN_MESSAGE_MOTOR_L:
@@ -138,13 +141,24 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case DISPLAY_BUTTON_PRESSED:
+      WifiState::onWifiButtonPress();
       computerMessage.type = Computer::MessageType::DISPLAY_BUTTON;
       computerMessage.as = {.displayButton = message.as.displayButton};
       Computer::receiveMessage(computerMessage);
       break;
     case BUTTON_DOWN:
+      if (message.as.physicalButton == PhysicalButton::WEB_SERVER) {
+        WifiState::onPhysicalSwitchChange(true);
+      } else if (message.as.physicalButton == PhysicalButton::MOTORS) {
+        // TODO implement
+      }
       break;
     case BUTTON_UP:
+      if (message.as.physicalButton == PhysicalButton::WEB_SERVER) {
+        WifiState::onPhysicalSwitchChange(false);
+      } else if (message.as.physicalButton == PhysicalButton::MOTORS) {
+        // TODO implement
+      }
       break;
     case STORAGE_UPDATE:
       broadcastStateUpdate();
@@ -184,6 +198,15 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case RIGHT_MOTOR_PARAM_UPDATED:
       state.rightMotorLimits = message.as.motorParams;
       broadcastStateUpdate();
+      break;
+    case TX_SWITCH_ARMED:
+      // TODO handle this
+      break;
+    case TX_SWITCH_CONTROL_SOURCE:
+      // TODO handle this
+      break;
+    case TX_SWITCH_WEB_SERVER:
+      WifiState::onTxSwitchChange(message.as.txBinarySwitch);
       break;
     default:
       Serial.println("[ERROR] Unknown message type");

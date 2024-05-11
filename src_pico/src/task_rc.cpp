@@ -160,13 +160,21 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   }
 #endif
 
+  /*
+   * Channel 1: Speed
+   * Channel 2: Direction
+   * Channel 5: Armed
+   * Channel 6: Control Source
+   * Channel 7: Wifi
+  */
+
   // TODO is this range actually 988 to 2012 as we're seeing on the controller?
   // float direction = mapRange(992, 2008, -1, 1, crsf->rcToUs(rcData->value[1]));
   StorageState &state = Storage::getState();
-  float speed = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[0]));
+  float speed = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[CHANNEL_SPEED]));
   float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
   // if within 100 of 1500, set speed to 0
-  if (abs(TICKS_TO_US(channels[0]) - 1500) < 100) {
+  if (abs(TICKS_TO_US(channels[CHANNEL_SPEED]) - 1500) < 100) {
     speed = 0;
   }
   if (lastSpeed !=  speed || lastDirection != direction) {
@@ -178,6 +186,45 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
     };
     DataManager::receiveMessage(taskMessage);
   }
+
+  // Check armed switch
+  const int armedChannel = TICKS_TO_US(channels[CHANNEL_ARM]);
+  const int controlSourceChannel = TICKS_TO_US(channels[CHANNEL_CONTROL_SOURCE]);
+  const int wifiChannel = TICKS_TO_US(channels[CHANNEL_WIFI]);
+
+  const bool isArmedSwitch = armedChannel < 1500;
+  // 1000 = manual, 1500 = obc, 2000 = flight controller
+  const DataManager::ControlSource controlSourceSwitch = 
+    controlSourceChannel < 1250 
+      ? DataManager::MANUAL 
+      : controlSourceChannel < 1750 ? DataManager::ONBOARD_COMPUTER : DataManager::FLIGHT_CONTROLLER;
+  const bool isWifiSwitch = wifiChannel > 1500;
+  
+  DataManager::Message taskMessage;
+  if (armedSwitch != isArmedSwitch) {
+    armedSwitch = isArmedSwitch;
+    taskMessage.type = DataManager::Type::TX_SWITCH_ARMED;
+    taskMessage.as.txBinarySwitch = isArmedSwitch;
+    DataManager::receiveMessage(taskMessage);
+  }
+
+  if (controlSource != controlSourceSwitch) {
+    controlSource = controlSourceSwitch;
+    taskMessage.type = DataManager::Type::TX_SWITCH_CONTROL_SOURCE;
+    taskMessage.as.txControlSourceSwitch = controlSourceSwitch;
+    DataManager::receiveMessage(taskMessage);
+  }
+
+  if (wifiSwitch != isWifiSwitch || firstRcChannels) {
+    wifiSwitch = isWifiSwitch;
+    Serial.println("WIFI switch changed");
+    taskMessage.type = DataManager::Type::TX_SWITCH_WEB_SERVER;
+    taskMessage.as.txBinarySwitch = isWifiSwitch;
+    DataManager::receiveMessage(taskMessage);
+  }
+
+  firstRcChannels = false;
+
 }
 
 void TaskRC::onFailsafeActivated() {
