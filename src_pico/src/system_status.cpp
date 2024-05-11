@@ -33,7 +33,7 @@ void SystemStatus::receiveDataManagerMessage(const DataManager::Message &message
     case DataManager::STATE_RC:
     case DataManager::ENABLE_WEB_SERVER:
     case DataManager::DISABLE_WEB_SERVER:
-    case DataManager::TOGGLE_WEB_SERVER_ENABLED:
+    case DataManager::DISPLAY_WEB_SERVER_BTN_PRESSED:
     case DataManager::ENABLE_MOTORS:
     case DataManager::DISABLE_MOTORS:
     case DataManager::SET_MOTOR_SPEED_COMBINED:

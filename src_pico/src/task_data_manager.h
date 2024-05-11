@@ -11,7 +11,7 @@ public:
     STATE_RC,     // taskReceiveFromRC
     ENABLE_WEB_SERVER,
     DISABLE_WEB_SERVER,
-    TOGGLE_WEB_SERVER_ENABLED,
+    DISPLAY_WEB_SERVER_BTN_PRESSED,
     ENABLE_MOTORS,
     DISABLE_MOTORS,
     SET_MOTOR_SPEED_COMBINED,       // taskReceiveFromRC (onboard computer in future)
@@ -39,6 +39,9 @@ public:
     UPDATE_MOTOR_SPEED_KI,
     LEFT_MOTOR_PARAM_UPDATED,
     RIGHT_MOTOR_PARAM_UPDATED,
+    TX_SWITCH_ARMED,
+    TX_SWITCH_CONTROL_SOURCE,
+    TX_SWITCH_WEB_SERVER,
   } Type;
 
   typedef struct {
@@ -133,6 +136,12 @@ public:
     unsigned long last_speed_ki_update;
   } TimestampedMotorLimits;
 
+  typedef enum {
+    MANUAL,
+    ONBOARD_COMPUTER,
+    FLIGHT_CONTROLLER,
+  } ControlSource;
+
   typedef struct {
     Type type;
     union {
@@ -150,6 +159,8 @@ public:
       PhysicalButton physicalButton;
       float floatMotorParam;
       TimestampedMotorLimits motorParams;
+      bool txBinarySwitch;
+      ControlSource txControlSourceSwitch;
     } as;
   } Message;
 

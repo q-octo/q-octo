@@ -81,8 +81,19 @@ private:
   static inline link_statistics_t lastLinkStats = {0};
   static inline uint16_t lastChannels[16] = {0};
   static inline uint16_t lastChannelsUs[16] = {0};
+  static inline bool armedSwitch = false;
+  static inline bool wifiSwitch = false;
+  static inline DataManager::ControlSource controlSource = DataManager::MANUAL;
+  static inline bool firstRcChannels = true;
 
   static inline StorageState &state = Storage::getState();
+  
+  // 0-15
+  static const uint8_t CHANNEL_SPEED = 0;
+  static const uint8_t CHANNEL_DIRECTION = 1;
+  static const uint8_t CHANNEL_ARM = 4;
+  static const uint8_t CHANNEL_CONTROL_SOURCE = 5;
+  static const uint8_t CHANNEL_WIFI = 6;
 
   static void setThresholds();
 

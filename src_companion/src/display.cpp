@@ -116,10 +116,10 @@ void Display::paintPage1()
     int wifiwidth = graphics.measure_text("WIFI:", 2, 1, false);
 
     if (state.web_server_enabled) {
-        SET_PEN_GREEN();
+        SET_PEN_RED();
         graphics.text("ON", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
     } else {
-        SET_PEN_RED();
+        SET_PEN_GREEN();
         graphics.text("OFF", Point(topBar.x + 110 + wifiwidth, topBar.y), topBar.w);
     }
 
