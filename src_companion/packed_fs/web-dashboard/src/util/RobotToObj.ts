@@ -6,6 +6,7 @@ import { RoverState } from "../types"
 
 /** Convert Flatbuffer to Object */
 export const RobotToObj = (robot : Robot) => {
+
     return {
         motors: {
             motor1: {

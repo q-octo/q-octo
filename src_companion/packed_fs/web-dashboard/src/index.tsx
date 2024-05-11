@@ -1,41 +1,44 @@
-import { render } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
-import { RoverState } from './types';
-import './style.css';
-import ws from './util/WebSocket';
-import { updateBatteries } from './util/Updates';
-import { RobotToObj } from './util/RobotToObj';
-import { Robot } from './generated/fbs/robot';
 import * as flatbuffers from 'flatbuffers';
-import { Update, UpdateUnion } from './generated/fbs';
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+import { UpdateUnion } from './generated/fbs';
+import { Robot } from './generated/fbs/robot';
+import './style.css';
+import { RoverState } from './types';
+import { RobotToObj } from './util/RobotToObj';
 import { SendUpdate } from './util/SendUpdate';
+import { Round } from './util/Round';
+import ws from './util/WebSocket';
 
+/**
+ * This Component is where the current values of the rover are displayed
+ */
 const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 	console.log(rover);
 
 	return (
 		<div className="bg-white p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md mb-8">
-			<h2 className="text-xl sm:text-2xl font-bold mb-4">Q-Octo Dashboard</h2>
+			<h2 className="text-xl sm:text-2xl font-bold mb-4">Current Values</h2>
 			<div className="md:flex md:space-x-4">
 				{/* Motor 1 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm mb-4 md:mb-0 flex-1 md:mr-2">
-					<h3 className="text-lg font-bold mb-2">Left Motor</h3>
-					<p className="mb-1">Temperature: <span className="font-medium">{rover.motors.motor1.temperature}°C</span></p>
-					<p className="mb-1">Speed: <span className="font-medium">{rover.motors.motor1.rps} (rad/s)</span></p>
-					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor1.angle} °</span></p>
-					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
-					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor1.torque_limit}Nm</span></p>
+					<h3 className="text-lg font-bold mb-2">Motor 1</h3>
+					<p className="mb-1">Temp: <span className="font-medium">{Round(rover.motors.motor1.temperature)}°C</span></p>
+					<p className="mb-1">RPM: <span className="font-medium">{Round(rover.motors.motor1.rps)} RPM</span></p>
+					<p className="mb-1">Angle: <span className="font-medium">{Round(rover.motors.motor1.angle)} °</span></p>
+					<p>Torque: <span className="font-medium">{Round(rover.motors.motor1.torque)}Nm</span></p>
+					<p><b>Max Torque:</b> <span className="font-medium">{Round(rover.motors.motor1.torque_limit)}Nm</span></p>
 				</div>
 
 				{/* Motor 2 Card */}
 				<div className="bg-gray-100 p-6 rounded-lg shadow-sm flex-1">
-					<h3 className="text-lg font-bold mb-2">Right Motor</h3>
-					<p className="mb-1">Temperature: <span className="font-medium">{rover.motors.motor2.temperature} °C</span></p>
-					<p className="mb-1">Speed: <span className="font-medium">{rover.motors.motor2.rps} (rad/s)</span></p>
-					<p className="mb-1">Angle: <span className="font-medium">{rover.motors.motor2.angle} °</span></p>
-					<p>Torque: <span className="font-medium">{rover.motors.motor1.torque}Nm</span></p>
-					<p><b>Max Torque:</b> <span className="font-medium">{rover.motors.motor2.torque_limit}Nm</span></p>
+					<h3 className="text-lg font-bold mb-2">Motor 2</h3>
+					<p className="mb-1">Temp: <span className="font-medium">{Round(rover.motors.motor2.temperature)} °C</span></p>
+					<p className="mb-1">RPM: <span className="font-medium">{Round(rover.motors.motor2.rps)} RPM</span></p>
+					<p className="mb-1">Angle: <span className="font-medium">{Round(rover.motors.motor2.angle)} °</span></p>
+					<p>Torque: <span className="font-medium">{Round(rover.motors.motor1.torque)}Nm</span></p>
+					<p><b>Max Torque:</b> <span className="font-medium">{Round(rover.motors.motor2.torque_limit)}Nm</span></p>
 				</div>
 			</div>
 
@@ -44,17 +47,17 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 				<p class="text-base sm:text-sm">Number of Batteries 🔋 : <span class="font-medium">{rover.batteries}</span></p>
 				<p class="text-base sm:text-sm">Status ❓ : <span class="font-medium">{rover.status}</span></p>
 				<p class="text-base sm:text-sm">Control Source 🎮 : <span class="font-medium">{rover.control_source}</span></p>
-				<p class="text-base sm:text-sm">Fuel ⛽ : <span class="font-medium">{rover.fuel}%</span></p>
+				<p class="text-base sm:text-sm">Fuel ⛽ : <span class="font-medium">{Round(rover.fuel)}%</span></p>
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
-					<p class="text-base sm:text-sm">Voltage ⚡ : <span class="font-medium">{rover.voltage} V</span></p>
-					<p class="text-base sm:text-sm">Current 🅰 : <span class="font-medium">{rover.current} A</span></p>
+					<p class="text-base sm:text-sm">Voltage ⚡ : <span class="font-medium">{Round(rover.voltage)} V</span></p>
+					<p class="text-base sm:text-sm">Current 🅰 : <span class="font-medium">{Round(rover.current)} A</span></p>
 				</div>
 
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
-					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{rover.rssi} dBm</span></p>
-					<p class="text-base sm:text-sm">Link Quality 📻: <span class="font-medium">{rover.linkQualityThreshold} %</span></p>
+					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{Round(rover.rssi)} dBm</span></p>
+					<p class="text-base sm:text-sm">Link 📻: <span class="font-medium">{Round(rover.linkQualityThreshold)} %</span></p>
 				</div>
 
 			</div>
@@ -63,6 +66,10 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 	);
 };
 
+
+/**
+ * Component for the input form.
+ */
 const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	// Function to handle form submission for each field
 	const handleSubmit = (fieldName, event) => {
@@ -92,7 +99,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 		setFormValues({ ...formValues, [name]: value });
 	}
 
-	// Green if value is equal to the current value, red if not
+	// Decides what colour to render in the background of the input fields
 	const formColour = (fieldname: string) => {
 
 		console.log(formValues);
@@ -124,7 +131,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			{/* Number of batteries */}
 			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateBatteries, e)} className="mb-4">
 				<label htmlFor={`${UpdateUnion.UpdateBatteries}`} className="block text-sm font-medium text-gray-700">
-					Number of batteries (1-4)
+					Number of batteries
 				</label>
 				<div className="mt-1 flex rounded-md shadow-sm">
 					<input type="number" id={`${UpdateUnion.UpdateBatteries}`} name={`${UpdateUnion.UpdateBatteries}`} className={`${formColour('bats')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md`} required
@@ -170,7 +177,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			{/* Torque Limit */}
 			<form onSubmit={(e) => handleSubmit(UpdateUnion.UpdateMaxTorque, e)} className="mb-4">
 				<label htmlFor="torqueLimit" className="block text-sm font-medium text-gray-700">
-					Torque Limit (0-12.5Nm)
+					Torque Limit Left
 				</label>
 				<div className="mt-1 flex rounded-md shadow-sm">
 					<input type="number" step="0.1" id={`${UpdateUnion.UpdateMaxTorque}`} name={`${UpdateUnion.UpdateMaxTorque}`} className={`${formColour('torqueLimitLeft')} focus:ring-blue-500 focus:border-blue-500 block w-full pl-2 sm:text-sm border-gray-300 rounded-l-md" required`}
@@ -185,8 +192,12 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 	);
 };
 
+/**
+ * Root component of the application.
+ */
 export function App() {
 
+	// These defaults are shown until the first message is received from the server
 	const [rover, setRover] = useState<RoverState>({
 		motors: {
 			motor1: {
@@ -206,7 +217,7 @@ export function App() {
 		},
 		batteries: -1,
 		control_source: "RC",
-		status: "NO_TX",
+		status: "NOT_X",
 		voltage: -1,
 		current: -1,
 		rssi: -1,
@@ -217,6 +228,8 @@ export function App() {
 		fuel: -1,
 	});
 
+	// WebSocket client
+	// Just a typical listener callback pattern.
 	const wsClient = ws;
 	ws.onmessage = (event) => {
 		console.log(event)
