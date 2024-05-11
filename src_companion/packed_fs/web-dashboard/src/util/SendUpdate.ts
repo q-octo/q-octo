@@ -1,4 +1,4 @@
-import { Update, UpdateBatteries, UpdateCriticalVoltageThreshold, UpdateEnableRover, UpdateFoldWheels, UpdateLinkQualityThreshold, UpdateLowVoltageThreshold, UpdateReferenceWheelAngle, UpdateRssiThreshold, UpdateUnion } from "../generated/fbs"
+import { Update, UpdateBatteries, UpdateCriticalVoltageThreshold, UpdateCrsfLinkStatsTimeout, UpdateEnableRover, UpdateFoldWheels, UpdateLinkQualityThreshold, UpdateLowVoltageThreshold, UpdateMaxCurrent, UpdateMaxSpeed, UpdateMaxTorque, UpdateMotorKi, UpdateMotorKp, UpdateReferenceWheelAngle, UpdateRssiThreshold, UpdateStartWebServerOnLaunch, UpdateUnion } from "../generated/fbs"
 import * as flatbuffers from 'flatbuffers';
 
 export const SendUpdate = (index: number, value: any) => {
@@ -46,18 +46,6 @@ export const SendUpdate = (index: number, value: any) => {
 
             update = Update.endUpdate(builder);
             break;
-        case UpdateUnion.UpdateReferenceWheelAngle:
-            UpdateReferenceWheelAngle.startUpdateReferenceWheelAngle(builder);
-            UpdateReferenceWheelAngle.addReferenceWheelAngle(builder, value);
-
-            const referenceWheelAngleUpdate = UpdateReferenceWheelAngle.endUpdateReferenceWheelAngle(builder);
-
-            Update.startUpdate(builder);
-            Update.addUpdateType(builder, UpdateUnion.UpdateReferenceWheelAngle);
-            Update.addUpdate(builder, referenceWheelAngleUpdate);
-
-            update = Update.endUpdate(builder);
-            break;
         case UpdateUnion.UpdateEnableRover:
             UpdateEnableRover.startUpdateEnableRover(builder);
             UpdateEnableRover.addEnableRover(builder, value);
@@ -95,7 +83,92 @@ export const SendUpdate = (index: number, value: any) => {
             update = Update.endUpdate(builder);
             break;
 
-        // TODO: Add folding wheels
+        case UpdateUnion.UpdateMaxTorque:
+            UpdateMaxTorque.startUpdateMaxTorque(builder);
+            UpdateMaxTorque.addMaxTorque(builder, value);
+
+            const maxTorqueUpdate = UpdateMaxTorque.endUpdateMaxTorque(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateMaxTorque);
+            Update.addUpdate(builder, maxTorqueUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        case UpdateUnion.UpdateMaxSpeed:
+            UpdateMaxSpeed.startUpdateMaxSpeed(builder);
+            UpdateMaxSpeed.addMaxSpeed(builder, value);
+
+            const maxSpeedUpdate = UpdateMaxSpeed.endUpdateMaxSpeed(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateMaxSpeed);
+            Update.addUpdate(builder, maxSpeedUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        case UpdateUnion.UpdateMaxCurrent:
+            UpdateMaxCurrent.startUpdateMaxCurrent(builder);
+            UpdateMaxCurrent.addMaxCurrent(builder, value);
+
+            const maxCurrentUpdate = UpdateMaxCurrent.endUpdateMaxCurrent(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateMaxCurrent);
+            Update.addUpdate(builder, maxCurrentUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+
+        case UpdateUnion.UpdateMotorKp:
+            UpdateMotorKp.startUpdateMotorKp(builder);
+            UpdateMotorKp.addMotorKp(builder, value);
+
+            const motorKpUpdate = UpdateMotorKp.endUpdateMotorKp(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateMotorKp);
+            Update.addUpdate(builder, motorKpUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        case UpdateUnion.UpdateMotorKi:
+            UpdateMotorKi.startUpdateMotorKi(builder);
+            UpdateMotorKi.addMotorKi(builder, value);
+
+            const motorKiUpdate = UpdateMotorKi.endUpdateMotorKi(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateMotorKi);
+            Update.addUpdate(builder, motorKiUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        case UpdateUnion.UpdateCrsfLinkStatsTimeout:
+            UpdateCrsfLinkStatsTimeout.startUpdateCrsfLinkStatsTimeout(builder);
+            UpdateCrsfLinkStatsTimeout.addTimeoutMillis(builder, value);
+
+            const crsfLinkStatsTimeoutUpdate = UpdateCrsfLinkStatsTimeout.endUpdateCrsfLinkStatsTimeout(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateCrsfLinkStatsTimeout);
+            Update.addUpdate(builder, crsfLinkStatsTimeoutUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        case UpdateUnion.UpdateStartWebServerOnLaunch:
+            UpdateStartWebServerOnLaunch.startUpdateStartWebServerOnLaunch(builder);
+            UpdateStartWebServerOnLaunch.addStartWebServerOnLaunch(builder, value);
+
+            const startWebServerOnLaunchUpdate = UpdateStartWebServerOnLaunch.endUpdateStartWebServerOnLaunch(builder);
+
+            Update.startUpdate(builder);
+            Update.addUpdateType(builder, UpdateUnion.UpdateStartWebServerOnLaunch);
+            Update.addUpdate(builder, startWebServerOnLaunchUpdate);
+
+            update = Update.endUpdate(builder);
+            break;
+        
         default:
             console.log('Invalid index');
             break;   
