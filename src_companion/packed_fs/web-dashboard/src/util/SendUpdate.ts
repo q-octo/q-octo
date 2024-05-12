@@ -160,6 +160,8 @@ export const SendUpdate = (index: number, value: any) => {
             UpdateStartWebServerOnLaunch.startUpdateStartWebServerOnLaunch(builder);
             UpdateStartWebServerOnLaunch.addStartWebServerOnLaunch(builder, value);
 
+            console.log('Start Web Server on Launch: ', value);
+
             const startWebServerOnLaunchUpdate = UpdateStartWebServerOnLaunch.endUpdateStartWebServerOnLaunch(builder);
 
             Update.startUpdate(builder);
