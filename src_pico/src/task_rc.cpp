@@ -173,6 +173,13 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
   StorageState &state = Storage::getState();
   float speed = mapRange(988, 2012, -state.motorSpeedLimit, state.motorSpeedLimit, TICKS_TO_US(channels[CHANNEL_SPEED]));
   float direction = mapRange(988, 2012, -1, 1, TICKS_TO_US(channels[1]));
+  // if within 10 of 1500, set speed to 0
+  if (abs(TICKS_TO_US(channels[CHANNEL_SPEED]) - 1500) < 10) {
+    speed = 0;
+  }
+  if (abs(TICKS_TO_US(channels[CHANNEL_DIRECTION]) - 1500) < 10) {
+    direction = 0;
+  }
   if (lastSpeed !=  speed || lastDirection != direction) {
     lastSpeed = speed;
     lastDirection = direction;
