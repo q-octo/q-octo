@@ -92,23 +92,19 @@ void TaskControlMotors::handleStateUpdate() {
     StorageState &state = Storage::getState();
     if (state.motorSpeedLimit != maxSpeed) {
       maxSpeed = state.motorSpeedLimit;
-      cybergearL.set_limit_speed(maxSpeed);
-      cybergearR.set_limit_speed(maxSpeed);
+      setSpeedLimit(maxSpeed); 
       Serial.print("Speed limit: ");
       Serial.println(maxSpeed);
     }
     if (state.motorCurrentLimit != maxCurrent) {
       maxCurrent = state.motorCurrentLimit;
-      cybergearL.set_limit_current(maxCurrent);
-      cybergearR.set_limit_current(maxCurrent);
-      cybergearR.set_limit_current(maxCurrent);
+      setCurrentLimit(maxCurrent);
       Serial.print("Current limit: ");
       Serial.println(maxCurrent);
     }
     if (state.motorTorqueLimit != maxTorque) {
       maxTorque = state.motorTorqueLimit;
-      cybergearL.set_limit_torque(maxTorque);
-      cybergearR.set_limit_torque(maxTorque);
+      setTorqueLimit(maxTorque);
       Serial.print("Torque limit: ");
       Serial.println(maxTorque);
     } 
