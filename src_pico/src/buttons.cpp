@@ -34,7 +34,7 @@ void Buttons::loop() {
     DataManager::receiveMessage(message);
   }
 
-  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == HIGH && !disableMotorsBtnDown) {
+  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == LOW && !disableMotorsBtnDown) {
     disableMotorsBtnDown = true;
     Serial.println("Button to disable motors pressed");
 
@@ -45,7 +45,7 @@ void Buttons::loop() {
     DataManager::receiveMessage(message);
   }
 
-  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == LOW && disableMotorsBtnDown) {
+  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == HIGH && disableMotorsBtnDown) {
     disableMotorsBtnDown = false;
     Serial.println("Button to disable motors released");
 
