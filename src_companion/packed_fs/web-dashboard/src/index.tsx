@@ -14,9 +14,9 @@ const Motor = ({ motor, name }) => {
 
 	return (
 		<div className="bg-gray-100 p-6 rounded-lg shadow-sm mb-4 md:mb-0 flex-1 md:mr-2">
-			<h3 className="text-lg font-bold mb-2">{`Motor ${name}`}</h3>
-			<p className="mb-1">Temp: <span className="font-medium">{Round(motor.temperature)} °C</span></p>
-			<p className="mb-1">RPM: <span className="font-medium">{Round(motor.rps)} rad/s</span></p>
+			<h3 className="text-lg font-bold mb-2">{`${name}`}</h3>
+			<p className="mb-1">Temperature: <span className="font-medium">{Round(motor.temperature)} °C</span></p>
+			<p className="mb-1">Speed: <span className="font-medium">{Round(motor.rps)} rad/s</span></p>
 			<p className="mb-1">Angle: <span className="font-medium">{Round(motor.angle)} °</span></p>
 			<p>Kp: <span className="font-medium">{Round(motor.Kp)}</span></p>
 			<p>Ki: <span className="font-medium">{Round4(motor.Kp)}</span></p>
@@ -37,13 +37,13 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 	return (
 		<div className="bg-white p-4 sm:p-6 max-w-lg mx-auto rounded-lg shadow-md mb-8">
-			<h2 className="text-xl sm:text-2xl font-bold mb-4">Current Values</h2>
+			<h2 className="text-xl sm:text-2xl font-bold mb-4">Q-Octo Dashboard</h2>
 			<div className="md:flex md:space-x-4">
 				{/* Motor 1 Card */}
-				<Motor motor={rover.motors.motor1} name="1" />
+				<Motor motor={rover.motors.motor1} name="Left Motor" />
 
 				{/* Motor 2 Card */}
-				<Motor motor={rover.motors.motor2} name="2" />
+				<Motor motor={rover.motors.motor2} name="Right Motor" />
 			</div>
 
 
@@ -73,12 +73,12 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
 					<p class="text-base sm:text-sm">RSSI 📶: <span class="font-medium">{Round(rover.rssi)} dBm</span></p>
-					<p class="text-base sm:text-sm">Thres. : <span class="font-medium">{Round(rover.rssi_threshold)} dBm</span></p>
+					<p class="text-base sm:text-sm">Minimum RSSI: <span class="font-medium">-{Round(rover.rssi_threshold)} dBm</span></p>
 				</div>
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
-					<p class="text-base sm:text-sm">Link 📻: <span class="font-medium">{Round(rover.link_quality)} %</span></p>
-					<p class="text-base sm:text-sm">Thres : <span class="font-medium">{Round(rover.link_quality_threshold)} %</span></p>
+					<p class="text-base sm:text-sm">Link Quality 📻: <span class="font-medium">{Round(rover.link_quality)} %</span></p>
+					<p class="text-base sm:text-sm">Minumum Link Quality: <span class="font-medium">{Round(rover.link_quality_threshold)} %</span></p>
 				</div>
 
 				<p class="text-base sm:text-sm">Radio Timeout ⌛ : <span class="font-medium">{rover.radio_timeout}ms</span></p>
@@ -87,8 +87,8 @@ const Dashboard = ({ rover }: { rover: RoverState }) => {
 				<div class="h-4"></div>
 
 				<div class="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
-					<p class="text-base sm:text-sm">⚠⚙Motor Shut : <span class="font-medium">{Round(rover.low_voltage_threshold)} V</span></p>
-					<p class="text-base sm:text-sm">🟥System Shut : <span class="font-medium">{Round(rover.critical_voltage_threshold)} V</span></p>
+					<p class="text-base sm:text-sm">⚠⚙Motor Shutdown: <span class="font-medium">{Round(rover.low_voltage_threshold)} V</span></p>
+					<p class="text-base sm:text-sm">🟥System Shutdown : <span class="font-medium">{Round(rover.critical_voltage_threshold)} V</span></p>
 				</div>
 
 
@@ -268,7 +268,7 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			<h2 className="text-xl sm:text-2xl font-bold mb-4">Edit Values</h2>
 			<h3 className="text-lg sm:text-xl font-bold mb-4">❗ Motor Limits</h3>
 			<FormField field_id={UpdateUnion.UpdateMaxTorque} label="Torque Limit" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
-			<FormField field_id={UpdateUnion.UpdateMaxSpeed} label="Speed Limit" min={0} max={30} onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
+			<FormField field_id={UpdateUnion.UpdateMaxSpeed} label="Speed Limit (not synced to motor)" min={0} max={30} onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
 			<FormField field_id={UpdateUnion.UpdateMaxCurrent} label="Current Limit" min={0} max={27} onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
 
 			<h3 className="text-lg sm:text-xl font-bold mb-4">⚡ Voltage Thresholds</h3>
@@ -347,7 +347,7 @@ export function App() {
 		link_quality: -1,
 		low_voltage_threshold: -1,
 		critical_voltage_threshold: -1,
-		motor_error_code: "0xFF",
+		motor_error_code: "0x00",
 		radio_timeout: -1,
 		fuel: -1,
 		web_server_on_launch: false
