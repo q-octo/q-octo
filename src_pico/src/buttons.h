@@ -8,7 +8,6 @@ public:
     static void init();
     static void loop();
 private:
-
-    static inline bool webServerBtnDown = false;
+    static inline bool webServerSwitchEnabled = false;
     static inline bool disableMotorsBtnDown = false;
 };

@@ -175,7 +175,7 @@ void Companion::handleButtonPressedMessage(const ButtonPressed &buttonPressed) {
       break;
     case Button_X:
       // Toggle wifi
-      taskMessage = {.type = DataManager::Type::TOGGLE_WEB_SERVER_ENABLED};
+      taskMessage = {.type = DataManager::Type::DISPLAY_WEB_SERVER_BTN_PRESSED};
       sendTaskMessage(taskMessage);
       break;
   }

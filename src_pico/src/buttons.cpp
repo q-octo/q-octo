@@ -11,8 +11,9 @@ void Buttons::init() {
 
 void Buttons::loop() {
   static DataManager::Message message;
-  if (digitalRead(CFG_BTN_START_WEB_SERVER) == LOW && !webServerBtnDown) {
-    webServerBtnDown = true;
+  // HIGH = ON because a disconnected switch should be on by default
+  if (digitalRead(CFG_BTN_START_WEB_SERVER) == HIGH && !webServerSwitchEnabled) {
+    webServerSwitchEnabled = true;
     Serial.println("Button to start web server pressed");
 
     message = {
@@ -22,8 +23,8 @@ void Buttons::loop() {
     DataManager::receiveMessage(message);
   }
 
-  if (digitalRead(CFG_BTN_START_WEB_SERVER) == HIGH && webServerBtnDown) {
-    webServerBtnDown = false;
+  if (digitalRead(CFG_BTN_START_WEB_SERVER) == LOW && webServerSwitchEnabled) {
+    webServerSwitchEnabled = false;
     Serial.println("Button to start web server released");
 
     message = {
@@ -33,7 +34,7 @@ void Buttons::loop() {
     DataManager::receiveMessage(message);
   }
 
-  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == LOW && !disableMotorsBtnDown) {
+  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == HIGH && !disableMotorsBtnDown) {
     disableMotorsBtnDown = true;
     Serial.println("Button to disable motors pressed");
 
@@ -44,7 +45,7 @@ void Buttons::loop() {
     DataManager::receiveMessage(message);
   }
 
-  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == HIGH && disableMotorsBtnDown) {
+  if (digitalRead(CFG_BTN_DISABLE_MOTORS) == LOW && disableMotorsBtnDown) {
     disableMotorsBtnDown = false;
     Serial.println("Button to disable motors released");
 
