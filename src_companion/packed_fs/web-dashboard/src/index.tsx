@@ -15,15 +15,15 @@ const Motor = ({ motor, name }) => {
 	return (
 		<div className="bg-gray-100 p-6 rounded-lg shadow-sm mb-4 md:mb-0 flex-1 md:mr-2">
 			<h3 className="text-lg font-bold mb-2">{`Motor ${name}`}</h3>
-			<p className="mb-1">Temp: <span className="font-medium">{Round(motor.temperature)}°C</span></p>
+			<p className="mb-1">Temp: <span className="font-medium">{Round(motor.temperature)} °C</span></p>
 			<p className="mb-1">RPM: <span className="font-medium">{Round(motor.rps)} rad/s</span></p>
 			<p className="mb-1">Angle: <span className="font-medium">{Round(motor.angle)} °</span></p>
 			<p>Kp: <span className="font-medium">{Round(motor.Kp)}</span></p>
 			<p>Ki: <span className="font-medium">{Round4(motor.Kp)}</span></p>
-			<p>Torque: <span className="font-medium">{Round(motor.torque)}Nm</span></p>
-			<p><b>Max Torque:</b> <span className="font-medium">{Round(motor.torque_limit)}Nm</span></p>
-			<p><b>Max Speed:</b> <span className="font-medium">{Round(motor.speed_limit)}</span></p>
-			<p><b>Max Current:</b> <span className="font-medium">{Round(motor.current_limit)}A</span></p>
+			<p>Torque: <span className="font-medium">{Round(motor.torque)} Nm</span></p>
+			<p><b>Max Torque:</b> <span className="font-medium">{Round(motor.torque_limit)} Nm</span></p>
+			<p><b>Max Speed:</b> <span className="font-medium">{Round(motor.speed_limit)} Mph</span></p>
+			<p><b>Max Current:</b> <span className="font-medium">{Round(motor.current_limit)} A</span></p>
 		</div>
 	);
 }
@@ -199,8 +199,8 @@ const FormField = ({ field_id, label, handleSubmit, onChange, formValues, rover,
 					required
 					onChange={onChange}
 					key={field_id}
-					max = {max}
-					min = {min}
+					max={max}
+					min={min}
 				/>
 				<button type="submit" className="ml-2 bg-blue-500 text-white py-2 px-4 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
 					Save
@@ -286,6 +286,19 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 
 			<h3 className="text-lg sm:text-xl font-bold mb-4">⚙ Other Settings</h3>
 			<FormField field_id={UpdateUnion.UpdateBatteries} label="Number of batteries" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
+
+			{/* The WiFi launch enable is just a toggle so we'll use a button*/}
+			<label className="block text-sm font-medium text-gray-700">
+				Launch Web Dashboard on Startup
+			</label>
+
+			<button label={formValues[UpdateUnion.UpdateStartWebServerOnLaunch] ? "Disable" : "Enable"} onClick={(e) => {
+				ws.send(SendUpdate(UpdateUnion.UpdateStartWebServerOnLaunch, !rover.web_server_on_launch));
+			}
+			} className={`w-full ${rover.web_server_on_launch ? "bg-green-500" : "bg-red-500"} text-white py-2 px-4 rounded-md hover:${rover.web_server_on_launch ? "bg-green-100" : "bg-red-100"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`}>
+				Enabled = {rover.web_server_on_launch ? "True" : "False"}
+			</button>
+			
 
 		</div>
 	);
