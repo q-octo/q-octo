@@ -213,7 +213,8 @@ void TaskControlMotors::broadcastStatusUpdate() {
           .left =
                   {
                           .temperature = statusL.temperature / 10.0f,
-                          .RPM = statusL.speed,
+                          // Negated
+                          .RPM = -statusL.speed,
                           .torque = statusL.torque,
                           .position = statusL.position,
                   },
@@ -259,9 +260,9 @@ void TaskControlMotors::setSpeedCombined(float speed, float direction) {
     // Speed is between -30 and 30 rad/s
     // Direction is between -1 and 1 (full left to full right)
     float scaledSpeed = speed / maxSpeed;
-    float left = (scaledSpeed - direction) * maxSpeed;
-    float right = (scaledSpeed + direction) * maxSpeed;
-    setSpeedIndividual(left, -right);
+    float left = (scaledSpeed + direction) * maxSpeed;
+    float right = (scaledSpeed - direction) * maxSpeed;
+    setSpeedIndividual(-left, right);
 }
 
 void TaskControlMotors::initMotors() {
