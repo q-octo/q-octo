@@ -22,7 +22,7 @@ const Motor = ({ motor, name }) => {
 			<p>Ki: <span className="font-medium">{Round4(motor.Kp)}</span></p>
 			<p>Torque: <span className="font-medium">{Round(motor.torque)} Nm</span></p>
 			<p><b>Max Torque:</b> <span className="font-medium">{Round(motor.torque_limit)} Nm</span></p>
-			<p><b>Max Speed:</b> <span className="font-medium">{Round(motor.speed_limit)} Mph</span></p>
+			<p><b>Max Speed:</b> <span className="font-medium">{Round(motor.speed_limit)}</span></p>
 			<p><b>Max Current:</b> <span className="font-medium">{Round(motor.current_limit)} A</span></p>
 		</div>
 	);
