@@ -192,10 +192,12 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case LEFT_MOTOR_PARAM_UPDATED:
+      // Serial.println("Left motor param updated");
       state.leftMotorLimits = message.as.motorParams;
       broadcastStateUpdate();
       break;
     case RIGHT_MOTOR_PARAM_UPDATED:
+      // Serial.println("Right motor param updated");
       state.rightMotorLimits = message.as.motorParams;
       broadcastStateUpdate();
       break;

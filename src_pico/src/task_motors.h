@@ -57,8 +57,11 @@ private:
 
   static void initMotors();
   static void handleStateUpdate();
+  
+  static void checkCAN();
 
   static void debugPrintMotorStatus();
+  
 
   static inline bool motorsEnabled = true;
   // static inline uint32_t lastStatusRequestMs = 0;
@@ -66,8 +69,20 @@ private:
   static inline float maxSpeed;
   static inline float maxTorque;
   static inline float maxCurrent;
-  static inline DataManager::TimestampedMotorLimits leftMotorLimits{};
-  static inline DataManager::TimestampedMotorLimits rightMotorLimits{};
+  static inline DataManager::TimestampedMotorLimits leftMotorLimits{
+    .last_max_speed_update = 0,
+    .last_max_current_update = 0,
+    .last_max_torque_update = 0,
+    .last_speed_kp_update = 0,
+    .last_speed_ki_update = 0,
+  };
+  static inline DataManager::TimestampedMotorLimits rightMotorLimits{
+    .last_max_speed_update = 0,
+    .last_max_current_update = 0,
+    .last_max_torque_update = 0,
+    .last_speed_kp_update = 0,
+    .last_speed_ki_update = 0,
+  };
   static inline unsigned long lastLeftMotorParameterResponseMicros = 0;
   static inline unsigned long lastRightMotorParameterResponseMicros = 0;
   // This needs to be sufficiently large otherwise we start talking over the motors
@@ -77,6 +92,7 @@ private:
   static inline float lastSpeedL = 0;
   static inline float lastSpeedR = 0;
   static inline bool pendingSpeedUpdate = false;
+  static inline unsigned long lastParameterRequestMillis = 0;
   
 
   static inline XiaomiCyberGearDriver cybergearL =

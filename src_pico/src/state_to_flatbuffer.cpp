@@ -111,11 +111,15 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
     .max_speed = robotState.leftMotorLimits.last_max_speed_update > 0 ? robotState.leftMotorLimits.max_speed : -1,
     .max_current = robotState.leftMotorLimits.last_max_current_update > 0 ? robotState.leftMotorLimits.max_current : -1,
     .max_torque = robotState.leftMotorLimits.last_max_torque_update > 0 ? robotState.leftMotorLimits.max_torque : -1,
+    .speed_kp = robotState.leftMotorLimits.last_speed_kp_update > 0 ? robotState.leftMotorLimits.speed_kp : -1,
+    .speed_ki = robotState.leftMotorLimits.last_speed_ki_update > 0 ? robotState.leftMotorLimits.speed_ki : -1,
   };
   MotorLimitsT rightMotorLimits{
     .max_speed = robotState.rightMotorLimits.last_max_speed_update > 0 ? robotState.rightMotorLimits.max_speed : -1,
     .max_current = robotState.rightMotorLimits.last_max_current_update > 0 ? robotState.rightMotorLimits.max_current : -1,
     .max_torque = robotState.rightMotorLimits.last_max_torque_update > 0 ? robotState.rightMotorLimits.max_torque : -1,
+    .speed_kp = robotState.rightMotorLimits.last_speed_kp_update > 0 ? robotState.rightMotorLimits.speed_kp : -1,
+    .speed_ki = robotState.rightMotorLimits.last_speed_ki_update > 0 ? robotState.rightMotorLimits.speed_ki : -1,
   };
   robot.left_motor_limits = std::make_unique<MotorLimitsT>(leftMotorLimits);
   robot.right_motor_limits = std::make_unique<MotorLimitsT>(rightMotorLimits);

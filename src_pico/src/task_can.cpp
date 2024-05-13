@@ -42,17 +42,19 @@ void TaskCAN::onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_
   const uint8_t motorCommType = packetId >> 24;
   // TODO verify that MASTER_CAN_ID is correct before enforcing this check.
   const uint8_t motorHostId = packetId & 0xFF;
-  bool isMotorPacket = motorCommType == 0x02 || motorCommType == 0x15;
+  bool isMotorPacket = motorCommType == 0x02 || motorCommType == 0x15 || motorCommType == 0x11;
   const bool isPowerMonitor = isPowerMonitorPacket(packetId);
 
-  if (isPowerMonitor) {
-    message.type = DataManager::Type::CAN_MESSAGE_POWER_MONITOR;
-    DataManager::receiveMessage(message);
-    return;
-  }
+  // if (isPowerMonitor) {
+  //   message.type = DataManager::Type::CAN_MESSAGE_POWER_MONITOR;
+  //   DataManager::receiveMessage(message);
+  //   return;
+  // }
 
   if (isMotorPacket) {
     switch (motorCommType) {
+      case 0x11:
+      case 0x15:
       case 0x02: // Motor feedback data
       {
         const uint8_t motorId = (packetId & 0xFF00) >> 8;
@@ -65,16 +67,6 @@ void TaskCAN::onReceiveCanPacket(uint8_t packetLength, uint32_t packetId, uint8_
           message.type = DataManager::Type::CAN_MESSAGE_MOTOR_R;
           DataManager::receiveMessage(message);
         }
-        break;
-      }
-      case 0x15: // Fault feedback frame
-      {
-        Serial.println("[WARN] Received fault feedback frame");
-        // Just send to both motors for now
-        message.type = DataManager::Type::CAN_MESSAGE_MOTOR_L;
-        DataManager::receiveMessage(message);
-        message.type = DataManager::Type::CAN_MESSAGE_MOTOR_R;
-        DataManager::receiveMessage(message);
         break;
       }
       default: {

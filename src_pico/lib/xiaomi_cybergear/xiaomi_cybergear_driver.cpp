@@ -213,15 +213,14 @@ void XiaomiCyberGearDriver::process_message(uint32_t id, uint8_t *data)
         _status.modeStatus = (ResponseModeStatus)((id >> 22) & 0x03);
         break;
     }
-    case CMD_DEVICE_ID:
-        break;
     case CMD_RAM_READ:
         process_read_parameter_packet(data);
         break;
+    case CMD_DEVICE_ID:
     case CMD_GET_MOTOR_FAIL:
         // TODO handle this case
-        break;
     default:
+        Serial.println("Unhandled motor message");
         break;
     }
 }
@@ -265,6 +264,16 @@ void XiaomiCyberGearDriver::process_read_parameter_packet(const uint8_t * data)
       motor_param_.last_vbus_update_usec = currentMicros;
       Serial.printf("Receive ADDR_VBUS = [%f]\n", float_data);
       break;
+    case ADDR_SPEED_KP:
+        motor_param_.spd_kp = float_data;
+        motor_param_.last_speed_kp_update_usec = currentMicros;
+        Serial.printf("Receive ADDR_SPEED_KP = [%f]\n", float_data);
+        break;
+    case ADDR_SPEED_KI:
+        motor_param_.spd_ki = float_data;
+        motor_param_.last_speed_ki_update_usec = currentMicros;
+        Serial.printf("Receive ADDR_SPEED_KI = [%f]\n", float_data);
+        break;
     default:
       Serial.printf("Unknown parameter value index=[0x%04x]\n", index);
       is_updated = false;
@@ -272,7 +281,7 @@ void XiaomiCyberGearDriver::process_read_parameter_packet(const uint8_t * data)
   }
 
   if (is_updated) {
-    motor_param_.stamp_usec = micros();
+    motor_param_.stamp_usec = currentMicros;
   }
 }
 
