@@ -70,6 +70,13 @@ private:
   static inline DataManager::TimestampedMotorLimits rightMotorLimits{};
   static inline unsigned long lastLeftMotorParameterResponseMicros = 0;
   static inline unsigned long lastRightMotorParameterResponseMicros = 0;
+  // This needs to be sufficiently large otherwise we start talking over the motors
+  static const int MOTOR_SPEED_UPDATE_INTERVAL_MICROS = 10'000;
+  static const int MOTOR_COMMAND_DELAY_MICROS = 1000;
+  static inline unsigned long lastSpeedUpdateMicros = 0;
+  static inline float lastSpeedL = 0;
+  static inline float lastSpeedR = 0;
+  static inline bool pendingSpeedUpdate = false;
   
 
   static inline XiaomiCyberGearDriver cybergearL =
