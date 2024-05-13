@@ -16,7 +16,7 @@ const uint8_t CYBERGEAR_CAN_ID_R = 0x7F; // 127
 const uint8_t TEST_MOTOR_CAN_ID = CYBERGEAR_CAN_ID_L;
 
 static CanardInstance canard;
-static uint8_t memory_pool[1024];
+static uint32_t memory_pool[1024];
 uint8_t cached_node_id[16];
 uint8_t cached_node_id_offset = 0;
 
@@ -81,12 +81,16 @@ void setup() {
 
   // Power monitor:
   // Initialize the Canard library
+  Serial.println("Initializing Canard");
+  delay(1000); // Wait for a second
   canardInit(&canard,
              memory_pool,
              sizeof(memory_pool),
              onTransferReceived,
              shouldAcceptTransfer,
              nullptr);
+
+  Serial.println("Initialized Canard WHOOOO");
 
   canardSetLocalNodeID(&canard, 97);
   Serial.println("Initialized Canard");

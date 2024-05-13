@@ -38,7 +38,7 @@ private:
 
 
   static inline CanardInstance canard;
-  static inline uint8_t memory_pool[1024];
+  static inline uint32_t memory_pool[1024];
   static inline StorageState &state = Storage::getState();
 
 };
