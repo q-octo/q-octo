@@ -1,10 +1,14 @@
 #pragma once
+#include <Arduino.h>
+#include <SerialPIO.h>
+#include "config.h"
 
 class Voice
 {
 public:
-    typedef enum
+    typedef enum : uint8_t
     {
+        EASTER_EGG = 1,
         OK,
         LOW_BATTERY,
         TX_LOST,
@@ -24,4 +28,9 @@ public:
     static void announce(Announcement announcement);
 
 private:
+    static inline SerialPIO voiceSerial = SerialPIO(CFG_VOICE_UART_TX, CFG_VOICE_UART_RX);
+
+    static void setVolume(unsigned char vol);
+    static void playTrackDocumented(uint16_t track);
+    static void playTrack(unsigned char track);
 };
