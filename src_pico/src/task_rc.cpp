@@ -229,11 +229,13 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
     DataManager::receiveMessage(taskMessage);
   }
 
-  if (controlSource != controlSourceSwitch) {
-    controlSource = controlSourceSwitch;
-    taskMessage.type = DataManager::Type::TX_SWITCH_CONTROL_SOURCE;
-    taskMessage.as.txControlSourceSwitch = controlSourceSwitch;
-    DataManager::receiveMessage(taskMessage);
+  if (CFG_ENABLE_EXTRA_SWITCHES) {
+    if (controlSource != controlSourceSwitch) {
+      controlSource = controlSourceSwitch;
+      taskMessage.type = DataManager::Type::TX_SWITCH_CONTROL_SOURCE;
+      taskMessage.as.txControlSourceSwitch = controlSourceSwitch;
+      DataManager::receiveMessage(taskMessage);
+    }
   }
 
   if (wifiSwitch != isWifiSwitch || firstRcChannels) {

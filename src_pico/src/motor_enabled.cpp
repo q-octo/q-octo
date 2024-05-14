@@ -1,5 +1,6 @@
 #include "motor_enabled.h"
 #include "task_data_manager.h"
+#include "config.h"
 
 
 void MotorEnabled::onTxFailsafed()
@@ -42,5 +43,11 @@ void MotorEnabled::notify()
 
 bool MotorEnabled::isMotorEnabled()
 {
-    return !failsafed && armed && !lowBattery;
+    bool enabled = true;
+    enabled = enabled && !failsafed;
+    if (CFG_ENABLE_EXTRA_SWITCHES) {
+        enabled = enabled && armed;
+    }
+    enabled = enabled && !lowBattery;
+    return enabled;
 }
