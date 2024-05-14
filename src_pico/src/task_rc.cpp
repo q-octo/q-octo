@@ -101,6 +101,13 @@ void TaskRC::sendStateAsTelem(const DataManager::State &state) {
   uint16_t* currentLimitPtr = reinterpret_cast<uint16_t*>(&buffer[7]);
   *currentLimitPtr = currentLimit; 
   buffer[9] = static_cast<uint8_t>(max(state.leftMotorLimits.max_torque, state.rightMotorLimits.max_torque) * 10);
+  uint16_t speedKp = static_cast<uint16_t>(state.leftMotorLimits.speed_kp);
+  uint16_t* speedKpPtr = reinterpret_cast<uint16_t*>(&buffer[10]);
+  *speedKpPtr = speedKp;
+  uint16_t speedKi = static_cast<uint16_t>(state.leftMotorLimits.speed_ki);
+  uint16_t* speedKiPtr = reinterpret_cast<uint16_t*>(&buffer[12]);
+  *speedKiPtr = speedKi;
+
   /*
   crsfPayload = {
   1,    -- Message Type
@@ -111,6 +118,8 @@ void TaskRC::sendStateAsTelem(const DataManager::State &state) {
   0x00, 0x00, -- Speed Limit
   0x00, 0x00, -- Current Limit
   0,    -- Torque Limit
+  0x00, 0x00, -- Speed Kp
+  0x00, 0x00, -- Speed Ki
 }
   */
   crsf_telem_set_custom_payload(buffer, payloadSize);
