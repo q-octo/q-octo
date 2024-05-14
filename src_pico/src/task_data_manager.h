@@ -80,14 +80,22 @@ public:
     bool diagnosticsMode;
   } Diagnostics;
 
+  typedef enum {
+    MANUAL,
+    ONBOARD_COMPUTER,
+    FLIGHT_CONTROLLER,
+  } RobotControlSource;
+
   typedef struct {
     float leftSpeed;
     float rightSpeed;
+    RobotControlSource controlSource;
   } SetMotorSpeedIndividual;
 
   typedef struct {
     float speed;
     float direction;
+    RobotControlSource controlSource;
   } SetMotorSpeedCombined;
 
   typedef struct {
@@ -136,11 +144,7 @@ public:
     unsigned long last_speed_ki_update;
   } TimestampedMotorLimits;
 
-  typedef enum {
-    MANUAL,
-    ONBOARD_COMPUTER,
-    FLIGHT_CONTROLLER,
-  } ControlSource;
+
 
   typedef struct {
     Type type;
@@ -160,7 +164,7 @@ public:
       float floatMotorParam;
       TimestampedMotorLimits motorParams;
       bool txBinarySwitch;
-      ControlSource txControlSourceSwitch;
+      RobotControlSource txControlSourceSwitch;
     } as;
   } Message;
 
@@ -172,6 +176,7 @@ public:
     DisplayMessages displayMessages;
     TimestampedMotorLimits leftMotorLimits;
     TimestampedMotorLimits rightMotorLimits;
+    RobotControlSource controlSource;
   } State; 
 
   static void receiveMessage(const Message &message);
@@ -192,6 +197,8 @@ public:
       .message7 = &defaultMessage,
     };
     state.rc.channels = nullptr;
+    state.controlSource = RobotControlSource::MANUAL;
+    // TODO does the rest of `state` need to be initialised here?
   }
 
 private:

@@ -185,7 +185,11 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
     lastDirection = direction;
     taskMessage = {
             .type = DataManager::Type::SET_MOTOR_SPEED_COMBINED,
-            .as = {.motorSpeedCombined = {.speed = speed, .direction = direction}},
+            .as = {.motorSpeedCombined = {
+              .speed = speed, 
+              .direction = direction,
+              .controlSource = DataManager::RobotControlSource::MANUAL,
+              }},
     };
     DataManager::receiveMessage(taskMessage);
   }
@@ -197,10 +201,10 @@ void TaskRC::onReceiveChannels(const uint16_t channels[16]) {
 
   const bool isArmedSwitch = armedChannel < 1500;
   // 1000 = manual, 1500 = obc, 2000 = flight controller
-  const DataManager::ControlSource controlSourceSwitch = 
+  const DataManager::RobotControlSource controlSourceSwitch = 
     controlSourceChannel < 1250 
-      ? DataManager::MANUAL 
-      : controlSourceChannel < 1750 ? DataManager::ONBOARD_COMPUTER : DataManager::FLIGHT_CONTROLLER;
+      ? DataManager::RobotControlSource::MANUAL 
+      : controlSourceChannel < 1750 ? DataManager::RobotControlSource::ONBOARD_COMPUTER : DataManager::RobotControlSource::FLIGHT_CONTROLLER;
   const bool isWifiSwitch = wifiChannel > 1500;
   
   DataManager::Message taskMessage;

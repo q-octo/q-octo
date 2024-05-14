@@ -10,8 +10,6 @@
 #include <flatbuffers/flatbuffer_builder.h>
 #include "state_to_flatbuffer.h"
 
-using namespace fbs;
-
 class Computer
 {
 public:
@@ -40,7 +38,6 @@ private:
   static void serialiseState(const DataManager::State &state);
   static void sendStateToComputer(const DataManager::State &state);
   static void handleComputerTx(const OnboardComputerTx &computerTx);
-  static void sendTaskMessage(const DataManager::Message &message);
   static void sendDisplayButtonToComputer(const DataManager::DisplayButton &displayButton);
   static void parseIncomingSerialData();
   static bool verifyIncomingFlatbuffer(flatbuffers::Verifier &verifier);

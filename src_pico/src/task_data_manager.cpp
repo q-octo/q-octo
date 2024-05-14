@@ -79,6 +79,10 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case DISABLE_MOTORS:
       break;
     case SET_MOTOR_SPEED_COMBINED:
+      if (message.as.motorSpeedCombined.controlSource != state.controlSource) {
+        // Ignore a control message from an inactive source
+        break;
+      } 
       controlMotorsMessage.type = TaskControlMotors::MessageType::SET_SPEED_COMBINED;
       controlMotorsMessage.as = {.speedCombined = message.as.motorSpeedCombined};
       TaskControlMotors::receiveMessage(controlMotorsMessage);

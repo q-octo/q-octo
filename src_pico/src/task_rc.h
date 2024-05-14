@@ -83,7 +83,7 @@ private:
   static inline uint16_t lastChannelsUs[16] = {0};
   static inline bool armedSwitch = false;
   static inline bool wifiSwitch = false;
-  static inline DataManager::ControlSource controlSource = DataManager::MANUAL;
+  static inline DataManager::RobotControlSource controlSource = DataManager::MANUAL;
   static inline bool firstRcChannels = true;
 
   static inline StorageState &state = Storage::getState();

@@ -48,7 +48,8 @@ void Computer::parseIncomingSerialData() {
   handleComputerTx(*computerMessage);
 }
 
-void Computer::handleComputerTx(const OnboardComputerTx &computerMessage) {
+void Computer::handleComputerTx(const fbs::OnboardComputerTx &computerMessage) {
+  static DataManager::Message message;
   switch (computerMessage.message_type()) {
     case OnboardComputerTxUnion_NONE:
       break;
@@ -56,14 +57,40 @@ void Computer::handleComputerTx(const OnboardComputerTx &computerMessage) {
       // TODO implement if we can receive data on the transmitter.
       Serial.println("Received CRSF frame to forward to transmitter");
       break;
-    case OnboardComputerTxUnion_DriveRobot:
-      // TODO implement driving via the onboard computer
-      // Fun...
+    case OnboardComputerTxUnion_DriveRobot: {
       Serial.println("Received drive robot message");
+      auto driveMsg = computerMessage.message_as_DriveRobot()->UnPack();
+      switch (driveMsg->config.type)
+      {
+        case DriveConfig_TankDriveConfig: {
+          auto tankDriveConfig = driveMsg->config.AsTankDriveConfig();
+          message.type = DataManager::Type::SET_MOTOR_SPEED_INDIVIDUAL;
+          message.as.motorSpeedIndividual = {
+            .leftSpeed = tankDriveConfig->left_rad_s,
+            .rightSpeed = tankDriveConfig->right_rad_s,
+            .controlSource = DataManager::RobotControlSource::ONBOARD_COMPUTER,
+          };
+          DataManager::receiveMessage(message);
+          break;
+        }
+        case DriveConfig_MixedDriveConfig: {
+          auto mixedDriveConfig = driveMsg->config.AsMixedDriveConfig();
+          message.type = DataManager::Type::SET_MOTOR_SPEED_COMBINED;
+          message.as.motorSpeedCombined = {
+            .speed = mixedDriveConfig->rad_s,
+            .direction = mixedDriveConfig->direction,
+            .controlSource = DataManager::RobotControlSource::ONBOARD_COMPUTER,
+          };
+          DataManager::receiveMessage(message);
+          break;
+        }
+        default:
+          break;
+      }
       break;
+    }
     case OnboardComputerTxUnion_DisplayMessages: {
       Serial.println("Received display messages");
-      DataManager::Message message;
       message.type = DataManager::Type::DISPLAY_MESSAGES;
       auto messages = computerMessage.message_as_DisplayMessages();
 
@@ -82,15 +109,12 @@ void Computer::handleComputerTx(const OnboardComputerTx &computerMessage) {
       static std::string message7 = messages->message7()->str();
       message.as.displayMessages.message7 = &message7;
 
-      sendTaskMessage(message);
+      DataManager::receiveMessage(message);
       break;
     }
   }
 }
 
-void Computer::sendTaskMessage(const DataManager::Message &message) {
-  DataManager::receiveMessage(message);
-}
 
 void Computer::sendStateToComputer(const DataManager::State &state) {
   Serial.println("Sending state to onboard computer");
