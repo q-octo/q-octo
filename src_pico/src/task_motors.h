@@ -54,6 +54,11 @@ private:
   static void setTorqueLimit(float torqueLimit);
   static void setSpeedKi(float speedKi);
   static void setSpeedKp(float speedKp);
+  static void getSpeedLimit();
+  static void getCurrentLimit();
+  static void getTorqueLimit();
+  static void getSpeedKi();
+  static void getSpeedKp();
 
   static void initMotors();
   static void handleStateUpdate();
@@ -66,9 +71,11 @@ private:
   static inline bool motorsEnabled = true;
   // static inline uint32_t lastStatusRequestMs = 0;
   static inline uint32_t lastStatusBroadcastMs = 0;
-  static inline float maxSpeed;
-  static inline float maxTorque;
-  static inline float maxCurrent;
+  static inline float maxSpeed = 0;
+  static inline float maxTorque = 0;
+  static inline float maxCurrent = 0;
+  static inline float speedKi = 0;
+  static inline float speedKp = 0;
   static inline DataManager::TimestampedMotorLimits leftMotorLimits{
     .last_max_speed_update = 0,
     .last_max_current_update = 0,

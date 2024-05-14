@@ -14,6 +14,8 @@ void TaskControlMotors::init() {
   maxSpeed = state.motorSpeedLimit;
   maxCurrent = state.motorCurrentLimit;
   maxTorque = state.motorTorqueLimit;
+  speedKi = state.speedKi;
+  speedKp = state.speedKp;
 
   leftMotorLimits = {
     .last_max_speed_update = 0,
@@ -107,31 +109,54 @@ void TaskControlMotors::loop() {
 
   if (currentMillis - lastParameterRequestMillis > 2000) {
     lastParameterRequestMillis = currentMillis;
-    cybergearL.get_speed_limit();
-    checkCAN();
-    cybergearL.get_current_limit();
-    checkCAN();
-    cybergearL.get_torque_limit();
-    checkCAN();
-    cybergearL.get_speed_kp();
-    checkCAN();
-    cybergearL.get_speed_ki();
-    checkCAN();
-    cybergearR.get_speed_limit();
-    checkCAN();
-    cybergearR.get_current_limit();
-    checkCAN();
-    cybergearR.get_torque_limit();
-    checkCAN();
-    cybergearR.get_speed_kp();
-    checkCAN();
-    cybergearR.get_speed_ki();
-    checkCAN();
+    getSpeedLimit();
+    getCurrentLimit();
+    getTorqueLimit();
+    getSpeedKi();
+    getSpeedKp(); 
   }
 
 }
 
+void TaskControlMotors::getSpeedLimit() {
+  cybergearL.get_speed_limit();
+  checkCAN();
+  cybergearR.get_speed_limit();
+  checkCAN();
+}
+
+void TaskControlMotors::getCurrentLimit() {
+  cybergearL.get_current_limit();
+  checkCAN();
+  cybergearR.get_current_limit();
+  checkCAN();
+}
+
+void TaskControlMotors::getTorqueLimit() {
+  cybergearL.get_torque_limit();
+  checkCAN();
+  cybergearR.get_torque_limit();
+  checkCAN();
+}
+
+void TaskControlMotors::getSpeedKi() {
+  cybergearL.get_speed_ki();
+  checkCAN();
+  cybergearR.get_speed_ki();
+  checkCAN();
+}
+
+void TaskControlMotors::getSpeedKp() {
+  cybergearL.get_speed_kp();
+  checkCAN();
+  cybergearR.get_speed_kp();
+  checkCAN();
+}
+
 void TaskControlMotors::checkCAN() {
+  // The can board seems to only buffer a limited number of frames.
+  // So earlier responses will be lost if we send consecutive motor 
+  // instructions unless we check for them here.
   TaskCAN::loop();
 }
 
@@ -155,6 +180,19 @@ void TaskControlMotors::handleStateUpdate() {
       Serial.print("Torque limit: ");
       Serial.println(maxTorque);
     } 
+    // TODO enable ki/kp after testing
+    // if (state.speedKi != speedKi) {
+    //   speedKi = state.speedKi;
+    //   setSpeedKi(speedKi);
+    //   Serial.print("Speed Ki: ");
+    //   Serial.println(speedKi);
+    // }
+    // if (state.speedKp != speedKp) {
+    //   speedKp = state.speedKp;
+    //   setSpeedKp(speedKp);
+    //   Serial.print("Speed Kp: ");
+    //   Serial.println(speedKp);
+    // }
 }
 
 void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message) {
@@ -224,11 +262,7 @@ void TaskControlMotors::setSpeedLimit(float speedLimit) {
   checkCAN();
   cybergearR.set_limit_speed(speedLimit);
   checkCAN();
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
-  cybergearL.get_speed_limit();
-  checkCAN();
-  cybergearR.get_speed_limit();
-  checkCAN();
+  getSpeedLimit(); 
 }
 
 void TaskControlMotors::setCurrentLimit(float currentLimit) {
@@ -236,11 +270,7 @@ void TaskControlMotors::setCurrentLimit(float currentLimit) {
   checkCAN();
   cybergearR.set_limit_current(currentLimit);
   checkCAN();
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
-  cybergearL.get_current_limit();
-  checkCAN();
-  cybergearR.get_current_limit();
-  checkCAN();
+  getCurrentLimit();
 }
 
 void TaskControlMotors::setTorqueLimit(float torqueLimit) {
@@ -248,11 +278,7 @@ void TaskControlMotors::setTorqueLimit(float torqueLimit) {
   checkCAN();
   cybergearR.set_limit_torque(torqueLimit);
   checkCAN();
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
-  cybergearL.get_torque_limit();
-  checkCAN();
-  cybergearR.get_torque_limit();
-  checkCAN();
+  getTorqueLimit();
 }
 
 void TaskControlMotors::setSpeedKi(float speedKi) {
@@ -260,11 +286,7 @@ void TaskControlMotors::setSpeedKi(float speedKi) {
   checkCAN();
   cybergearR.set_speed_ki(speedKi);
   checkCAN();
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
-  cybergearL.get_speed_ki();
-  checkCAN();
-  cybergearR.get_speed_ki();
-  checkCAN();
+  getSpeedKi();
 }
 
 void TaskControlMotors::setSpeedKp(float speedKp) {
@@ -272,11 +294,7 @@ void TaskControlMotors::setSpeedKp(float speedKp) {
   checkCAN();
   cybergearR.set_speed_kp(speedKp);
   checkCAN();
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
-  cybergearL.get_speed_kp();
-  checkCAN();
-  cybergearR.get_speed_kp();
-  checkCAN();
+  getSpeedKp();
 }
 
 void TaskControlMotors::broadcastStatusUpdate() {
@@ -344,11 +362,11 @@ void TaskControlMotors::initMotors() {
   cybergearR.init_motor(MODE_SPEED);
   checkCAN();
   setSpeedLimit(maxSpeed);
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
   setCurrentLimit(maxCurrent);
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
   setTorqueLimit(maxTorque);
-  // delayMicroseconds(MOTOR_COMMAND_DELAY_MICROS);
+  // TODO enable ki/kp after testing
+  // setSpeedKi(speedKi);
+  // setSpeedKp(speedKp);
   cybergearL.enable_motor();
   checkCAN();
   cybergearR.enable_motor();
