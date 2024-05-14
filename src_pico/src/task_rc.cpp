@@ -85,7 +85,7 @@ void TaskRC::receiveMessage(const Message &message) {
 }
 
 void TaskRC::sendStateAsTelem(const DataManager::State &state) {
-  const size_t payloadSize = 9;
+  const size_t payloadSize = 14;
   uint8_t buffer[payloadSize] = {0};
   buffer[0] = 1; // Our internal message type.
   buffer[1] = state.webServerEnabled;
@@ -101,10 +101,10 @@ void TaskRC::sendStateAsTelem(const DataManager::State &state) {
   uint16_t* currentLimitPtr = reinterpret_cast<uint16_t*>(&buffer[7]);
   *currentLimitPtr = currentLimit; 
   buffer[9] = static_cast<uint8_t>(max(state.leftMotorLimits.max_torque, state.rightMotorLimits.max_torque) * 10);
-  uint16_t speedKp = static_cast<uint16_t>(state.leftMotorLimits.speed_kp);
+  uint16_t speedKp = static_cast<uint16_t>(state.leftMotorLimits.speed_kp * 10);
   uint16_t* speedKpPtr = reinterpret_cast<uint16_t*>(&buffer[10]);
   *speedKpPtr = speedKp;
-  uint16_t speedKi = static_cast<uint16_t>(state.leftMotorLimits.speed_ki);
+  uint16_t speedKi = static_cast<uint16_t>(state.leftMotorLimits.speed_ki * 10);
   uint16_t* speedKiPtr = reinterpret_cast<uint16_t*>(&buffer[12]);
   *speedKiPtr = speedKi;
 
