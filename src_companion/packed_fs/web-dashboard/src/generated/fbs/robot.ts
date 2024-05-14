@@ -41,7 +41,7 @@ batteries():number {
 
 controlSource():ControlSource {
   const offset = this.bb!.__offset(this.bb_pos, 6);
-  return offset ? this.bb!.readInt8(this.bb_pos + offset) : ControlSource.RC;
+  return offset ? this.bb!.readInt8(this.bb_pos + offset) : ControlSource.Manual;
 }
 
 status():Status {
@@ -158,7 +158,7 @@ static addBatteries(builder:flatbuffers.Builder, batteries:number) {
 }
 
 static addControlSource(builder:flatbuffers.Builder, controlSource:ControlSource) {
-  builder.addFieldInt8(1, controlSource, ControlSource.RC);
+  builder.addFieldInt8(1, controlSource, ControlSource.Manual);
 }
 
 static addStatus(builder:flatbuffers.Builder, status:Status) {
@@ -312,7 +312,7 @@ unpackTo(_o: RobotT): void {
 export class RobotT implements flatbuffers.IGeneratedObject {
 constructor(
   public batteries: number = 4,
-  public controlSource: ControlSource = ControlSource.RC,
+  public controlSource: ControlSource = ControlSource.Manual,
   public status: Status = Status.OK,
   public motors: MotorsT|null = null,
   public voltage: number = 0.0,

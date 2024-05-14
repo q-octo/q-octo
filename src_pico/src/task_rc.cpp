@@ -50,7 +50,10 @@ void TaskRC::loop() {
     DataManager::receiveMessage(taskMessage);
   }
 
-  const bool hasReceiverTimedOut = currentMillis - lastReceiverUpdateMs >= RECEIVER_TIMEOUT_MS;  
+  const StorageState& state = Storage::getState();
+
+  // Seems like we receive updates more frequently when the receiver is connected
+  const bool hasReceiverTimedOut = currentMillis - lastReceiverUpdateMs >= state.radioReceiverTimeoutMillis;  
   if (receiverTimedOut != hasReceiverTimedOut) {
     receiverTimedOut = hasReceiverTimedOut;
     if (receiverTimedOut) {

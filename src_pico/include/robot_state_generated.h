@@ -49,36 +49,33 @@ struct RobotT;
 
 enum ControlSource : int8_t {
   ControlSource_Manual = 0,
-  ControlSource_FlightController = 1,
-  ControlSource_OnboardComputer = 2,
-  ControlSource_RC = 3,
+  ControlSource_OnboardComputer = 1,
+  ControlSource_FlightController = 2,
   ControlSource_MIN = ControlSource_Manual,
-  ControlSource_MAX = ControlSource_RC
+  ControlSource_MAX = ControlSource_FlightController
 };
 
-inline const ControlSource (&EnumValuesControlSource())[4] {
+inline const ControlSource (&EnumValuesControlSource())[3] {
   static const ControlSource values[] = {
     ControlSource_Manual,
-    ControlSource_FlightController,
     ControlSource_OnboardComputer,
-    ControlSource_RC
+    ControlSource_FlightController
   };
   return values;
 }
 
 inline const char * const *EnumNamesControlSource() {
-  static const char * const names[5] = {
+  static const char * const names[4] = {
     "Manual",
-    "FlightController",
     "OnboardComputer",
-    "RC",
+    "FlightController",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameControlSource(ControlSource e) {
-  if (::flatbuffers::IsOutRange(e, ControlSource_Manual, ControlSource_RC)) return "";
+  if (::flatbuffers::IsOutRange(e, ControlSource_Manual, ControlSource_FlightController)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesControlSource()[index];
 }
@@ -915,7 +912,7 @@ inline ::flatbuffers::Offset<CrsfData> CreateCrsfData(
 struct RobotT : public ::flatbuffers::NativeTable {
   typedef Robot TableType;
   uint8_t batteries = 4;
-  fbs::ControlSource control_source = fbs::ControlSource_RC;
+  fbs::ControlSource control_source = fbs::ControlSource_Manual;
   fbs::Status status = fbs::Status_OK;
   std::unique_ptr<fbs::MotorsT> motors{};
   float voltage = 0.0f;
@@ -973,7 +970,7 @@ struct Robot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     return GetField<uint8_t>(VT_BATTERIES, 4);
   }
   fbs::ControlSource control_source() const {
-    return static_cast<fbs::ControlSource>(GetField<int8_t>(VT_CONTROL_SOURCE, 3));
+    return static_cast<fbs::ControlSource>(GetField<int8_t>(VT_CONTROL_SOURCE, 0));
   }
   fbs::Status status() const {
     return static_cast<fbs::Status>(GetField<int8_t>(VT_STATUS, 0));
@@ -1081,7 +1078,7 @@ struct RobotBuilder {
     fbb_.AddElement<uint8_t>(Robot::VT_BATTERIES, batteries, 4);
   }
   void add_control_source(fbs::ControlSource control_source) {
-    fbb_.AddElement<int8_t>(Robot::VT_CONTROL_SOURCE, static_cast<int8_t>(control_source), 3);
+    fbb_.AddElement<int8_t>(Robot::VT_CONTROL_SOURCE, static_cast<int8_t>(control_source), 0);
   }
   void add_status(fbs::Status status) {
     fbb_.AddElement<int8_t>(Robot::VT_STATUS, static_cast<int8_t>(status), 0);
@@ -1157,7 +1154,7 @@ struct RobotBuilder {
 inline ::flatbuffers::Offset<Robot> CreateRobot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint8_t batteries = 4,
-    fbs::ControlSource control_source = fbs::ControlSource_RC,
+    fbs::ControlSource control_source = fbs::ControlSource_Manual,
     fbs::Status status = fbs::Status_OK,
     ::flatbuffers::Offset<fbs::Motors> motors = 0,
     float voltage = 0.0f,
@@ -1207,7 +1204,7 @@ inline ::flatbuffers::Offset<Robot> CreateRobot(
 inline ::flatbuffers::Offset<Robot> CreateRobotDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint8_t batteries = 4,
-    fbs::ControlSource control_source = fbs::ControlSource_RC,
+    fbs::ControlSource control_source = fbs::ControlSource_Manual,
     fbs::Status status = fbs::Status_OK,
     ::flatbuffers::Offset<fbs::Motors> motors = 0,
     float voltage = 0.0f,

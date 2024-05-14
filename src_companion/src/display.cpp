@@ -85,6 +85,19 @@ std::string Display::fmtFloat(const float& number, const int& precision) {
     return formatted.str();
 }
 
+std::string controlSourceToString(ControlSource source) {
+    switch (source) {
+        case ControlSource_Manual:
+            return "MANUAL";
+        case ControlSource_OnboardComputer:
+            return "ONBCOM";
+        case ControlSource_FlightController:
+            return "FL_CON";
+        default:
+            return "??????";
+    }
+}
+
 void Display::paintPage1()
 {
 // An example of how to access state.
@@ -107,7 +120,7 @@ void Display::paintPage1()
     topBar.deflate(2);
 
     oss.str("");
-    oss << EnumNamesControlSource()[state.control_source];
+    oss << controlSourceToString(state.control_source);
     SET_PEN_BLACK()
     graphics.text(oss.str(), Point(topBar.x, topBar.y), topBar.w);
 

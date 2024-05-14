@@ -6,7 +6,7 @@ namespace fbs;
 file_identifier "ROBO";
 
 // Define enums for control sources and status codes
-enum ControlSource : byte { Manual, FlightController, OnboardComputer, RC }
+enum ControlSource : byte { Manual, OnboardComputer, FlightController}
 enum Status : byte { OK, NO_TX_SIGNAL, LOW_BATTERY, MOTOR_ERROR, DISARMED }
 
 // Define a table for motor information
@@ -84,7 +84,7 @@ table CrsfData {
 // Define the main table for your data structure
 table Robot {
     batteries: ubyte = 4;
-    control_source: ControlSource = RC;
+    control_source: ControlSource = Manual;
     status: Status = OK;
     motors: Motors;
     voltage: float = 0.0;

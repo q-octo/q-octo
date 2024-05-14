@@ -4,7 +4,6 @@
 
 export enum ControlSource {
   Manual = 0,
-  FlightController = 1,
-  OnboardComputer = 2,
-  RC = 3
+  OnboardComputer = 1,
+  FlightController = 2
 }

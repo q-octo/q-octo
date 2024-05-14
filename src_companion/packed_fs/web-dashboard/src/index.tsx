@@ -338,7 +338,7 @@ export function App() {
 			}
 		},
 		batteries: -1,
-		control_source: "RC",
+		control_source: "Manual",
 		status: "NO_TX",
 		voltage: -1,
 		current: -1,

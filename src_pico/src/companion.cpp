@@ -93,7 +93,6 @@ void Companion::handleUpdateMessage(const Update &update) {
       break;
     }
     case UpdateUnion::UpdateUnion_UpdateCriticalVoltageThreshold: {
-
       auto updateCriticalVoltageThreshold =
               update.update_as_UpdateCriticalVoltageThreshold();
       state.criticalVoltageThreshold = updateCriticalVoltageThreshold->critical_voltage_threshold();
@@ -124,7 +123,6 @@ void Companion::handleUpdateMessage(const Update &update) {
       // TODO implement rover enable/disable
       break;
     case UpdateUnion::UpdateUnion_UpdateStartWebServerOnLaunch:
-      // TODO we still need to check this flag on launch
       state.startWebServerOnLaunch = update.update_as_UpdateStartWebServerOnLaunch()->start_web_server_on_launch();
       Storage::save();
       break;
@@ -154,6 +152,30 @@ void Companion::handleUpdateMessage(const Update &update) {
       state.motorTorqueLimit = update.update_as_UpdateMaxTorque()->max_torque();
       Storage::save();
       break;
+    }
+    case UpdateUnion_UpdateMotorKp: {
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_SPEED_KP,
+              .as = {.floatMotorParam = update.update_as_UpdateMotorKp()->motor_kp()}};
+      DataManager::receiveMessage(taskMessage);
+      state.speedKp = update.update_as_UpdateMotorKp()->motor_kp();
+      Storage::save();
+      break;
+    }
+    case UpdateUnion_UpdateMotorKi: {
+      taskMessage = {
+              .type = DataManager::Type::UPDATE_MOTOR_SPEED_KI,
+              .as = {.floatMotorParam = update.update_as_UpdateMotorKi()->motor_ki()}};
+      DataManager::receiveMessage(taskMessage);
+      state.speedKi = update.update_as_UpdateMotorKi()->motor_ki();
+      Storage::save();
+      break;
+    }
+    case UpdateUnion_UpdateCrsfLinkStatsTimeout: {
+      state.radioReceiverTimeoutMillis = update.update_as_UpdateCrsfLinkStatsTimeout()->timeout_millis();
+      Storage::save();
+      break;
+    
     }
   }
 }

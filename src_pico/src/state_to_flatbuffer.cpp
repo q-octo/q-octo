@@ -22,11 +22,23 @@ Status serialiseSystemStatus(const DataManager::Status &systemStatus) {
   return Status_OK;
 }
 
+ControlSource serialiseControlSource(const DataManager::RobotControlSource &controlSource) {
+  switch (controlSource) {
+    case DataManager::MANUAL:
+      return ControlSource_Manual;
+    case DataManager::ONBOARD_COMPUTER:
+      return ControlSource_OnboardComputer;
+    case DataManager::FLIGHT_CONTROLLER:
+      return ControlSource_FlightController;
+    default:
+      return ControlSource_Manual;
+  }
+}
+
 void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   const StorageState &storageState = Storage::getState();
   robot.batteries = storageState.batteryCount;
-  // TODO get control source
-  robot.control_source = ControlSource_RC;
+  robot.control_source = serialiseControlSource(robotState.controlSource);
   robot.status = serialiseSystemStatus(SystemStatus::getStatus());
 
   robot.voltage = robotState.battery.voltage;
@@ -123,5 +135,7 @@ void stateToFlatbuffer(const DataManager::State &robotState, RobotT &robot) {
   };
   robot.left_motor_limits = std::make_unique<MotorLimitsT>(leftMotorLimits);
   robot.right_motor_limits = std::make_unique<MotorLimitsT>(rightMotorLimits);
+  
+  robot.crsf_link_stats_timeout_millis = storageState.radioReceiverTimeoutMillis;
   
 }
