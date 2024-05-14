@@ -33,12 +33,17 @@ void setup() {
 #if DEBUG_ENABLE_WIFI_ON_LAUNCH
   webServer.start();
 #endif
+  // Start the watchdog timer
+  rp2040.wdt_begin(10'000);
 }
 
 void loop() {
   display.loop();
   webServer.loop();
   QOctoSerial::loop();
+  
+  // Reset the watchdog timer
+  rp2040.wdt_reset();
 }
 
 void onReceiveSerialMessage(const CompanionRxT &message) {
