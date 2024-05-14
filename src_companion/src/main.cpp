@@ -34,7 +34,7 @@ void setup() {
   webServer.start();
 #endif
   // Start the watchdog timer
-  rp2040.wdt_begin(10'000);
+  rp2040.wdt_begin(15'000);
 }
 
 void loop() {
