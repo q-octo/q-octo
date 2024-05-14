@@ -84,21 +84,23 @@ void TaskRC::receiveMessage(const Message &message) {
 void TaskRC::sendStateAsTelem(const DataManager::State &state) {
   const size_t payloadSize = 9;
   uint8_t buffer[payloadSize] = {0};
-  buffer[0] = state.webServerEnabled;
-  buffer[1] = 1; // TODO set this
+  buffer[0] = 1; // Our internal message type.
+  buffer[1] = state.webServerEnabled;
+  buffer[2] = state.armed;
   // Manual, obc, flight con
-  buffer[2] = 0; // TODO set this
-  buffer[3] = SystemStatus::getStatus();
+  buffer[3] = state.controlSource;
+  buffer[4] = SystemStatus::getStatus();
   auto speedLimit = static_cast<uint16_t>(max(state.leftMotorLimits.max_speed, state.rightMotorLimits.max_speed) * 10);
-  // Big endian
-  buffer[4] = (speedLimit >> 8) & 0xFF;
-  buffer[5] = speedLimit & 0xFF;
+  // little endian
+  uint16_t* speedLimitPtr = reinterpret_cast<uint16_t*>(&buffer[5]);
+  *speedLimitPtr = speedLimit; 
   uint16_t currentLimit = static_cast<uint16_t>(max(state.leftMotorLimits.max_current, state.rightMotorLimits.max_current) * 10);
-  buffer[6] = (currentLimit >> 8) & 0xFF;
-  buffer[7] = currentLimit & 0xFF;
-  buffer[8] = static_cast<uint8_t>(max(state.leftMotorLimits.max_torque, state.rightMotorLimits.max_torque) * 10);
+  uint16_t* currentLimitPtr = reinterpret_cast<uint16_t*>(&buffer[7]);
+  *currentLimitPtr = currentLimit; 
+  buffer[9] = static_cast<uint8_t>(max(state.leftMotorLimits.max_torque, state.rightMotorLimits.max_torque) * 10);
   /*
   crsfPayload = {
+  1,    -- Message Type
   0,    -- Wifi
   0,    -- Armed
   0,    -- Control Source
