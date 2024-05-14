@@ -180,19 +180,18 @@ void TaskControlMotors::handleStateUpdate() {
       Serial.print("Torque limit: ");
       Serial.println(maxTorque);
     } 
-    // TODO enable ki/kp after testing
-    // if (state.speedKi != speedKi) {
-    //   speedKi = state.speedKi;
-    //   setSpeedKi(speedKi);
-    //   Serial.print("Speed Ki: ");
-    //   Serial.println(speedKi);
-    // }
-    // if (state.speedKp != speedKp) {
-    //   speedKp = state.speedKp;
-    //   setSpeedKp(speedKp);
-    //   Serial.print("Speed Kp: ");
-    //   Serial.println(speedKp);
-    // }
+    if (state.speedKi != speedKi) {
+      speedKi = state.speedKi;
+      setSpeedKi(speedKi);
+      Serial.print("Speed Ki: ");
+      Serial.println(speedKi);
+    }
+    if (state.speedKp != speedKp) {
+      speedKp = state.speedKp;
+      setSpeedKp(speedKp);
+      Serial.print("Speed Kp: ");
+      Serial.println(speedKp);
+    }
 }
 
 void TaskControlMotors::receiveMessage(const TaskControlMotors::Message &message) {
@@ -364,9 +363,8 @@ void TaskControlMotors::initMotors() {
   setSpeedLimit(maxSpeed);
   setCurrentLimit(maxCurrent);
   setTorqueLimit(maxTorque);
-  // TODO enable ki/kp after testing
-  // setSpeedKi(speedKi);
-  // setSpeedKp(speedKp);
+  setSpeedKi(speedKi);
+  setSpeedKp(speedKp);
   cybergearL.enable_motor();
   checkCAN();
   cybergearR.enable_motor();

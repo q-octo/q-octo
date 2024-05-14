@@ -19,9 +19,8 @@ struct StorageState
     float motorCurrentLimit = 1.0f;
     // Max = 12.5
     float motorTorqueLimit = 12.5f;
-    // TODO use kp and ki once I've checked that 2.0 is the real default
-    float speedKp = 2.0f; 
-    float speedKi = 2.0f;
+    float speedKp = 12.0f; 
+    float speedKi = 12.0f;
     uint16_t radioReceiverTimeoutMillis = 2000;
 };
 
