@@ -277,9 +277,9 @@ const EditValuesForm = ({ rover }: { rover: RoverState }) => {
 			<FormField field_id={UpdateUnion.UpdateCriticalVoltageThreshold} label="Critical Voltage Threshold" step={0.01} onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
 
 			<h3 className="text-lg sm:text-xl font-bold mb-4">📻 Radio Settings</h3>
-			<FormField field_id={UpdateUnion.UpdateRssiThreshold} min={0} max={130} label="RSSI Threshold" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
-			<FormField field_id={UpdateUnion.UpdateLinkQualityThreshold} min={0} max={100} label="Link Quality Threshold" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
-			<FormField field_id={UpdateUnion.UpdateCrsfLinkStatsTimeout} min={0} max={10000} label="CRSF Link Stats Timeout" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
+			<FormField field_id={UpdateUnion.UpdateRssiThreshold} min={0} max={130} label="RSSI Threshold (0-130)" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
+			<FormField field_id={UpdateUnion.UpdateLinkQualityThreshold} min={0} max={100} label="Link Quality Threshold (0-100)" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
+			<FormField field_id={UpdateUnion.UpdateCrsfLinkStatsTimeout} min={0} max={10000} label="CRSF Link Stats Timeout (milliseconds)" onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
 
 			<h3 className="text-lg sm:text-xl font-bold mb-4">🔧 Motor PID Constants</h3>
 			<FormField field_id={UpdateUnion.UpdateMotorKi} label="Motor Ki" step={0.01} onChange={handleChange} handleSubmit={handleSubmit} formValues={formValues} rover={rover} />
