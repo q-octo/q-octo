@@ -80,8 +80,8 @@ public:
     bool diagnosticsMode;
   } Diagnostics;
 
-  typedef enum {
-    MANUAL,
+  typedef enum : uint8_t {
+    MANUAL = 0,
     ONBOARD_COMPUTER,
     FLIGHT_CONTROLLER,
   } RobotControlSource;
@@ -177,6 +177,8 @@ public:
     TimestampedMotorLimits leftMotorLimits;
     TimestampedMotorLimits rightMotorLimits;
     RobotControlSource controlSource;
+    // TODO set this 
+    bool armed;
   } State; 
 
   static void receiveMessage(const Message &message);
@@ -198,6 +200,7 @@ public:
     };
     state.rc.channels = nullptr;
     state.controlSource = RobotControlSource::MANUAL;
+    state.armed = false;
     // TODO does the rest of `state` need to be initialised here?
   }
 

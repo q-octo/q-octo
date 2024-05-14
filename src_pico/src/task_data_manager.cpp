@@ -7,6 +7,7 @@
 #include "computer.h"
 #include "system_status.h"
 #include "wifi_state.h"
+#include "motor_enabled.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -75,8 +76,12 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       WifiState::onWifiButtonPress();
       break;
     case ENABLE_MOTORS:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case DISABLE_MOTORS:
+      controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case SET_MOTOR_SPEED_COMBINED:
       if (message.as.motorSpeedCombined.controlSource != state.controlSource) {
@@ -96,12 +101,12 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
       WifiState::onTxFailsafed();
+      MotorEnabled::onTxFailsafed();
       broadcastStateUpdate();
       break;
     case TX_RESTORED:
-      controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
-      TaskControlMotors::receiveMessage(controlMotorsMessage);
       WifiState::onTxFailsafeCleared();
+      MotorEnabled::onTxFailsafeCleared();
       broadcastStateUpdate();
       break;
     case CAN_MESSAGE_MOTOR_L:
@@ -124,6 +129,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_OK:
       state.battery = message.as.battery;
+      MotorEnabled::onBatteryVoltage(false);
       rcMessage.type = TaskRC::MessageType::BATTERY;
       rcMessage.as.battery = message.as.battery;
       TaskRC::receiveMessage(rcMessage);
@@ -131,13 +137,11 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_VOLTAGE_LOW:
       // Disable motors
-      controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
-      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      MotorEnabled::onBatteryVoltage(true);
       broadcastStateUpdate();
       break;
     case BATT_VOLTAGE_CRITICAL:
-      controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
-      TaskControlMotors::receiveMessage(controlMotorsMessage);
+      MotorEnabled::onBatteryVoltage(true);
       exit(1);
       break;
     case FOLD_WHEELS:
@@ -206,10 +210,21 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       broadcastStateUpdate();
       break;
     case TX_SWITCH_ARMED:
-      // TODO handle this
+      MotorEnabled::onTxSwitchChange(message.as.txBinarySwitch);
+      state.armed = message.as.txBinarySwitch;
+      broadcastStateUpdate();
       break;
-    case TX_SWITCH_CONTROL_SOURCE:
-      // TODO handle this
+    case TX_SWITCH_CONTROL_SOURCE: 
+      state.controlSource = message.as.txControlSourceSwitch;
+      broadcastStateUpdate();
+      // Stop motors
+      controlMotorsMessage.type = TaskControlMotors::MessageType::SET_SPEED_INDIVIDUAL;
+      controlMotorsMessage.as = {.speedIndividual = {
+        .leftSpeed = 0,
+        .rightSpeed = 0,
+        .controlSource = state.controlSource
+      }};
+      TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case TX_SWITCH_WEB_SERVER:
       WifiState::onTxSwitchChange(message.as.txBinarySwitch);
