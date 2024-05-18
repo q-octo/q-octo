@@ -15,7 +15,7 @@
 #include "task_power_monitor.h"
 #include "buttons.h"
 #include "task_data_manager.h"
-#include "wifi_state.h"
+#include "enable_wifi.h"
 
 #define CORE_0 (1 << 0)
 #define CORE_1 (1 << 1)
@@ -54,7 +54,7 @@ void setup() {
   Computer::init();
   Watchdog::init();
   Buttons::init();
-  WifiState::init();
+  EnableWifi::init();
   initTasks();
 }
 

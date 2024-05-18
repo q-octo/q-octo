@@ -1,10 +1,10 @@
-#include "wifi_state.h"
+#include "enable_wifi.h"
 #include "storage.h"
 #include "task_data_manager.h"
 
-void WifiState::init() {}
+void EnableWifi::init() {}
 
-void WifiState::onPhysicalSwitchChange(bool on)
+void EnableWifi::onPhysicalSwitchChange(bool on)
 {
     if (physicalSwitchOn == on && physicalSwitchInitialised)
     {
@@ -36,7 +36,7 @@ void WifiState::onPhysicalSwitchChange(bool on)
     }
 }
 
-void WifiState::onTxSwitchChange(bool on)
+void EnableWifi::onTxSwitchChange(bool on)
 {
     Serial.println("onTxSwitchChange: " + String(on ? "on" : "off"));
     if (txSwitchOn == on && txSwitchInitialised)
@@ -69,12 +69,12 @@ void WifiState::onTxSwitchChange(bool on)
     }
 }
 
-void WifiState::onTxFailsafed()
+void EnableWifi::onTxFailsafed()
 {
     failsafed = true;
 }
 
-void WifiState::onTxFailsafeCleared()
+void EnableWifi::onTxFailsafeCleared()
 {
     failsafed = false;
     /*
@@ -85,13 +85,13 @@ void WifiState::onTxFailsafeCleared()
     */
 }
 
-void WifiState::onWifiButtonPress()
+void EnableWifi::onWifiButtonPress()
 {
     const bool forcedOff = !physicalSwitchOn || !txSwitchOn;
     setWifiState(!forcedOff && !wifiEnabled);
 }
 
-void WifiState::setWifiState(bool on)
+void EnableWifi::setWifiState(bool on)
 {
     if (wifiEnabled == on)
     {
@@ -106,7 +106,7 @@ void WifiState::setWifiState(bool on)
     DataManager::receiveMessage(message);
 }
 
-void WifiState::onSwitchesInitialised()
+void EnableWifi::onSwitchesInitialised()
 {
     Serial.println("[INFO] onSwitchesInitialised");
     switchesInitialised = true;

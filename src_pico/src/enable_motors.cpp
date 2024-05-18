@@ -1,33 +1,33 @@
-#include "motor_enabled.h"
+#include "enable_motors.h"
 #include "task_data_manager.h"
 #include "config.h"
 
 
-void MotorEnabled::onTxFailsafed()
+void EnableMotors::onTxFailsafed()
 {
     failsafed = true;
     notify();
 }
 
-void MotorEnabled::onTxFailsafeCleared()
+void EnableMotors::onTxFailsafeCleared()
 {
     failsafed = false;
     notify();
 }
 
-void MotorEnabled::onTxSwitchChange(bool on)
+void EnableMotors::onTxSwitchChange(bool on)
 {
     armed = on;
     notify();
 }
 
-void MotorEnabled::onBatteryVoltage(bool low)
+void EnableMotors::onBatteryVoltage(bool low)
 {
     lowBattery = low;
     notify();
 }
 
-void MotorEnabled::notify()
+void EnableMotors::notify()
 {
     if (isMotorEnabled() == lastMotorEnabled)
     {
@@ -41,7 +41,7 @@ void MotorEnabled::notify()
     DataManager::receiveMessage(message);
 }
 
-bool MotorEnabled::isMotorEnabled()
+bool EnableMotors::isMotorEnabled()
 {
     bool enabled = true;
     enabled = enabled && !failsafed;

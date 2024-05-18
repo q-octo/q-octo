@@ -7,7 +7,7 @@ Decides whether or not the motor is enabled based on:
 * Arm switch
 */
 
-class MotorEnabled {
+class EnableMotors {
 public:
     static void onTxFailsafed();
     static void onTxFailsafeCleared();

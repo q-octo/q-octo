@@ -1,6 +1,6 @@
 #pragma once
 
-class WifiState
+class EnableWifi
 {
 public:
     static void init();

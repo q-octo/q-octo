@@ -6,8 +6,8 @@
 #include "companion.h"
 #include "computer.h"
 #include "system_status.h"
-#include "wifi_state.h"
-#include "motor_enabled.h"
+#include "enable_wifi.h"
+#include "enable_motors.h"
 
 /*
 This task will have a higher priority than the tasks that message it.
@@ -64,7 +64,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       setWebServerEnabled(false);
       break;
     case DISPLAY_WEB_SERVER_BTN_PRESSED:
-      WifiState::onWifiButtonPress();
+      EnableWifi::onWifiButtonPress();
       break;
     case ENABLE_MOTORS:
       controlMotorsMessage.type = TaskControlMotors::MessageType::ENABLE;
@@ -91,13 +91,13 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
     case TX_LOST:
       controlMotorsMessage.type = TaskControlMotors::MessageType::DISABLE;
       TaskControlMotors::receiveMessage(controlMotorsMessage);
-      WifiState::onTxFailsafed();
-      MotorEnabled::onTxFailsafed();
+      EnableWifi::onTxFailsafed();
+      EnableMotors::onTxFailsafed();
       broadcastStateUpdate();
       break;
     case TX_RESTORED:
-      WifiState::onTxFailsafeCleared();
-      MotorEnabled::onTxFailsafeCleared();
+      EnableWifi::onTxFailsafeCleared();
+      EnableMotors::onTxFailsafeCleared();
       broadcastStateUpdate();
       break;
     case CAN_MESSAGE_MOTOR_L:
@@ -120,7 +120,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_OK:
       state.battery = message.as.battery;
-      MotorEnabled::onBatteryVoltage(false);
+      EnableMotors::onBatteryVoltage(false);
       rcMessage.type = TaskRC::MessageType::BATTERY;
       rcMessage.as.battery = message.as.battery;
       TaskRC::receiveMessage(rcMessage);
@@ -128,11 +128,11 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       break;
     case BATT_VOLTAGE_LOW:
       // Disable motors
-      MotorEnabled::onBatteryVoltage(true);
+      EnableMotors::onBatteryVoltage(true);
       broadcastStateUpdate();
       break;
     case BATT_VOLTAGE_CRITICAL:
-      MotorEnabled::onBatteryVoltage(true);
+      EnableMotors::onBatteryVoltage(true);
       exit(1);
       break;
     case FOLD_WHEELS:
@@ -140,21 +140,21 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case DISPLAY_BUTTON_PRESSED:
-      WifiState::onWifiButtonPress();
+      EnableWifi::onWifiButtonPress();
       computerMessage.type = Computer::MessageType::DISPLAY_BUTTON;
       computerMessage.as = {.displayButton = message.as.displayButton};
       Computer::receiveMessage(computerMessage);
       break;
     case BUTTON_DOWN:
       if (message.as.physicalButton == PhysicalButton::WEB_SERVER) {
-        WifiState::onPhysicalSwitchChange(true);
+        EnableWifi::onPhysicalSwitchChange(true);
       } else if (message.as.physicalButton == PhysicalButton::MOTORS) {
         // TODO implement
       }
       break;
     case BUTTON_UP:
       if (message.as.physicalButton == PhysicalButton::WEB_SERVER) {
-        WifiState::onPhysicalSwitchChange(false);
+        EnableWifi::onPhysicalSwitchChange(false);
       } else if (message.as.physicalButton == PhysicalButton::MOTORS) {
         // TODO implement
       }
@@ -201,7 +201,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       broadcastStateUpdate();
       break;
     case TX_SWITCH_ARMED:
-      MotorEnabled::onTxSwitchChange(message.as.txBinarySwitch);
+      EnableMotors::onTxSwitchChange(message.as.txBinarySwitch);
       state.armed = message.as.txBinarySwitch;
       broadcastStateUpdate();
       break;
@@ -218,7 +218,7 @@ void DataManager::receiveMessage(const DataManager::Message &message) {
       TaskControlMotors::receiveMessage(controlMotorsMessage);
       break;
     case TX_SWITCH_WEB_SERVER:
-      WifiState::onTxSwitchChange(message.as.txBinarySwitch);
+      EnableWifi::onTxSwitchChange(message.as.txBinarySwitch);
       break;
     default:
       Serial.println("[ERROR] Unknown message type");
