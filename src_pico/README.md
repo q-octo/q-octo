@@ -1,13 +1,13 @@
-## Notes to self
+# Q-Octo
 
-How to compile...
+## Setup
 
-Speed is in rad/s
+1. Clone this repo
+2. Run `git submodule update --init`
 
-https://www.instructables.com/Using-RP2040-PIO-in-Arduino-IDE-on-Windows/
+VSCode with the PlatformIO extension or CLion with the PlatformIO Plugin is recommended.
 
-
-`git submodule update --init`
+### Web Dashboard
 
 `curl -fsSL https://bun.sh/install | bash` (https://bun.sh/docs/installation#installing)
 
@@ -18,24 +18,5 @@ https://www.instructables.com/Using-RP2040-PIO-in-Arduino-IDE-on-Windows/
 * https://github.com/earlephilhower/arduino-pico?tab=readme-ov-file#windows-specific-notes
 
 
-
-## FreeRTOS
-
-https://arduino-pico.readthedocs.io/en/latest/freertos.html
-
-Priority levels range from 0 to 7.
-
-`delay()` and `yield()` free the CPU for other tasks, while delayMicroseconds() does not.
-
-
-## Web Server
-
-Example code:
-* https://github.com/Links2004/arduinoWebSockets/tree/master/examples/esp8266_pico
-* https://github.com/earlephilhower/arduino-pico/tree/master/libraries/WebServer/examples
-
-## Configurations
-
-Include `config.h` to use any of the `CFG_<config name>` properties
 
 ## Licensing and Credits
