@@ -9,7 +9,6 @@ static const int CFG_ENABLE_COMPANION = 1;
 static const int CFG_ENABLE_ONBOARD_COMPUTER = 0;
 static const int CFG_WAIT_FOR_USB_SERIAL = 0;
 
-static const int CFG_DEBUG_LIST_TASKS = 0;
 static const int CFG_DEBUG_WIPE_STORAGE = 0;
 // Control source & armed switch don't work with the smaller transmitter yet
 static const int CFG_ENABLE_EXTRA_SWITCHES = 0;
