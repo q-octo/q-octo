@@ -83,6 +83,7 @@ private:
   static inline bool wifiSwitch = false;
   static inline DataManager::RobotControlSource controlSource = DataManager::MANUAL;
   static inline bool firstRcChannels = true;
+  static inline crsf_instance receiverCrsfIns;
 
   static inline StorageState &state = Storage::getState();
   

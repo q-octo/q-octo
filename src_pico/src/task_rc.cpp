@@ -12,8 +12,8 @@
 #define RC_LINK_STATS_LOG_FREQUENCY 2000 // ms
 
 void TaskRC::setThresholds() {
-  crsf_set_link_quality_threshold(state.linkQualityThreshold);
-  crsf_set_rssi_threshold(state.rssiThreshold);
+  crsf_set_link_quality_threshold(&receiverCrsfIns, state.linkQualityThreshold);
+  crsf_set_rssi_threshold(&receiverCrsfIns, state.rssiThreshold);
 }
 
 void TaskRC::init() {
@@ -21,11 +21,12 @@ void TaskRC::init() {
     return;
   }
 
+  crsf_init(&receiverCrsfIns);
   setThresholds();
-  crsf_set_on_link_statistics(onLinkStatisticsUpdate);
-  crsf_set_on_rc_channels(onReceiveChannels);
-  crsf_set_on_failsafe(onFailsafe);
-  crsf_begin(uart0, CFG_RC_UART_TX, CFG_RC_UART_RX);
+  crsf_set_on_link_statistics(&receiverCrsfIns, onLinkStatisticsUpdate);
+  crsf_set_on_rc_channels(&receiverCrsfIns, onReceiveChannels);
+  crsf_set_on_failsafe(&receiverCrsfIns, onFailsafe);
+  crsf_begin(&receiverCrsfIns, uart0, CFG_RC_UART_TX, CFG_RC_UART_RX);
 
   Serial.println("RC class init complete");
 }
@@ -34,7 +35,7 @@ void TaskRC::loop() {
   if (!CFG_ENABLE_RC) {
     return;
   }
-  crsf_process_frames();
+  crsf_process_frames(&receiverCrsfIns);
   const uint32_t currentMillis = millis();
   if (currentMillis - lastBroadcastMs >= BROADCAST_FREQUENCY) {
     lastBroadcastMs = currentMillis;
@@ -68,7 +69,7 @@ void TaskRC::receiveMessage(const Message &message) {
 
   switch (message.type) {
     case BATTERY:
-      crsf_telem_set_battery_data(
+      crsf_telem_set_battery_data(&receiverCrsfIns, 
               message.as.battery.voltage * 10,
               message.as.battery.current * 10,
               message.as.battery.fuel,
@@ -122,7 +123,7 @@ void TaskRC::sendStateAsTelem(const DataManager::State &state) {
   0x00, 0x00, -- Speed Ki
 }
   */
-  crsf_telem_set_custom_payload(buffer, payloadSize);
+  crsf_telem_set_custom_payload(&receiverCrsfIns, buffer, payloadSize);
 }
 
 void TaskRC::onLinkStatisticsUpdate(const link_statistics_t linkStatistics) {
