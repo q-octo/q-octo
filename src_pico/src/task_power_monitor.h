@@ -4,11 +4,13 @@
 #include "storage.h"
 #include <canard.h>
 #include <uavcan.equipment.power.BatteryInfo.h>
+#include "crsf.h"
 
 class TaskPowerMonitor {
 public:
   typedef enum {
     CAN_MESSAGE,
+    FLIGHT_CON_MESSAGE,
   } MessageType;
 
   typedef struct {
@@ -17,6 +19,7 @@ public:
       DataManager::CanMessage canMessage;
       float voltageThreshold;
       int batteryCount;
+      crsf_payload_battery_sensor_t crsf_battery;
     } as;
 
   } Message;
@@ -33,6 +36,7 @@ private:
                                    CanardTransferType transfer_type, uint8_t source_node_id);
 
   static void handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+  static void handleBattery(const float voltage, const float current);
 
   static uint8_t voltageToBatteryPercent(float voltage);
 

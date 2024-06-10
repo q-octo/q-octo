@@ -12,6 +12,8 @@
 #include "buttons.h"
 #include "task_data_manager.h"
 #include "enable_wifi.h"
+#include "flight_controller.h"
+
 
 void setup() {
   Serial.begin(115200);
@@ -33,6 +35,7 @@ void setup() {
   Watchdog::init();
   Buttons::init();
   EnableWifi::init();
+  FlightController::init();
 }
 
 void loop() {

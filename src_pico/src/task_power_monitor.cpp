@@ -2,6 +2,8 @@
 #include "task_power_monitor.h"
 #include "storage.h"
 
+// TODO strip out CAN logic once Flight Controller logic is confirmed to work
+
 void TaskPowerMonitor::init() {
   if (!CFG_ENABLE_POWER_MONITOR) {
     return;
@@ -33,6 +35,10 @@ void TaskPowerMonitor::receiveMessage(const Message &message) {
       memcpy(rx_frame.data, msg.data, msg.len);
       canardHandleRxFrame(&canard, &rx_frame, micros());
       break;
+    }
+    case MessageType::FLIGHT_CON_MESSAGE: {
+      auto battery = message.as.crsf_battery;
+      handleBattery(battery.voltage, battery.current);
     }
   }
 }
@@ -99,6 +105,42 @@ uint8_t TaskPowerMonitor::voltageToBatteryPercent(float voltage) {
   return static_cast<uint8_t>(percent);
 }
 
+
+void TaskPowerMonitor::handleBattery(const float voltage, const float current) {
+  static DataManager::Message taskMessage{};
+  // Reset it
+  taskMessage = DataManager::Message{};
+
+  // There are 5 * 2 cells (parallel) each rated 3.6V so 3.6V * 5 = 18V
+  // So we can expect 18V * 4Ah = 72Wh?
+  // https://www.youtube.com/watch?v=WAKL66FG_0I
+  
+  if (voltage <= state.criticalVoltageThreshold) {
+    Serial.println("[WARN] Battery voltage critical, shutting down");
+    taskMessage.type = DataManager::Type::BATT_VOLTAGE_CRITICAL;
+  } else if (voltage <= state.lowVoltageThreshold) {
+    Serial.println("[WARN] Battery voltage low, disabling motors");
+    taskMessage.type = DataManager::Type::BATT_VOLTAGE_LOW;
+  } else {
+    const uint8_t batteryPercent = voltageToBatteryPercent(voltage);
+    // cells * 4000mAh
+    const uint32_t batteryFuel = state.batteryCount * 4000;
+    taskMessage = {
+            .type = DataManager::Type::BATT_OK,
+            .as = {
+                    .battery = {
+                            .voltage = voltage,
+                            .current = current,
+                            .fuel = batteryFuel,
+                            .percent = batteryPercent,
+                    },
+            },
+    };
+  }
+  // This will be reentrant (in the CAN case)!
+  DataManager::receiveMessage(taskMessage);
+}
+
 void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTransfer *transfer) {
   uavcan_equipment_power_BatteryInfo msg{};
   if (uavcan_equipment_power_BatteryInfo_decode(transfer, &msg)) {
@@ -106,36 +148,6 @@ void TaskPowerMonitor::handlePowerBatteryInfo(CanardInstance *ins, CanardRxTrans
     return;
   }
 
-  // There are 5 * 2 cells (parallel) each rated 3.6V so 3.6V * 5 = 18V
-  // So we can expect 18V * 4Ah = 72Wh?
-  // https://www.youtube.com/watch?v=WAKL66FG_0I
-
-  static DataManager::Message taskMessage{};
-  // Reset it
-  taskMessage = DataManager::Message{};
-
   // TODO check every x ms consecutively in case we get a temporary voltage drop
-
-  if (msg.voltage <= state.criticalVoltageThreshold) {
-    Serial.println("[WARN] Battery voltage critical, shutting down");
-    taskMessage.type = DataManager::Type::BATT_VOLTAGE_CRITICAL;
-  } else if (msg.voltage <= state.lowVoltageThreshold) {
-    Serial.println("[WARN] Battery voltage low, disabling motors");
-    taskMessage.type = DataManager::Type::BATT_VOLTAGE_LOW;
-  } else {
-    const uint8_t batteryPercent = voltageToBatteryPercent(msg.voltage);
-    taskMessage = {
-            .type = DataManager::Type::BATT_OK,
-            .as = {
-                    .battery = {
-                            .voltage = msg.voltage,
-                            .current = msg.current,
-                            .fuel = 4 * 4000, // 4 cells * 4000mAh
-                            .percent = batteryPercent,
-                    },
-            },
-    };
-  }
-  // This will be reentrant!
-  DataManager::receiveMessage(taskMessage);
+  handleBattery(msg.voltage, msg.current);
 }

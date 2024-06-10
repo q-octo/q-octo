@@ -22,5 +22,7 @@ static const int CFG_ONBOARD_COMPUTER_UART_TX = 4;
 static const int CFG_ONBOARD_COMPUTER_UART_RX = 5;
 static const int CFG_VOICE_UART_TX = 6;
 static const int CFG_VOICE_UART_RX = 7;
+// static const int CFG_FLIGHT_CONTROLLER_UART_TX = 8;
+static const int CFG_FLIGHT_CONTROLLER_UART_RX = 9;
 static const int CFG_BTN_START_WEB_SERVER = 14;
 static const int CFG_BTN_DISABLE_MOTORS = 15;
