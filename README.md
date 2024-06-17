@@ -63,4 +63,5 @@ VSCode with the PlatformIO extension or CLion with the PlatformIO Plugin is reco
 * cybergear
 * CRC
 
-Q-Octo was originally designed for [ELEC6212: Biologically Inspired Robotics](https://www.southampton.ac.uk/courses/modules/elec6212), a fourth year module at the University of Southampton.
+Q-Octo was originally designed for [ELEC6212: Biologically Inspired Robotics](https://www.southampton.ac.uk/courses/modules/elec6212), a fourth-year module at the University of Southampton.
+Q-Octo was inspired by [Q-Whex](https://www.youtube.com/watch?v=UJHbiZUROM8).
