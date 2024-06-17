@@ -9,7 +9,8 @@
 
 YouTube Video: https://www.youtube.com/watch?v=2PIdxYJO_Ck.
 
-[Q-Octo](https://www.youtube.com/watch?v=2PIdxYJO_Ck) is an eight-quasi-wheeled robotics platform. It is designed to excel at forest traversal, easily being able to clamber over small logs and rocks due to its uniquely shaped wheels. However, due to each pair of neighboring wheels being 180 degrees out of phase, the robot can run smoothly as if it had circular wheels when on flat ground.
+
+<img width="756" alt="image" src="https://github.com/q-octo/q-octo/assets/33752528/bc9f5f3a-bdaf-45e1-b646-cccf347db1b5">
 
 Q-Octo uses a pair of [CyberGear MicroMotors](https://www.aliexpress.com/item/1005005997659365.html), which provide not only high torque and speed but also feedback such as current amp draw and position. To power the motors, 4 [Parkside X20V](https://parkside-diy.com/gb/battery-technology/x20v-team) drill batteries are used, providing 6-hour continuous runtime paired with robust and safe recharging.
 
@@ -24,6 +25,8 @@ To build a Q-Octo, both a 3D printer and a laser cutter are required. It is suff
 * CAD design: https://github.com/JoshPattman/q-octo-cad
 * CRSF Reciever for the RP2040 (Raspberry Pi Pico): https://github.com/britannio/pico_crsf
 * EdgeTX transmitter script: https://github.com/q-octo/transmitter
+
+
 
 
 ## Setup
