@@ -1,5 +1,22 @@
 {
     "arduino.additionalUrls": [
         "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
-    ]
+    ],
+    "files.exclude": {
+        "**/*.vo": true,
+        "**/*.vok": true,
+        "**/*.vos": true,
+        "**/*.aux": true,
+        "**/*.glob": true,
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    }
 }
