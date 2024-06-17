@@ -3,6 +3,7 @@
 # Q-Octo
 
 <img src="img/side-view.png" width=64%/> <img src="img/chassis-ntp.png" width=34.5%/>
+<img src="https://github.com/q-octo/q-octo/assets/33752528/24593326-1585-46a0-86e6-9ef348a07ced" width=99%/>
 
 
 ## About Q-Octo
@@ -17,7 +18,7 @@ Q-Octo uses a pair of [CyberGear MicroMotors](https://www.aliexpress.com/item/10
 Q-Octo is controlled via a Raspberry Pi Pico with the display and web server managed via a Raspberry Pi Pico W.
 The main pico communicates with the [radio controller](https://github.com/q-octo/transmitter) to receive control commands however, navigation via a separate onboard computer or via a flight controller is planned.
 
-To build a Q-Octo, both a 3D printer and a laser cutter are required. It is sufficient to manufacture all 3D printed parts out of [Esun PLA+](https://www.esun3d.com/pla-pro-product/), providing excellent durability. All laser-cut parts (*except the front and rear battery cover) can be cut from 6 mm thick plyboard, which provides adequate rigidity and durability, assuming it is coated in outdoor paint.
+To build a Q-Octo, both a 3D printer and a laser cutter are required. It is sufficient to manufacture all 3D printed parts out of [Esun PLA+](https://www.esun3d.com/pla-pro-product/), providing excellent durability. All laser-cut parts (*except the front and rear battery cover) can be cut from 6mm thick plyboard, which provides adequate rigidity and durability, assuming it is coated in outdoor paint.
 
 
 ## Related Repositories
